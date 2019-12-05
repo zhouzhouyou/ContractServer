@@ -9,8 +9,8 @@ import java.util.List;
 @Mapper
 @Component
 public interface ActMapper {
-    @Select("select * from act where userName =#{userName} and roleName =#{roleName}")
-    Act select(String userName,String roleName);
+    @Select("select roleName from act where userName =#{userName}")
+    List<String> FindByUsername(String userName);
 
     @Select("select * from act")
     List<Act> selectAll();

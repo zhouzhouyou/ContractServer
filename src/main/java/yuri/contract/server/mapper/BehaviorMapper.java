@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public interface BehaviorMapper {
     @Select("select * from behavior where roleName =#{roleName} and num =#{num}")
-    Behavior select(String roleName,String num);
+    Behavior select(String roleName, String num);
 
     @Select("select * from behavior")
     List<Behavior> selectAll();

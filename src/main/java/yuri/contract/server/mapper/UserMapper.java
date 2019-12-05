@@ -12,6 +12,12 @@ public interface UserMapper {
     @Select("select * from user where name=#{name} and password=#{password}")
     User select(String name, String password);
 
+    @Select("select * from user where name=#{name}")
+    User findUserByName(String name);
+
+    @Select("select count(*) from user where name=#{name}")
+    int count(String name);
+
     @Select("select * from user")
     List<User> selectAll();
 

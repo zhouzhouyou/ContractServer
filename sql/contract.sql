@@ -174,9 +174,3 @@ CREATE TABLE contract_attachment
 );
 
 DROP TABLE IF EXISTS login;
-CREATE TABLE login
-(
-    userName varchar(40) REFERENCES user (name) ON DELETE CASCADE ,
-    token text not null,
-    primary key (userName)
-)
