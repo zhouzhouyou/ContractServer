@@ -125,20 +125,20 @@ CREATE TABLE contract
 (
     num         varchar(20) primary key,
     name        varchar(40) not null,
-    customerNum varchar(20) REFERENCES customer (num),
+    customerNum varchar(20) REFERENCES customer (num) ON DELETE CASCADE,
     begin       date        not null,
     end         date        not null,
     content     text        not null,
-    userName    varchar(40) REFERENCES user (name)
+    userName    varchar(40) REFERENCES user (name) ON DELETE NO ACTION
 );
 
 DROP TABLE IF EXISTS contract_process;
 CREATE TABLE contract_process
 (
-    contractNum varchar(20) REFERENCES contract (num),
+    contractNum varchar(20) REFERENCES contract (num) ON DELETE CASCADE ,
     type        integer not null,
     state       integer not null,
-    userName    varchar(40) REFERENCES user (name),
+    userName    varchar(40) REFERENCES user (name) ON DELETE CASCADE ,
     content     text,
     time        date,
     primary key (contractNum, type, userName)
@@ -147,7 +147,7 @@ CREATE TABLE contract_process
 DROP TABLE IF EXISTS contract_state;
 CREATE TABLE contract_state
 (
-    contractNum varchar(20) REFERENCES contract (num),
+    contractNum varchar(20) REFERENCES contract (num) ON DELETE CASCADE ,
     type        integer not null,
     time        date,
     primary key (contractNum)
@@ -156,7 +156,7 @@ CREATE TABLE contract_state
 DROP TABLE IF EXISTS contract_log;
 CREATE TABLE contract_log
 (
-    userName varchar(40) REFERENCES user (name),
+    userName varchar(40) REFERENCES user (name) ON DELETE NO ACTION ,
     content text,
     time date,
     primary key (userName, time)
@@ -165,10 +165,18 @@ CREATE TABLE contract_log
 DROP TABLE IF EXISTS contract_attachment;
 CREATE TABLE contract_attachment
 (
-    contractNum varchar(20) REFERENCES contract (num),
+    contractNum varchar(20) REFERENCES contract (num) ON DELETE CASCADE ,
     fileName varchar(100) not null,
     path varchar(100) not null,
     type varchar(20) not null,
     uploadTime date,
     primary key (contractNum)
 );
+
+DROP TABLE IF EXISTS login;
+CREATE TABLE login
+(
+    userName varchar(40) REFERENCES user (name) ON DELETE CASCADE ,
+    token text not null,
+    primary key (userName)
+)
