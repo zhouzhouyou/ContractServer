@@ -2,6 +2,7 @@ package yuri.contract.server.controlller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -12,17 +13,21 @@ import yuri.contract.server.service.SignInService;
 import yuri.contract.server.service.UserService;
 import yuri.contract.server.util.annotation.NeedToken;
 import yuri.contract.server.util.response.ResponseFactory;
+
+import javax.servlet.http.HttpServletRequest;
+
 @Api(tags = "To Control user operations")
 @RestController
 @RequestMapping("/api")
-public class UserController {
+public class UserController extends BaseController{
     private final SignInService loginService;
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService, SignInService loginService) {
-        this.userService = userService;
+    public UserController(HttpServletRequest request, SignInService loginService, UserService userService) {
+        super(request);
         this.loginService = loginService;
+        this.userService = userService;
     }
 
     @ApiOperation("Handle sign in")
@@ -52,15 +57,18 @@ public class UserController {
         return ResponseFactory.success("test!");
     }
 
-//    @CrossOrigin
-//    @DeleteMapping(value = "/delete")
-//    @ResponseBody
-//    public ResponseEntity<String> deleteUser(@RequestBody DeleteUserModel deleteUserModel, BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-//        String token = deleteUserModel.getToken();
-//        if ()
-//    }
 
+    @CrossOrigin
+    @DeleteMapping(value = "/delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteUser(@RequestBody Name name, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+        return userService.deleteUserByName(getOperator(), name.getName());
+    }
 
+    @Data
+    private static class Name {
+        private String name;
+    }
 
 }
