@@ -1,44 +1,49 @@
 package yuri.contract.server.controlller;
 
-import lombok.Data;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 import yuri.contract.server.model.User;
-import yuri.contract.server.service.LoginService;
+import yuri.contract.server.service.SignInService;
 import yuri.contract.server.service.UserService;
 import yuri.contract.server.util.annotation.NeedToken;
 import yuri.contract.server.util.response.ResponseFactory;
-
+@Api(tags = "To Control user operations")
 @RestController
 @RequestMapping("/api")
 public class UserController {
-    private final LoginService loginService;
+    private final SignInService loginService;
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService, LoginService loginService) {
+    public UserController(UserService userService, SignInService loginService) {
         this.userService = userService;
         this.loginService = loginService;
     }
 
+    @ApiOperation("Handle sign in")
     @CrossOrigin
-    @PostMapping(value = "/login", produces = "application/json; charset=UTF-8")
+    @PostMapping(value = "/signIn", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<String> loginPost(@RequestBody User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return loginService.login(user.getName(), user.getPassword());
-    }
-
-    @CrossOrigin
-    @PostMapping(value = "/signIn")
-    @ResponseBody
-    public ResponseEntity<String> signIn(@RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return loginService.signIn(user.getName(), user.getPassword());
     }
 
+    @ApiOperation("Handle sign up")
+    @CrossOrigin
+    @PostMapping(value = "/signUp")
+    @ResponseBody
+    public ResponseEntity<String> signUp(@RequestBody User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+        return loginService.signUp(user.getName(), user.getPassword());
+    }
+
+    @ApiIgnore
     @CrossOrigin
     @RequestMapping("/test")
     @ResponseBody

@@ -21,7 +21,7 @@ public interface ContractStateMapper {
     List<ContractState> selectAll();
 
     @Insert("insert into contract_state values(#{contractNum},#{type},#{time})")
-    int insert(String contractNum, OperationType type, Date time);
+    int insert(String contractNum, int type, Date time);
 
     @Delete("delete from contract_state where contractNum =#{contractNum}")
     int delete(String contractNum);

@@ -2,6 +2,7 @@ package yuri.contract.server.mapper;
 
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
+import yuri.contract.server.model.Customer;
 
 import java.util.List;
 
@@ -9,10 +10,10 @@ import java.util.List;
 @Component
 public interface CustomerMapper {
     @Select("select * from customer where num =#{num}")
-    CustomerMapper select(String num);
+    Customer select(String num);
 
     @Select("select * from customer")
-    List<CustomerMapper> selectAll();
+    List<Customer> selectAll();
 
     @Insert("insert into customer values(#{num},#{name},#{address},#{tel},#{fax},#{code},#{bank},#{account})")
     int insert(String num,String name,String address,String tel,String fax,String code,String bank,String account);

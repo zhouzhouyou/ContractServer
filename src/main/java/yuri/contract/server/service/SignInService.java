@@ -10,22 +10,22 @@ import yuri.contract.server.util.response.ResponseFactory;
 
 @Service
 @Component
-public class LoginService {
+public class SignInService {
     private final UserMapper userMapper;
 
     @Autowired
-    public LoginService(UserMapper userMapper) {
+    public SignInService(UserMapper userMapper) {
         this.userMapper = userMapper;
     }
 
-    public ResponseEntity<String> login(String name, String password) {
+    public ResponseEntity<String> signIn(String name, String password) {
         if (userMapper.select(name, password) != null) {
             return ResponseFactory.success(SecurityUtils.getToken(name));
         }
         return ResponseFactory.unauthorized(name);
     }
 
-    public ResponseEntity<String> signIn(String name, String password) {
+    public ResponseEntity<String> signUp(String name, String password) {
         if (userMapper.count(name) > 0) return ResponseFactory.badRequest(name + " exists");
         userMapper.insert(name, password);
         return ResponseFactory.success(SecurityUtils.getToken(name));
