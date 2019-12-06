@@ -8,6 +8,10 @@ import lombok.Data;
 @Data
 public class Role {
     /**
+     * 自增的ID
+     */
+    private Integer id;
+    /**
      * 角色名称
      */
     private String name;

@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 public class Behavior {
     /**
-     * 角色名
+     * 角色id
      */
-    private String roleName;
+    private Integer roleId;
 
     /**
      * 功能编号

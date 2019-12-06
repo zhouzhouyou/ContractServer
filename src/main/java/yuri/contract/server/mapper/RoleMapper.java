@@ -9,20 +9,23 @@ import java.util.List;
 @Mapper
 @Component
 public interface RoleMapper {
-    @Select("select * from role where name =#{name}")
+    @Select("select * from role where name = #{name}")
     Role select(String name);
 
     @Select("select * from role")
     List<Role> selectAll();
 
-    @Insert("insert into role values(#{name},#{description})")
-    int insert(String name,String description);
+    @Select("select count(*) from role where id = #{id}")
+    int exists(String id);
 
-    @Update("update role set description =#{description} where name =#{name}")
-    int updateDescription(String description,String name);
+    @Insert("insert into role (name, description) values(#{name}, #{description})")
+    int insert(String name, String description);
 
-    @Delete("delete from role where name =#{name}")
-    int delete(String name);
+    @Update("update role set name = #{name}, description = #{description} where id = #{id}")
+    int updateDescription(String name, String description, int id);
+
+    @Delete("delete from role where id =#{id}")
+    int delete(int id);
 
     @Delete("delete from role")
     int deleteAll();

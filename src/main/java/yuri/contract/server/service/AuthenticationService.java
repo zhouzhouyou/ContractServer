@@ -22,8 +22,15 @@ public class AuthenticationService {
         this.actMapper = actMapper;
     }
 
+    /**
+     * 通过用户名来判断是否拥有某个权限
+     *
+     * @param user     用户
+     * @param function 权限
+     * @return 是否拥有该权限
+     */
     public boolean hasFunction(User user, String function) {
-        List<String> roles = actMapper.FindByUsername(user.getName());
+        List<Integer> roles = actMapper.FindByUsername(user.getName());
         for (var role : roles) {
             Behavior behavior = behaviorMapper.select(role, function);
             if (behavior != null) return true;

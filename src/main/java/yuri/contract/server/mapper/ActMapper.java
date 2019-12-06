@@ -9,20 +9,20 @@ import java.util.List;
 @Mapper
 @Component
 public interface ActMapper {
-    @Select("select roleName from act where userName =#{userName}")
-    List<String> FindByUsername(String userName);
+    @Select("select roleId from act where userName =#{userName}")
+    List<Integer> FindByUsername(String userName);
 
     @Select("select * from act")
     List<Act> selectAll();
 
-    @Insert("insert into act values(#{userName},#{roleName},#{description})")
-    int insert(String userName,String roleName,String description);
+    @Insert("insert into act values(#{userName},#{roleId},#{description})")
+    int insert(String userName, Integer roleId, String description);
 
-    @Update("update act set description =#{description} where userName =#{userName} and roleName =#{roleName}")
-    int updateDescription(String userName,String roleName,String description);
+    @Update("update act set description =#{description} where userName =#{userName} and roleId =#{roleId}")
+    int updateDescription(String userName, Integer roleId, String description);
 
-    @Delete("delete from act where userName =#{userName} and roleName =#{roleName}")
-    int delete(String userName,String roleName);
+    @Delete("delete from act where userName =#{userName} and roleId =#{roleId}")
+    int delete(String userName, Integer roleId);
 
     @Delete("delete from act")
     int deleteAll();

@@ -18,6 +18,7 @@ public abstract class BaseController {
 
     /**
      * 获取token中对应的username
+     *
      * @return 当前token属于哪一个user
      */
     protected String getOperator() {

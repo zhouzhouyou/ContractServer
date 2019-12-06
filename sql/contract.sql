@@ -15,17 +15,18 @@ INSERT INTO user VALUES ('jxl', 'jxl');
 DROP TABLE IF EXISTS role;
 CREATE TABLE role
 (
-    name        varchar(40) primary key,
+    id          int primary key auto_increment,
+    name        varchar(40),
     description varchar(100)
 );
-INSERT INTO role VALUES ('管理员', '对系统进行管理，拥有管理最高权限，用来维护系统的正常运行。');
-INSERT INTO role VALUES ('操作员', '负责合同操作流程的管理，并可以跟踪合同的不同阶段。');
+INSERT INTO role (name, description) VALUES ('管理员', '对系统进行管理，拥有管理最高权限，用来维护系统的正常运行。');
+INSERT INTO role (name, description) VALUES ('操作员', '负责合同操作流程的管理，并可以跟踪合同的不同阶段。');
 
 DROP TABLE IF EXISTS `function`;
 CREATE TABLE `function`
 (
     num         varchar(10) primary key,
-    name        varchar(40) not null,
+    name        varchar(40) unique not null,
     description varchar(100)
 );
 INSERT INTO `function` values ('0', '起草合同', '');
@@ -60,52 +61,52 @@ DROP TABLE IF EXISTS act;
 CREATE TABLE act
 (
     username    varchar(40) REFERENCES `user` (name) ON DELETE CASCADE,
-    roleName    varchar(40) REFERENCES `role` (name) ON DELETE CASCADE,
+    roleId      int REFERENCES `role` (id) ON DELETE CASCADE,
     description varchar(100),
-    primary key (username, roleName)
+    primary key (username, roleId)
 );
-INSERT INTO act VALUES ('system', '管理员', '');
-INSERT INTO act VALUES ('zzy', '管理员', '');
-INSERT INTO act VALUES ('ckf', '管理员', '');
-INSERT INTO act VALUES ('czl', '管理员', '');
-INSERT INTO act VALUES ('ly', '管理员', '');
-INSERT INTO act VALUES ('jxl', '管理员', '');
-INSERT INTO act VALUES ('test', '操作员', '');
+INSERT INTO act VALUES ('system', 1, '');
+INSERT INTO act VALUES ('zzy', 1, '');
+INSERT INTO act VALUES ('ckf', 1, '');
+INSERT INTO act VALUES ('czl', 1, '');
+INSERT INTO act VALUES ('ly', 1, '');
+INSERT INTO act VALUES ('jxl', 1, '');
+INSERT INTO act VALUES ('test', 2, '');
 
 DROP TABLE IF EXISTS behavior;
 CREATE TABLE behavior
 (
-    roleName varchar(40) REFERENCES `role` (name) ON DELETE CASCADE,
+    roleId int REFERENCES `role` (id) ON DELETE CASCADE,
     num      varchar(10) REFERENCES `function` (num) ON DELETE CASCADE,
-    primary key (roleName, num)
+    primary key (roleId, num)
 );
-INSERT INTO behavior values ('管理员', '0');
-INSERT INTO behavior values ('管理员', '1');
-INSERT INTO behavior values ('管理员', '2');
-INSERT INTO behavior values ('管理员', '3');
-INSERT INTO behavior values ('管理员', '4');
-INSERT INTO behavior values ('管理员', '5');
-INSERT INTO behavior values ('管理员', '6');
-INSERT INTO behavior values ('管理员', '7');
-INSERT INTO behavior values ('管理员', '8');
-INSERT INTO behavior values ('管理员', '9');
-INSERT INTO behavior values ('管理员', '10');
-INSERT INTO behavior values ('管理员', '11');
-INSERT INTO behavior values ('管理员', '12');
-INSERT INTO behavior values ('管理员', '13');
-INSERT INTO behavior values ('管理员', '14');
-INSERT INTO behavior values ('管理员', '15');
-INSERT INTO behavior values ('管理员', '16');
-INSERT INTO behavior values ('管理员', '17');
-INSERT INTO behavior values ('管理员', '18');
-INSERT INTO behavior values ('管理员', '19');
-INSERT INTO behavior values ('管理员', '20');
-INSERT INTO behavior values ('管理员', '21');
-INSERT INTO behavior values ('管理员', '22');
-INSERT INTO behavior values ('管理员', '23');
-INSERT INTO behavior values ('管理员', '24');
-INSERT INTO behavior values ('管理员', '25');
-INSERT INTO behavior values ('管理员', '26');
+INSERT INTO behavior values (1, '0');
+INSERT INTO behavior values (1, '1');
+INSERT INTO behavior values (1, '2');
+INSERT INTO behavior values (1, '3');
+INSERT INTO behavior values (1, '4');
+INSERT INTO behavior values (1, '5');
+INSERT INTO behavior values (1, '6');
+INSERT INTO behavior values (1, '7');
+INSERT INTO behavior values (1, '8');
+INSERT INTO behavior values (1, '9');
+INSERT INTO behavior values (1, '10');
+INSERT INTO behavior values (1, '11');
+INSERT INTO behavior values (1, '12');
+INSERT INTO behavior values (1, '13');
+INSERT INTO behavior values (1, '14');
+INSERT INTO behavior values (1, '15');
+INSERT INTO behavior values (1, '16');
+INSERT INTO behavior values (1, '17');
+INSERT INTO behavior values (1, '18');
+INSERT INTO behavior values (1, '19');
+INSERT INTO behavior values (1, '20');
+INSERT INTO behavior values (1, '21');
+INSERT INTO behavior values (1, '22');
+INSERT INTO behavior values (1, '23');
+INSERT INTO behavior values (1, '24');
+INSERT INTO behavior values (1, '25');
+INSERT INTO behavior values (1, '26');
 
 DROP TABLE IF EXISTS customer;
 CREATE TABLE customer

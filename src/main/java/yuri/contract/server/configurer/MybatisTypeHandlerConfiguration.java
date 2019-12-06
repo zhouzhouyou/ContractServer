@@ -26,6 +26,7 @@ public class MybatisTypeHandlerConfiguration {
         this.typeHandlerRegistry = sqlSessionFactory.getConfiguration().getTypeHandlerRegistry();
         this.scanner = springClassScanner;
     }
+
     /**
      * 扫描所有的 {@link EnumValue} 实现类
      * 注册到 Spring 中
@@ -38,7 +39,6 @@ public class MybatisTypeHandlerConfiguration {
         Predicate<Class<?>> filter = clazz -> clazz.isEnum() && EnumValue.class.isAssignableFrom(clazz);
         return scanner.scanClass(MODEL_PACKAGE, filter);
     }
-
 
 
     /**

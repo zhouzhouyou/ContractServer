@@ -11,9 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- *
- * @author anyesu
  * @param <T> 继承了EnumType的类
+ * @author anyesu
  */
 public class EnumTypeHandler<T extends Enum<T> & EnumValue> extends BaseTypeHandler<T> {
     private final Class<T> type;
@@ -32,6 +31,7 @@ public class EnumTypeHandler<T extends Enum<T> & EnumValue> extends BaseTypeHand
     public EnumTypeHandler(Class<T> rawClass) {
         this.type = rawClass;
     }
+
     private T valueOf(String s) {
         return s == null ? null : EnumValue.valueOf(type, s);
     }
