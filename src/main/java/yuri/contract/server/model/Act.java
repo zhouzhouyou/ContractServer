@@ -1,5 +1,6 @@
 package yuri.contract.server.model;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 /**
@@ -7,6 +8,7 @@ import lombok.Data;
  * 主键为{@link #userName}和{@link #roleName}。
  */
 @Data
+@ApiModel(description = "用户扮演什么角色")
 public class Act {
     /**
      * 用户名称

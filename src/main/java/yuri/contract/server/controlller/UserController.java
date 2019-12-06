@@ -1,7 +1,6 @@
 package yuri.contract.server.controlller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,9 @@ import yuri.contract.server.util.annotation.NeedToken;
 import yuri.contract.server.util.response.ResponseFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
+@SuppressWarnings("ConstantConditions")
 @Api(tags = "To Control user operations")
 @RestController
 @RequestMapping("/api")
@@ -32,7 +33,7 @@ public class UserController extends BaseController{
 
     @ApiOperation("用户登录，会返回token")
     @CrossOrigin
-    @PostMapping(value = "/signIn", produces = "application/json; charset=UTF-8")
+    @PostMapping(value = "/signIn")
     @ResponseBody
     public ResponseEntity<String> signIn(@RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
@@ -77,6 +78,15 @@ public class UserController extends BaseController{
     public ResponseEntity<String> insertUser(@RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return userService.insertUser(getOperator(), user);
+    }
+
+    @ApiOperation("获取所有用户名, List<String>")
+    @CrossOrigin
+    @GetMapping(value = "/user/selectAll")
+    @ResponseBody
+    @NeedToken(function = NeedToken.SELECT_USER)
+    public ResponseEntity<List<String>> selectAllUser() {
+        return userService.selectAll();
     }
 
     @Data

@@ -1,5 +1,7 @@
 package yuri.contract.server.model;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.sql.Date;
@@ -8,20 +10,24 @@ import java.sql.Date;
  * 合同表
  */
 @Data
+@ApiModel
 public class Contract {
     /**
      * 合同编号
      */
+    @ApiModelProperty(value = "合同编号")
     private String num;
 
     /**
      * 合同名称
      */
+    @ApiModelProperty(value = "合同名称")
     private String name;
 
     /**
-     * 客户
+     * 客户编号
      */
+    @ApiModelProperty(value = "客户编号")
     private String customer;
 
     /**

@@ -10,6 +10,9 @@ import yuri.contract.server.mapper.UserMapper;
 import yuri.contract.server.model.User;
 import yuri.contract.server.util.response.ResponseFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * User服务类
  */
@@ -48,5 +51,12 @@ public class UserService extends BaseService {
         if (count == 0) return ResponseFactory.badRequest(user.getName());
         writeLog(operator, "insert user: " + user.getName());
         return ResponseFactory.success(user.getName());
+    }
+
+    public ResponseEntity<List<String>> selectAll() {
+        List<User> users = userMapper.selectAll();
+        List<String> names = new ArrayList<>();
+        users.forEach(user -> names.add(user.getName()));
+        return ResponseFactory.success(names);
     }
 }
