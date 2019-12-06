@@ -14,7 +14,7 @@ import java.util.List;
  * 自己写太麻烦了
  * @author anyesu
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unused"})
 public class GenericsUtils {
     /**
      * 通过反射,获得指定类的父类的第一个泛型参数的实际类型.
