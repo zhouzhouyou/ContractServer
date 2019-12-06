@@ -30,7 +30,7 @@ public class UserController extends BaseController{
         this.userService = userService;
     }
 
-    @ApiOperation("Handle sign in")
+    @ApiOperation("用户登录，会返回token")
     @CrossOrigin
     @PostMapping(value = "/signIn", produces = "application/json; charset=UTF-8")
     @ResponseBody
@@ -39,7 +39,7 @@ public class UserController extends BaseController{
         return loginService.signIn(user.getName(), user.getPassword());
     }
 
-    @ApiOperation("Handle sign up")
+    @ApiOperation("用户注册，会返回token")
     @CrossOrigin
     @PostMapping(value = "/signUp")
     @ResponseBody
@@ -59,14 +59,17 @@ public class UserController extends BaseController{
     }
 
 
+    @ApiOperation("删除用户")
     @CrossOrigin
     @DeleteMapping(value = "/user/delete")
     @ResponseBody
+    @NeedToken(function = NeedToken.DELETE_USER)
     public ResponseEntity<String> deleteUser(@RequestBody Name name, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return userService.deleteUserByName(getOperator(), name.getName());
     }
 
+    @ApiOperation("插入用户（这个不是注册，是直接插入，所以不会返回token）")
     @CrossOrigin
     @PutMapping(value = "/user/insert")
     @ResponseBody
