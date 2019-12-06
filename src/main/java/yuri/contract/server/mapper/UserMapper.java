@@ -21,7 +21,7 @@ public interface UserMapper {
     @Select("select * from user")
     List<User> selectAll();
 
-    @Insert("insert into user values (#{name}, #{password}")
+    @Insert("insert into user values (#{name}, #{password})")
     int insert(String name, String password);
 
     @Delete("delete from user where name=#{name}")

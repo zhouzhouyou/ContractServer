@@ -34,7 +34,7 @@ public class UserController extends BaseController{
     @CrossOrigin
     @PostMapping(value = "/signIn", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public ResponseEntity<String> loginPost(@RequestBody User user, BindingResult bindingResult) {
+    public ResponseEntity<String> signIn(@RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return loginService.signIn(user.getName(), user.getPassword());
     }
@@ -45,6 +45,7 @@ public class UserController extends BaseController{
     @ResponseBody
     public ResponseEntity<String> signUp(@RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+
         return loginService.signUp(user.getName(), user.getPassword());
     }
 
@@ -59,11 +60,20 @@ public class UserController extends BaseController{
 
 
     @CrossOrigin
-    @DeleteMapping(value = "/delete")
+    @DeleteMapping(value = "/user/delete")
     @ResponseBody
     public ResponseEntity<String> deleteUser(@RequestBody Name name, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return userService.deleteUserByName(getOperator(), name.getName());
+    }
+
+    @CrossOrigin
+    @PutMapping(value = "/user/insert")
+    @ResponseBody
+    @NeedToken(function = NeedToken.INSERT_USER)
+    public ResponseEntity<String> insertUser(@RequestBody User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+        return userService.insertUser(getOperator(), user);
     }
 
     @Data

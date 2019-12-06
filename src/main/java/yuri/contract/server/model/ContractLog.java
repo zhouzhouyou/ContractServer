@@ -11,6 +11,11 @@ import java.sql.Date;
 @Data
 public class ContractLog {
     /**
+     * 自动增长的id
+     */
+    private Integer id;
+
+    /**
      * 操作人员
      */
     private String userName;

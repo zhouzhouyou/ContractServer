@@ -156,10 +156,10 @@ CREATE TABLE contract_state
 DROP TABLE IF EXISTS contract_log;
 CREATE TABLE contract_log
 (
-    userName varchar(40) REFERENCES user (name) ON DELETE NO ACTION ,
-    content text,
-    time date,
-    primary key (userName, time)
+    id       int primary key auto_increment,
+    userName varchar(40) REFERENCES user (name) ON DELETE NO ACTION,
+    content  text,
+    time     datetime
 );
 
 DROP TABLE IF EXISTS contract_attachment;
@@ -169,7 +169,7 @@ CREATE TABLE contract_attachment
     fileName varchar(100) not null,
     path varchar(100) not null,
     type varchar(20) not null,
-    uploadTime date,
+    uploadTime datetime,
     primary key (contractNum)
 );
 

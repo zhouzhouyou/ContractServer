@@ -18,7 +18,7 @@ public abstract class BaseService {
     }
 
     protected void writeLog(String username, String content) {
-        logMapper.insert(username, content, new Date(System.currentTimeMillis()));
+        logMapper.insert(username, content);
         log.info("write log:{}", content);
     }
 }

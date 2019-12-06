@@ -10,17 +10,14 @@ import java.util.List;
 @Mapper
 @Component
 public interface ContractLogMapper {
-    @Select("select * from contract_log where userName =#{userName} and time =#{time}")
-    ContractLog select(String userName, Date time);
+    @Select("select * from contract_log where userName =#{userName}")
+    List<ContractLog> selectByUserName(String userName);
 
     @Select("select * from contract_log")
     List<ContractLog> selectAll();
 
-    @Insert("Insert into contract_log values(#{userName},#{content},#{time})")
-    int insert(String userName,String content,Date time);
-
-    @Update("update contract_log set content =#{content} where userName =#{userName} and time =#{time}")
-    int updateContent(String userName,String content,Date time);
+    @Insert("insert into contract_log (username, content, time) values(#{userName}, #{content}, now())")
+    int insert(String userName,String content);
 
     @Delete("delete from contract_log where userName =#{userName} and time =#{time}")
     int delete(String userName,Date time);

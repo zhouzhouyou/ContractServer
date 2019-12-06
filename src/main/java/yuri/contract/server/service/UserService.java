@@ -42,4 +42,11 @@ public class UserService extends BaseService {
         writeLog(operator, "delete user: " + name);
         return ResponseFactory.success(name);
     }
+
+    public ResponseEntity<String> insertUser(String operator, User user) {
+        int count = userMapper.insert(user.getName(), user.getPassword());
+        if (count == 0) return ResponseFactory.badRequest(user.getName());
+        writeLog(operator, "insert user: " + user.getName());
+        return ResponseFactory.success(user.getName());
+    }
 }
