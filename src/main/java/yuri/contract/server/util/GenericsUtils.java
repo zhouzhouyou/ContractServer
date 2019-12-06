@@ -12,6 +12,7 @@ import java.util.List;
  * 泛型工具类
  * 这个是网上提供的代码~
  * 自己写太麻烦了
+ *
  * @author anyesu
  */
 @SuppressWarnings({"rawtypes", "unused"})

@@ -3,8 +3,6 @@ package yuri.contract.server.mapper;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 import yuri.contract.server.model.ContractProcess;
-import yuri.contract.server.model.util.OperationState;
-import yuri.contract.server.model.util.OperationType;
 
 import java.sql.Date;
 import java.util.List;
@@ -13,7 +11,7 @@ import java.util.List;
 @Component
 public interface ContractProcessMapper {
     @Select("select * from contract_process where contractNum =#{contractNum} and type = #{type} and userName =#{userName}")
-    ContractProcess select(String contractNum, int type,String userName);
+    ContractProcess select(String contractNum, int type, String userName);
 
     @Select("select * from contract_process")
     List<ContractProcess> selectAll();
@@ -28,7 +26,7 @@ public interface ContractProcessMapper {
     int updateState(int state);
 
     @Delete("delete from contract_process where contractNum =#{contractNum} and type = #{type} and userName =#{userName}")
-    int delete(String contractNum, int type,String userName);
+    int delete(String contractNum, int type, String userName);
 
     @Delete("delete from contract_process")
     int deleteAll();

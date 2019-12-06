@@ -16,10 +16,10 @@ public interface FunctionMapper {
     List<Function> selectAll();
 
     @Insert("insert into function values(#{num},#{name},#{description})")
-    int insert(String num,String name,String description);
+    int insert(String num, String name, String description);
 
     @Update("update function set description =#{description} where num =#{num}")
-    int updateDescription(String description,String num);
+    int updateDescription(String description, String num);
 
     @Delete("delete from function where num =#{num}")
     int delete(String num);

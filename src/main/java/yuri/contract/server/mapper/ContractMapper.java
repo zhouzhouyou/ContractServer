@@ -20,7 +20,7 @@ public interface ContractMapper {
     int insert(String num, String name, String customerNum, Date begin, Date end, String content, String userName);
 
     @Update("update contract set content =#{content} where num =#{num}")
-    int updateContent(String num,String content);
+    int updateContent(String num, String content);
 
     @Delete("delete from contract where num =#{num}")
     int delete(String num);

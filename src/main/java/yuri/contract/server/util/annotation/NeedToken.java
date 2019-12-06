@@ -15,12 +15,14 @@ import java.lang.annotation.Target;
 public @interface NeedToken {
     /**
      * 是否需要权限
+     *
      * @return 是否需要权限
      */
     boolean required() default true;
 
     /**
      * 需要的是什么权限
+     *
      * @return 权限编号
      */
     String function();

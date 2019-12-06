@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import yuri.contract.server.mapper.ContractLogMapper;
 
-import java.sql.Date;
-
 @Slf4j
 @Component
 public abstract class BaseService {

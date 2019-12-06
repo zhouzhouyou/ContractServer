@@ -1,6 +1,5 @@
 package yuri.contract.server.service;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -30,7 +29,7 @@ public class UserService extends BaseService {
     /**
      * 是否存在该账户
      *
-     * @param name     用户名
+     * @param name 用户名
      * @return 是否存在该账户
      */
     public boolean exists(String name) {
@@ -41,7 +40,7 @@ public class UserService extends BaseService {
         return userMapper.findUserByName(name);
     }
 
-    public ResponseEntity<String> deleteUserByName(String operator ,String name) {
+    public ResponseEntity<String> deleteUserByName(String operator, String name) {
         writeLog(operator, "delete user: " + name);
         return ResponseFactory.success(name);
     }

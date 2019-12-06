@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 import yuri.contract.server.model.ContractState;
-import yuri.contract.server.model.util.OperationType;
 
 import java.sql.Date;
 import java.util.List;

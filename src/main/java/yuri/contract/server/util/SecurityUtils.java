@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.util.DigestUtils;
 import yuri.contract.server.util.constant.Constant;
 
 import javax.crypto.SecretKey;
@@ -51,7 +50,7 @@ public class SecurityUtils {
         return builder.compact();
     }
 
-    public static String getToken(String account)  {
+    public static String getToken(String account) {
         try {
             return createJWT(account, 60 * 60 * 1000);
         } catch (Exception e) {
