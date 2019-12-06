@@ -18,7 +18,7 @@ import java.util.List;
 public class GenericsUtils {
     /**
      * 通过反射,获得指定类的父类的第一个泛型参数的实际类型.
-     * 如 class Test extends HashMap<String, Object> {
+     * 如 {@code class Test extends HashMap<String, Object>} {
      *
      * @param clazz 需要反射的类,该类必须继承泛型父类
      * @return 泛型参数的实际类型, 如果没有实现 {@link ParameterizedType} 接口, 即不支持泛型, 所以直接返回 <code>Object.class</code>
@@ -29,7 +29,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得指定类的父类的第 index 个泛型参数的实际类型.
-     * 如 class Test extends HashMap<String, Object> {
+     * 如 {@code class Test extends HashMap<String, Object>} {
      *
      * @param clazz 需要反射的类,该类必须继承范型父类
      * @param index 泛型参数所在索引, 从0开始.
@@ -42,7 +42,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得指定类的父类的第一个泛型参数的实际类型.
-     * 如 class Test extends HashMap<String, Object> {
+     * 如 {@code class Test extends HashMap<String, Object>} {
      *
      * @param clazz 需要反射的类,该类必须继承泛型父类
      * @return 泛型参数的实际类型, 如果没有实现 {@link ParameterizedType} 接口, 即不支持泛型, 所以直接返回 <code>Object.class</code>
@@ -53,7 +53,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得指定类的父类的第 index 个泛型参数的实际类型.
-     * 如 class Test extends HashMap<String, Object> {
+     * 如 {@code class Test extends HashMap<String, Object>} {
      *
      * @param clazz 需要反射的类,该类必须继承范型父类
      * @param index 泛型参数所在索引, 从0开始.
@@ -66,7 +66,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得方法返回值第一个泛型参数的实际类型.
-     * 如: public Map<String, Object> getNames(){}
+     * 如: {@code public Map<String, Object> getNames(){}}
      *
      * @param method 方法
      * @return 泛型参数的实际类型, 如果没有实现 {@link ParameterizedType} 接口, 即不支持泛型, 所以直接返回 <code>Object.class</code>
@@ -77,7 +77,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得方法返回值第 index 个泛型参数的实际类型.
-     * 如: public Map<String, Object> getNames(){}
+     * 如: {@code public Map<String, Object> getNames(){}}
      *
      * @param method 方法
      * @param index  泛型参数所在索引, 从0开始.
@@ -90,7 +90,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得方法输入参数第一个输入参数的所有泛型参数的实际类型.
-     * 如: void test(HashMap<Object, BigDecimal> map, List<String> list) {}
+     * 如: {@code void test(HashMap<Object, BigDecimal> map, List<String> list) {}}
      *
      * @param method 方法
      * @return 输入参数的泛型参数的实际类型集合, 如果没有实现 {@link ParameterizedType} 接口, 即不支持泛型, 所以直接返回空集合
@@ -101,7 +101,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得方法输入参数第 index 个输入参数的所有泛型参数的实际类型.
-     * 如: void test(HashMap<Object, BigDecimal> map, List<String> list) {}
+     * 如: {@code void test(HashMap<Object, BigDecimal> map, List<String> list) {}}
      *
      * @param method 方法
      * @param index  第几个输入参数
@@ -127,7 +127,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得字段第一个泛型参数的实际类型.
-     * 如: public Map<String, Object> names;
+     * 如: {@code public Map<String, Object> names;}
      *
      * @param field 字段
      * @return 泛型参数的实际类型, 如果没有实现 {@link ParameterizedType} 接口, 即不支持泛型, 所以直接返回<code>Object.class</code>
@@ -138,7 +138,7 @@ public class GenericsUtils {
 
     /**
      * 通过反射,获得字段第 index 个泛型参数的实际类型.
-     * 如: public Map<String, Object> names;
+     * 如: {@code public Map<String, Object> names;}
      *
      * @param field 字段
      * @param index 泛型参数所在索引,从0开始.
@@ -151,7 +151,7 @@ public class GenericsUtils {
 
     /**
      * 获得指定类的第 index 个泛型参数的实际类型.
-     * 如 Map<String, Object>
+     * 如 {@code Map<String, Object>}
      *
      * @param type  泛型类型
      * @param index 泛型参数所在索引, 从0开始.
@@ -164,7 +164,7 @@ public class GenericsUtils {
         }
 
         // 返回表示此类型实际类型参数的 Type 对象的数组,数组里放的都是对应类型的Class,
-        // 如 Map<String, Object> 就返回 [String.class, Object.class]
+        // 如 {@code Map<String, Object>} 就返回 [String.class, Object.class]
         Type[] typeArguments = getGenericTypes(type);
         if (index >= typeArguments.length || index < 0) {
             throw new RuntimeException("你输入的索引" + (index < 0 ? "不能小于0" : "超出了参数的总数"));
@@ -175,7 +175,7 @@ public class GenericsUtils {
 
     /**
      * 获得指定泛型类的所有泛型参数.
-     * 如 Map<String, Object>
+     * 如 {@code Map<String, Object>}
      *
      * @param type 泛型类型
      * @return 所有泛型参数
