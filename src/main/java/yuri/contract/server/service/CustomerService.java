@@ -24,7 +24,7 @@ public class CustomerService extends BaseService{
         return ResponseFactory.success(customerMapper.selectAll());
     }
 
-    public ResponseEntity<String> insert(Customer customer) {
+    public ResponseEntity<String> insert(Customer customer, String operator) {
         int flag = customerMapper.insert(
                 customer.getName(),
                 customer.getAddress(),
@@ -35,6 +35,24 @@ public class CustomerService extends BaseService{
                 customer.getAccount(),
                 customer.getOther());
         if (flag == 0) return ResponseFactory.badRequest("");
+        writeLog(operator, " insert a customer " + customer.getName());
+        return ResponseFactory.success("");
+    }
+
+    public ResponseEntity<String> update(Customer customer, String operator) {
+        int flag = customerMapper.update(
+                customer.getNum(),
+                customer.getName(),
+                customer.getAddress(),
+                customer.getTel(),
+                customer.getFax(),
+                customer.getCode(),
+                customer.getBank(),
+                customer.getAccount(),
+                customer.getOther()
+        );
+        if (flag == 0) return ResponseFactory.badRequest("");
+        writeLog(operator, " update a customer " + customer.getName());
         return ResponseFactory.success("");
     }
 }
