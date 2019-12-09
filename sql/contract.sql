@@ -2,7 +2,18 @@ SELECT concat('DROP TABLE IF EXISTS ', table_name, ';')
 FROM information_schema.tables
 WHERE table_schema = 'yuri';
 
+DROP TABLE IF EXISTS contract_log;
+DROP TABLE IF EXISTS contract_process;
+DROP TABLE IF EXISTS contract_state;
+DROP TABLE IF EXISTS contract_attachment;
+DROP TABLE IF EXISTS behavior;
+DROP TABLE IF EXISTS act;
+DROP TABLE IF EXISTS `function`;
+DROP TABLE IF EXISTS `role`;
+DROP TABLE IF EXISTS contract;
 DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS customer;
+
 CREATE TABLE user
 (
     name     varchar(40) primary key,
@@ -23,7 +34,6 @@ VALUES ('ly', 'ly');
 INSERT INTO user
 VALUES ('jxl', 'jxl');
 
-DROP TABLE IF EXISTS role;
 CREATE TABLE role
 (
     id          int primary key auto_increment,
@@ -35,7 +45,6 @@ VALUES ('管理员', '对系统进行管理，拥有管理最高权限，用来�
 INSERT INTO role (name, description)
 VALUES ('操作员', '负责合同操作流程的管理，并可以跟踪合同的不同阶段。');
 
-DROP TABLE IF EXISTS `function`;
 CREATE TABLE `function`
 (
     num         varchar(10) primary key,
@@ -94,7 +103,6 @@ values ('25', '查询客户', '');
 INSERT INTO `function`
 values ('26', '删除客户', '');
 
-DROP TABLE IF EXISTS act;
 CREATE TABLE act
 (
     username    varchar(40),
@@ -119,7 +127,6 @@ VALUES ('jxl', 1, '');
 INSERT INTO act
 VALUES ('test', 2, '');
 
-DROP TABLE IF EXISTS behavior;
 CREATE TABLE behavior
 (
     roleId int,
@@ -180,7 +187,6 @@ values (1, '25');
 INSERT INTO behavior
 values (1, '26');
 
-DROP TABLE IF EXISTS customer;
 CREATE TABLE customer
 (
     num     int primary key auto_increment,
@@ -200,7 +206,6 @@ values ('c2', '北京', '153******19');
 INSERT INTO customer (name, address, tel)
 values ('c3', 'CS', '135********20');
 
-DROP TABLE IF EXISTS contract;
 CREATE TABLE contract
 (
     num         varchar(20) primary key,
@@ -214,7 +219,6 @@ CREATE TABLE contract
     foreign key (userName) REFERENCES user (name) ON DELETE NO ACTION
 );
 
-DROP TABLE IF EXISTS contract_process;
 CREATE TABLE contract_process
 (
     contractNum varchar(20),
@@ -228,7 +232,6 @@ CREATE TABLE contract_process
     foreign key (contractNum) REFERENCES user (name) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS contract_state;
 CREATE TABLE contract_state
 (
     contractNum varchar(20),
@@ -238,7 +241,6 @@ CREATE TABLE contract_state
     foreign key (contractNum) REFERENCES contract (num) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS contract_log;
 CREATE TABLE contract_log
 (
     id       int primary key auto_increment,
@@ -248,7 +250,6 @@ CREATE TABLE contract_log
     foreign key (userName) REFERENCES user (name) ON DELETE NO ACTION
 );
 
-DROP TABLE IF EXISTS contract_attachment;
 CREATE TABLE contract_attachment
 (
     contractNum varchar(20),
