@@ -15,6 +15,9 @@ public interface BehaviorMapper {
     @Select("select * from behavior where roleId =#{roleId} and num =#{num}")
     Behavior select(Integer roleId, String num);
 
+    @Select("select num from behavior where roleId =#{roleId}")
+    List<String> selectByRole(Integer roleId);
+
     @Select("select * from behavior")
     List<Behavior> selectAll();
 
