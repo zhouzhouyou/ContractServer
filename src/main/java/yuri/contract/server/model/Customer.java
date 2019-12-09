@@ -10,7 +10,7 @@ public class Customer {
     /**
      * 客户编号
      */
-    private String num;
+    private Integer num;
 
     /**
      * 客户名称
@@ -46,4 +46,9 @@ public class Customer {
      * 银行账户
      */
     private String account;
+
+    /**
+     * 备注
+     */
+    private String other;
 }

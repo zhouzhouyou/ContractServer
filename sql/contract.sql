@@ -1,3 +1,7 @@
+SELECT concat('DROP TABLE IF EXISTS ', table_name, ';')
+FROM information_schema.tables
+WHERE table_schema = 'yuri';
+
 DROP TABLE IF EXISTS user;
 CREATE TABLE user
 (
@@ -179,22 +183,29 @@ values (1, '26');
 DROP TABLE IF EXISTS customer;
 CREATE TABLE customer
 (
-    num     varchar(20) primary key,
+    num     int primary key auto_increment,
     name    varchar(40) not null,
     address varchar(100),
     tel     varchar(20),
     fax     varchar(20),
     code    varchar(10),
     bank    varchar(50),
-    account varchar(50)
+    account varchar(50),
+    other   varchar(100)
 );
+INSERT INTO customer (name, address, tel)
+values ('c1', '长沙', '153******18');
+INSERT INTO customer (name, address, tel)
+values ('c2', '北京', '153******19');
+INSERT INTO customer (name, address, tel)
+values ('c3', 'CS', '135********20');
 
 DROP TABLE IF EXISTS contract;
 CREATE TABLE contract
 (
     num         varchar(20) primary key,
     name        varchar(40) not null,
-    customerNum varchar(20),
+    customerNum int,
     begin       date        not null,
     end         date        not null,
     content     text        not null,
@@ -250,3 +261,5 @@ CREATE TABLE contract_attachment
 );
 
 DROP TABLE IF EXISTS login;
+
+SET @@GLOBAL.FOREIGN_KEY_CHECKS = 1;
