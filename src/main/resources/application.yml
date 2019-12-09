@@ -11,3 +11,13 @@ spring:
       characterEncoding=utf-8
     username: root
     password: 123456
+#  thymeleaf:
+#    cache: false
+#    prefix: classpath:/templates/
+#    check-template-location: true
+#    suffix: .html
+#    encoding: UTF-8
+#    mode: HTML
+  devtools:
+    restart:
+      additional-paths: resources/**, static/**, templates/**
