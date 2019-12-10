@@ -65,17 +65,17 @@ public @interface NeedToken {
     /**
      * 分配会签
      */
-    String ASSIGN_COUNTER_SIGN = "7";
+    String ASSIGN = "7";
 
     /**
      * 分配审批
      */
-    String ASSIGN_REVIEW = "8";
+    //String ASSIGN_REVIEW = "8";
 
     /**
      * 分配签订
      */
-    String ASSIGN_SIGN = "9";
+    //String ASSIGN_SIGN = "9";
 
     /**
      * 流程查询
