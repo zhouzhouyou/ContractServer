@@ -19,8 +19,8 @@ public interface ContractAttachmentMapper {
     @Select("select * from contract_attachment")
     List<ContractAttachment> selectAll();
 
-    @Insert("insert into contract_attachment values(#{contractNum},#{fileName},#{path},#{type},#{uploadTime})")
-    int insert(String contractNum, String fileName, String path, String type, Date uploadTime);
+    @Insert("insert into contract_attachment values(#{contractNum},#{fileName},#{path},#{type},now())")
+    int insert(String contractNum, String fileName, String path, String type);
 
     @Delete("delete from contract_attachment where contractNum =#{contractNum}")
     int delete(String contractNum);

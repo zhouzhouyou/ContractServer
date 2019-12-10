@@ -66,11 +66,9 @@ values ('5', '审批合同', '');
 INSERT INTO `function`
 values ('6', '签订合同', '');
 INSERT INTO `function`
-values ('7', '分配会签', '');
-INSERT INTO `function`
-values ('8', '分配审批', '');
-INSERT INTO `function`
-values ('9', '分配签订', '');
+values ('7', '分配', '');
+#INSERT INTO `function` values ('8', '分配审批', '');
+#INSERT INTO `function` values ('9', '分配签订', '');
 INSERT INTO `function`
 values ('10', '流程查询', '');
 INSERT INTO `function`
@@ -151,10 +149,8 @@ INSERT INTO behavior
 values (1, '6');
 INSERT INTO behavior
 values (1, '7');
-INSERT INTO behavior
-values (1, '8');
-INSERT INTO behavior
-values (1, '9');
+#INSERT INTO behavior values (1, '8');
+#INSERT INTO behavior values (1, '9');
 INSERT INTO behavior
 values (1, '10');
 INSERT INTO behavior
@@ -229,15 +225,15 @@ CREATE TABLE contract_process
     time        date,
     primary key (contractNum, type, userName),
     foreign key (contractNum) REFERENCES contract (num) ON DELETE CASCADE,
-    foreign key (contractNum) REFERENCES user (name) ON DELETE CASCADE
+    foreign key (userName) REFERENCES user (name) ON DELETE CASCADE
 );
 
 CREATE TABLE contract_state
 (
     contractNum varchar(20),
-    type        integer not null,
+    status      integer,
     time        date,
-    primary key (contractNum),
+    primary key (contractNum,status),
     foreign key (contractNum) REFERENCES contract (num) ON DELETE CASCADE
 );
 
