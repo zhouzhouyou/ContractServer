@@ -9,6 +9,10 @@ import java.util.List;
 @Mapper
 @Component
 public interface CustomerMapper {
+    @Select("select * from customer where concat_ws (num, name, address, tel, fax, code, bank, account, other) " +
+            "like concat_ws('%', #{query}, '%');")
+    List<Customer> fuzzyQuery(String query);
+
     @Select("select * from customer where num =#{num}")
     Customer select(Integer num);
 

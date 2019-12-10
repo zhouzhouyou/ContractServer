@@ -2,6 +2,7 @@ package yuri.contract.server.controlller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -26,8 +27,18 @@ public class CustomerController extends BaseController{
         this.customerService = customerService;
     }
 
+    @ApiOperation("模糊查询")
+    @CrossOrigin
+    @ResponseBody
+    @PostMapping("/fuzzyQuery")
+    @NeedToken(function = NeedToken.SELECT_CUSTOMER)
+    public ResponseEntity<List<Customer>> fuzzyQuery(@RequestBody Query a, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(null);
+        return customerService.fuzzyQuery(a.query);
+    }
+
     @ApiOperation("查询所有的客户")
-    @GetMapping("/selectAll")
+    @PostMapping("/selectAll")
     @CrossOrigin
     @ResponseBody
     @NeedToken(function = NeedToken.SELECT_CUSTOMER)
@@ -53,5 +64,10 @@ public class CustomerController extends BaseController{
     public ResponseEntity<String> update(@RequestBody Customer customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return customerService.update(customer, getOperator());
+    }
+
+    @Data
+    private static class Query {
+        private String query;
     }
 }

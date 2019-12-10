@@ -55,4 +55,8 @@ public class CustomerService extends BaseService{
         writeLog(operator, " update a customer " + customer.getName());
         return ResponseFactory.success("");
     }
+
+    public ResponseEntity<List<Customer>> fuzzyQuery(String a) {
+        return ResponseFactory.success(customerMapper.fuzzyQuery(a));
+    }
 }
