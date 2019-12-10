@@ -38,4 +38,14 @@ public class PageController {
     public String signUp2(HttpServletRequest request) {
         return "signUp";
     }
+
+    @GetMapping("draft")
+    public String draft(HttpServletRequest request) {
+        return "draft";
+    }
+
+    @GetMapping("draft.html")
+    public String draft2(HttpServletRequest request) {
+        return "draft";
+    }
 }
