@@ -2,6 +2,8 @@ package yuri.contract.server.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class DetailContractMessage {
     /**
@@ -9,25 +11,33 @@ public class DetailContractMessage {
      */
     private Contract contract;
 
-    /**
-     * 操作人员
-     */
-    private String operator;
+    private List<List<Message>> messageLists;
 
-    /**
-     * 操作类型
-     */
-    private String type;
-
-    /**
-     * 完成状态
-     */
-    private String state;
-
-    public DetailContractMessage(Contract contract, String operator, String type, String state) {
+    public DetailContractMessage(Contract contract,List<List<Message>> messageLists) {
         this.contract = contract;
-        this.operator = operator;
-        this.type = type;
-        this.state = state;
+        this.messageLists = messageLists;
+    }
+
+    public static class Message{
+        /**
+         * 操作人员
+         */
+        private String operator;
+
+        /**
+         * 操作类型
+         */
+        private String type;
+
+        /**
+         * 完成状态
+         */
+        private String state;
+
+        public Message(String operator, String type, String state) {
+            this.operator = operator;
+            this.type = type;
+            this.state = state;
+        }
     }
 }

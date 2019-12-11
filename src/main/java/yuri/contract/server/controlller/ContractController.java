@@ -56,7 +56,7 @@ public class ContractController extends BaseController {
     @PostMapping(value = "/select")
     @ResponseBody
     @NeedToken(function = NeedToken.SELECT_CONTRACT)
-    public ResponseEntity<List<List<DetailContractMessage>>> selectContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
+    public ResponseEntity<DetailContractMessage> selectContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
         return contractService.getDetailContractMessage(getOperator(), contractNum.contractNum);
