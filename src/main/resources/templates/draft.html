@@ -176,7 +176,7 @@
             statusCode: {
                 200: function () {
                     alert("成功");
-                    clearAll();
+                    reset();
                 }
             },
 
@@ -190,7 +190,7 @@
         nameInput.val('');
         setValid(nameInput, false);
         openCustomerSelector.val('');
-        setValid(customerInput, false);
+        setValid(openCustomerSelector, false);
         currentCustomerId = null;
         beginTime.value('');
         setValid(beginTime, false);
@@ -220,6 +220,7 @@
             select.click(function () {
                 currentCustomerId = customer.num;
                 openCustomerSelector.val(`编号: ${customer.num}, 姓名: ${customer.name}, 地址：${customer.address}, 电话：${customer.tel}`);
+                setValid(openCustomerSelector, true);
             });
             tr.append(select);
         };
@@ -291,6 +292,7 @@
             enctype: 'multipart/form-data',
             uploadAsync: true,
             uploadUrl: 'api/contract/attachment/upload',
+            accept: ["doc", "docx", "jpg", "jpeg", "png", "bmp", "gif"],
             allowedFileExtensions: ["doc", "docx", "jpg", "jpeg", "png", "bmp", "gif"],
         }).on('fileuploaded', function(event, data) {
             let response = data.response;
