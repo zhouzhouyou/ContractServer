@@ -345,7 +345,7 @@ public class ContractService extends BaseService {
         List<Contract> contracts = selectAllContracts();
         List<ContractWithState> contractWithStates = new ArrayList<>();
         if (customerNum != null) {
-            contracts.removeIf(contract -> !contract.getCustomer().equals(customerNum));
+            contracts.removeIf(contract -> !contract.getCustomerNum().equals(customerNum));
         }
         for (int i = 0; i < statuses.length; i++) {
             if (!statuses[i]) {
@@ -412,18 +412,34 @@ public class ContractService extends BaseService {
         lists.add(signers);
 
         drafter.add(new DetailContractMessage(contract, contract.getName(), "draft", "finished"));
+        List<String> assignOperator = processMapper.selectOperator(contractNum, -1);
         if (stateMapper.getContractStatus(contractNum) == 1) {
-            List<String> operators = processMapper.selectOperator(contractNum, -1);
+
         } else if (stateMapper.getContractStatus(contractNum) == 2) {
-
+            List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
+            List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
+            List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
+            List<String> signOperator = processMapper.selectOperator(contractNum, 3);
         } else if (stateMapper.getContractStatus(contractNum) == 3) {
-
+            List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
+            List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
+            List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
+            List<String> signOperator = processMapper.selectOperator(contractNum, 3);
         } else if (stateMapper.getContractStatus(contractNum) == 4) {
-
+            List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
+            List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
+            List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
+            List<String> signOperator = processMapper.selectOperator(contractNum, 3);
         } else if (stateMapper.getContractStatus(contractNum) == 5) {
-
+            List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
+            List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
+            List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
+            List<String> signOperator = processMapper.selectOperator(contractNum, 3);
         } else if (stateMapper.getContractStatus(contractNum) == 6) {
-
+            List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
+            List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
+            List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
+            List<String> signOperator = processMapper.selectOperator(contractNum, 3);
         }
         return ResponseFactory.success(lists);
     }

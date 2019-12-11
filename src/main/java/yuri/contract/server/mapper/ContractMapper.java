@@ -16,7 +16,7 @@ public interface ContractMapper {
     @Select("select * from contract")
     List<Contract> selectAll();
 
-    @Select("select * from contract where concat_ws(num,name,customerNum,begin,end) like concat('%', #{content}, '%')")
+    @Select("select * from contract where concat_ws(num,name,customerNum,begin,end,userName) like concat('%', #{content}, '%')")
     List<Contract> fuzzyQuery(String content);
 
     @Select("SELECT Auto_increment FROM information_schema.tables WHERE Table_Schema='yuri' and table_name='contract'")
