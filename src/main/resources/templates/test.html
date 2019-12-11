@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="css/gijgo.min.css" rel="stylesheet">
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/gijgo.min.js"></script>
+    <script src="js/messages.zh-cn.min.js"></script>
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Bootstrap 101 Template</title>
+
+</head>
+<body>
+<div id="header"></div>
+<div id="body">
+    <button onclick="clearAll();" type="button">a</button>
+    <button onclick="addAll(a);" type="button">b</button>
+    <input id="datepicker" width="276" />
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">序号</th>
+            <th scope="col">名称</th>
+            <th scope="col">地址</th>
+            <th scope="col">电话</th>
+            <th scope="col">传真</th>
+            <th scope="col">邮编</th>
+            <th scope="col">银行</th>
+            <th scope="col">账户</th>
+            <th scope="col">备注</th>
+            <th scope="col">select</th>
+        </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+</div>
+
+<script src="js/js.cookie-2.2.1.min.js"></script>
+<script src="js/nav.js" type="text/javascript"></script>
+<script src="js/common.js" type="text/javascript"></script>
+<script>
+
+    $('#datepicker').datepicker({
+        uiLibrary: 'bootstrap4',
+        locale: 'zh-cn'
+    });
+
+    let tableBody;
+    let a;
+    let x;
+    $(function () {
+        tableBody = $("#tableBody");
+
+
+        class Customer {
+            constructor(num, name, address, tel, fax, code, bank, account, other) {
+                this.num = num;
+                this.name = name;
+                this.address = address;
+                this.tel = tel;
+                this.fax = fax;
+                this.code = code;
+                this.bank = bank;
+                this.account = account;
+                this.other = other;
+            }
+        }
+
+        a = [new Customer(1, 2, 3, 4, 5, 6, 7, 8, 9), new Customer(2, 3, 3, 4, 5, 6, 7, 8, 9)];
+
+        let json = [
+            {
+                "num": 1,
+                "name": "c1",
+                "address": "长沙",
+                "tel": "153******18",
+                "fax": null,
+                "code": null,
+                "bank": null,
+                "account": null,
+                "other": null
+            },
+            {
+                "num": 2,
+                "name": "c2",
+                "address": "北京",
+                "tel": "153******19",
+                "fax": null,
+                "code": null,
+                "bank": null,
+                "account": null,
+                "other": null
+            },
+            {
+                "num": 3,
+                "name": "c3",
+                "address": "CS",
+                "tel": "135********20",
+                "fax": null,
+                "code": null,
+                "bank": null,
+                "account": null,
+                "other": null
+            }
+        ];
+
+        let y = function (object, tr) {
+            // let select = $(`<input type="radio" name="id" value=${object.num} onclick="test(this.value)"/>`);
+            let select = $(`<td><button class="btn btn-primary">确定</button></td>`);
+            select.click(function () {
+                test(object.num);
+            });
+            tr.append(select);
+        };
+        let customer = eval(JSON.stringify(json));
+        addTr(customer, tableBody, y);
+        // addAll(customer);
+    });
+
+    function test(value) {
+        alert(value);
+    }
+
+
+    function addAll(customers) {
+        for (let i = 0; i < customers.length; i++) {
+            let tr = $("<tr></tr>");
+            add(customers[i], tr);
+            tableBody.append(tr);
+
+        }
+
+    }
+
+    function clearAll() {
+        tableBody.empty();
+    }
+
+
+</script>
+</body>
+</html>

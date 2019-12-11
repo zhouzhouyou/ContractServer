@@ -2,6 +2,8 @@ package yuri.contract.server.service;
 
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import yuri.contract.server.util.response.ResponseFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.Date;
 import java.util.*;
 
@@ -54,27 +57,34 @@ public class ContractService extends BaseService {
             return ResponseFactory.badRequest("fail to add");
         writeLog(operator, "add contract: " + contract.getName());
         int contractNum = contract.getNum();
-        processMapper.insert(contractNum, OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), contract.getUserName(), contract.getContent());
+        processMapper.insert(contractNum, OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), operator, contract.getContent());
         stateMapper.insert(contractNum, Status.DRAFT.getValue());
         String attachmentName = contract.getUserName();
         String type = attachmentName.substring(attachmentName.lastIndexOf(".") + 1);
-        attachmentMapper.insert(contractNum, contract.getUserName(), "", type);
+        attachmentMapper.insert(contractNum, attachmentName, "", type);
         return ResponseFactory.success(contract.getName());
     }
 
     public ResponseEntity<String> uploadFile(MultipartFile file) {
-        String originName = file.getOriginalFilename();
-        int count = attachmentMapper.getNewFileNameCount(originName);
-        String fileType = originName.substring(originName.lastIndexOf(".") + 1);
-        String newName = originName.substring(0, originName.lastIndexOf(".")) + "(" + count + ")" + fileType;
-        File newFile = new File("./Attachment/" + newName);
-        if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
-        try {
-            file.transferTo(newFile);
-        } catch (IOException e) {
-            e.printStackTrace();
+        String basePath = System.getProperty("user.dir") + "/attachment";
+        String fullName = file.getOriginalFilename();
+        String fileName = fullName.substring(0, fullName.lastIndexOf("."));
+        String fileType = fullName.substring(fullName.lastIndexOf(".") + 1);
+
+        File descFile = new File(basePath + File.separator + fullName);
+        int count  = 1;
+        while (descFile.exists()) {
+            String newName = fileName + "(" + count + ")." + fileType;
+            descFile = new File(basePath + File.separator + newName);
+            count++;
         }
-        return ResponseFactory.success(newName);
+        if (!descFile.getParentFile().exists()) descFile.getParentFile().mkdirs();
+        try {
+            file.transferTo(descFile);
+        } catch (IOException e) {
+            return ResponseFactory.badRequest(e.toString());
+        }
+        return ResponseFactory.success(String.format("{\"finalName\":\"%s\"}", descFile.getName()));
     }
 
 //    public ResponseEntity<String> deleteContractByNum(String operator, String contractNum) {

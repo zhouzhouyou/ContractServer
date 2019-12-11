@@ -19,7 +19,7 @@ public interface ContractAttachmentMapper {
     @Select("select * from contract_attachment")
     List<ContractAttachment> selectAll();
 
-    @Select("select count(*) from contract_attachment where fileName is like concat('%', #{originName}, '%'")
+    @Select("select count(*) from contract_attachment where fileName like concat('%', #{originName}, '%')")
     int getNewFileNameCount(String originName);
 
     @Insert("insert into contract_attachment values(#{contractNum},#{fileName},#{path},#{type},now())")

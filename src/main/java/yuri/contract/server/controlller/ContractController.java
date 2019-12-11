@@ -77,9 +77,9 @@ public class ContractController extends BaseController {
     @CrossOrigin
     @PostMapping(value = "/attachment/upload")
     @ResponseBody
-    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return ResponseFactory.badRequest(null);
+    public ResponseEntity<String> uploadFile(@RequestParam("file_data") MultipartFile file, HttpServletRequest request) {
+//        if (bindingResult.hasErrors())
+//            return ResponseFactory.badRequest(null);
         return contractService.uploadFile(file);
     }
 
