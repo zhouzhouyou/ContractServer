@@ -11,8 +11,8 @@ import java.util.List;
 @Mapper
 @Component
 public interface ContractProcessMapper {
-    @Select("select * from contract_process where contractNum =#{contractNum} and type = #{type} and userName =#{userName}")
-    ContractProcess select(int contractNum, int type, String userName);
+    @Select("select distinct userName from contract_process where contractNum =#{contractNum} and type = #{type}")
+    List<String> selectOperator(int contractNum, int type);
 
     @Select("select * from contract_process")
     List<ContractProcess> selectAll();
@@ -24,7 +24,7 @@ public interface ContractProcessMapper {
     List<Integer> fuzzySelectNumOfUnAssigned(String content);
 
     @Select("select contractNum from contract_process where type = #{type} and userName = #{userName}")
-    List<Integer> selectNumOfNeededProcess(String userName,int type);
+    List<Integer> selectNumOfNeededProcess(String userName, int type);
 
     @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and concat_ws(contractNum,type,state,userName,content,time) like concat('%', #{content}, '%')")
     List<Integer> fuzzySelectNumOfNeededProcess(String userName, String content, int type);

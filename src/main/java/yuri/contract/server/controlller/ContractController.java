@@ -59,7 +59,7 @@ public class ContractController extends BaseController {
     public ResponseEntity<List<List<DetailContractMessage>>> selectContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
-        return contractService.getDetailContractMessage(contractNum.contractNum);
+        return contractService.getDetailContractMessage(getOperator(), contractNum.contractNum);
     }
 
     @ApiOperation("查询所有存在的合同信息")
@@ -71,7 +71,29 @@ public class ContractController extends BaseController {
         return contractService.selectAllContractsWithState();
     }
 
-    @ApiOperation("获取附件本体")
+    @ApiOperation("模糊查询所有存在的合同信息")
+    @CrossOrigin
+    @PostMapping(value = "/fuzzyQuery")
+    @ResponseBody
+    @NeedToken(function = NeedToken.SELECT_CONTRACT)
+    public ResponseEntity<List<ContractWithState>> fuzzyQueryAllContracts(@RequestBody FuzzyContent content, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.fuzzyQueryAllContract(content.content);
+    }
+
+    @ApiOperation("条件查询所有存在的合同信息")
+    @CrossOrigin
+    @PostMapping(value = "/filterQuery")
+    @ResponseBody
+    @NeedToken(function = NeedToken.SELECT_CONTRACT)
+    public ResponseEntity<List<ContractWithState>> filterQueryAllContents(@RequestBody Filter filter, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.filterQueryAllContract(filter.statuses, filter.customerNum);
+    }
+
+    @ApiOperation("上传附件本体")
     @CrossOrigin
     @PostMapping(value = "/attachment/upload")
     @ResponseBody
@@ -280,5 +302,11 @@ public class ContractController extends BaseController {
     private static class Assign {
         private List<List<String>> assignLists;
         private int contractNum;
+    }
+
+    @Data
+    private static class Filter {
+        private boolean[] statuses;
+        private Integer customerNum;
     }
 }

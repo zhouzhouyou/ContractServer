@@ -56,6 +56,7 @@ public class ContractService extends BaseService {
         writeLog(operator, "add contract: " + contract.getName());
         int contractNum = contract.getNum();
         processMapper.insert(contractNum, OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), operator, contract.getContent());
+        processMapper.insert(contractNum, OperationType.FINALIZE.getValue(), OperationState.UNFINISHED.getValue(), operator, contract.getContent());
         stateMapper.insert(contractNum, Status.DRAFT.getValue());
         String attachmentName = contract.getUserName();
         String type = attachmentName.substring(attachmentName.lastIndexOf(".") + 1);
@@ -267,12 +268,15 @@ public class ContractService extends BaseService {
                 result = "Assigned";
                 break;
             case 3:
-                result = "Finalized";
+                result = "Countersigned";
                 break;
             case 4:
-                result = "Reviewed";
+                result = "Finalized";
                 break;
             case 5:
+                result = "Reviewed";
+                break;
+            case 6:
                 result = "Signed";
                 break;
             default:
@@ -326,6 +330,43 @@ public class ContractService extends BaseService {
         return ResponseFactory.success(contractWithStates);
     }
 
+    public ResponseEntity<List<ContractWithState>> fuzzyQueryAllContract(String content) {
+        List<Contract> contracts = contractMapper.fuzzyQuery(content);
+        List<ContractWithState> contractWithStates = new ArrayList<>();
+        if (contracts == null || contracts.size() == 0) {
+            return ResponseFactory.success(contractWithStates);
+        }
+
+        contracts.forEach(contract -> contractWithStates.add(new ContractWithState(contract, getContractState(contract.getNum()))));
+        return ResponseFactory.success(contractWithStates);
+    }
+
+    public ResponseEntity<List<ContractWithState>> filterQueryAllContract(boolean[] statuses, Integer customerNum) {
+        List<Contract> contracts = selectAllContracts();
+        List<ContractWithState> contractWithStates = new ArrayList<>();
+        if (customerNum != null) {
+            contracts.removeIf(contract -> !contract.getCustomer().equals(customerNum));
+        }
+        for (int i = 0; i < statuses.length; i++) {
+            if (!statuses[i]) {
+                var iterator = contracts.iterator();
+                while (iterator.hasNext()) {
+                    Contract contract = iterator.next();
+                    if (stateMapper.getContractStatus(contract.getNum()) == i + 1)
+                        iterator.remove();
+                }
+            }
+        }
+
+        if (contracts == null || contracts.size() == 0) {
+            return ResponseFactory.success(contractWithStates);
+        }
+
+        contracts.forEach(contract -> contractWithStates.add(new ContractWithState(contract, getContractState(contract.getNum()))));
+        return ResponseFactory.success(contractWithStates);
+
+    }
+
     private String getContractState(int contractNum) {
         int count = stateMapper.getContractStatus(contractNum);
         String result = null;
@@ -337,12 +378,15 @@ public class ContractService extends BaseService {
                 result = "Assigned";
                 break;
             case 3:
-                result = "Finalized";
+                result = "Countersigned";
                 break;
             case 4:
-                result = "Reviewed";
+                result = "Finalized";
                 break;
             case 5:
+                result = "Reviewed";
+                break;
+            case 6:
                 result = "Signed";
                 break;
             default:
@@ -351,9 +395,36 @@ public class ContractService extends BaseService {
         return result;
     }
 
-    public ResponseEntity<List<List<DetailContractMessage>>> getDetailContractMessage(int contractNum) {
+    public ResponseEntity<List<List<DetailContractMessage>>> getDetailContractMessage(String operator, int contractNum) {
         List<List<DetailContractMessage>> lists = new ArrayList<>();
         Contract contract = selectContractByNum(contractNum);
+        List<DetailContractMessage> drafter = new ArrayList<>();
+        List<DetailContractMessage> finalizer = new ArrayList<>();
+        List<DetailContractMessage> assigner = new ArrayList<>();
+        List<DetailContractMessage> counterSigners = new ArrayList<>();
+        List<DetailContractMessage> reviewers = new ArrayList<>();
+        List<DetailContractMessage> signers = new ArrayList<>();
+        lists.add(drafter);
+        lists.add(assigner);
+        lists.add(finalizer);
+        lists.add(counterSigners);
+        lists.add(reviewers);
+        lists.add(signers);
+
+        drafter.add(new DetailContractMessage(contract, contract.getName(), "draft", "finished"));
+        if (stateMapper.getContractStatus(contractNum) == 1) {
+            List<String> operators = processMapper.selectOperator(contractNum, -1);
+        } else if (stateMapper.getContractStatus(contractNum) == 2) {
+
+        } else if (stateMapper.getContractStatus(contractNum) == 3) {
+
+        } else if (stateMapper.getContractStatus(contractNum) == 4) {
+
+        } else if (stateMapper.getContractStatus(contractNum) == 5) {
+
+        } else if (stateMapper.getContractStatus(contractNum) == 6) {
+
+        }
         return ResponseFactory.success(lists);
     }
 

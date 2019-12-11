@@ -16,6 +16,9 @@ public interface ContractMapper {
     @Select("select * from contract")
     List<Contract> selectAll();
 
+    @Select("select * from contract where concat_ws(num,name,customerNum,begin,end) like concat('%', #{content}, '%')")
+    List<Contract> fuzzyQuery(String content);
+
     @Select("SELECT Auto_increment FROM information_schema.tables WHERE Table_Schema='yuri' and table_name='contract'")
     int getLastContractNum();
 
@@ -26,7 +29,7 @@ public interface ContractMapper {
             "values(#{contract.name},#{contract.customer},#{contract.begin},#{contract.end}," +
             "#{contract.content},#{userName})")
     @Options(useGeneratedKeys = true, keyProperty = "contract.num")
-    int insert(Contract contract,String userName);
+    int insert(Contract contract, String userName);
 
     @Update("update contract set content =#{content} where num =#{num}")
     int updateContent(int num, String content);

@@ -12,7 +12,7 @@ public class ContractAttachment {
     /**
      * 合同编号
      */
-    private int contractNum;
+    private Integer contractNum;
 
     /**
      * 文件名
