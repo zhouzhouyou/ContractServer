@@ -18,7 +18,7 @@ public class ContractState {
     /**
      * 合同编号
      */
-    private String num;
+    private int num;
 
     /**
      * 合同状态（起草、会签完成、定稿完成、审核完成还是签订完成？）

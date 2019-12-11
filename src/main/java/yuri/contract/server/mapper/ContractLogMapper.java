@@ -19,6 +19,9 @@ public interface ContractLogMapper {
     @Select("select * from contract_log")
     List<ContractLog> selectAll();
 
+    @Select("select count(*) from contract_log")
+    int getNumberOfLog();
+
     @Insert("insert into contract_log (username, content, time) values(#{userName}, #{content}, now())")
     int insert(String userName, String content);
 

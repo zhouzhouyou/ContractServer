@@ -14,16 +14,16 @@ import java.util.List;
 @Component
 public interface ContractAttachmentMapper {
     @Select("select * from contract_attachment where contractNum =#{contractNum}")
-    ContractAttachment select(String contractNum);
+    ContractAttachment select(int contractNum);
 
     @Select("select * from contract_attachment")
     List<ContractAttachment> selectAll();
 
     @Insert("insert into contract_attachment values(#{contractNum},#{fileName},#{path},#{type},now())")
-    int insert(String contractNum, String fileName, String path, String type);
+    int insert(int contractNum, String fileName, String path, String type);
 
     @Delete("delete from contract_attachment where contractNum =#{contractNum}")
-    int delete(String contractNum);
+    int delete(int contractNum);
 
     @Delete("delete from contract_attachment")
     int deleteAll();

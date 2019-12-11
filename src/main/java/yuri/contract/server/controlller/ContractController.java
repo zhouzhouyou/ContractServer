@@ -251,7 +251,7 @@ public class ContractController extends BaseController {
 
     @Data
     private static class ContractNum {
-        private String contractNum;
+        private int contractNum;
     }
 
     @Data

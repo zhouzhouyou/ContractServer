@@ -204,7 +204,7 @@ values ('c3', 'CS', '135********20');
 
 CREATE TABLE contract
 (
-    num         varchar(20) primary key,
+    num         int primary key auto_increment,
     name        varchar(40) not null,
     customerNum int,
     begin       date        not null,
@@ -217,7 +217,7 @@ CREATE TABLE contract
 
 CREATE TABLE contract_process
 (
-    contractNum varchar(20),
+    contractNum int,
     type        integer not null,
     state       integer not null,
     userName    varchar(40),
@@ -230,7 +230,7 @@ CREATE TABLE contract_process
 
 CREATE TABLE contract_state
 (
-    contractNum varchar(20),
+    contractNum int,
     status      integer,
     time        date,
     primary key (contractNum,status),
@@ -248,7 +248,7 @@ CREATE TABLE contract_log
 
 CREATE TABLE contract_attachment
 (
-    contractNum varchar(20),
+    contractNum int,
     fileName    varchar(100) not null,
     path        varchar(100) not null,
     type        varchar(20)  not null,

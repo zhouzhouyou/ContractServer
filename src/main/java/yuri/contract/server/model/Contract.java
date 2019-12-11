@@ -16,7 +16,7 @@ public class Contract {
      * 合同编号
      */
     @ApiModelProperty(value = "合同编号")
-    private String num;
+    private int num;
 
     /**
      * 合同名称

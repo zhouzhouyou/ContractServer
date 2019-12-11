@@ -1,5 +1,6 @@
 package yuri.contract.server.service;
 
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -44,13 +45,13 @@ public class ContractService extends BaseService {
     }
 
     public ResponseEntity<String> addContract(String operator, Contract contract) {
-        int count = contractMapper.insert(contract.getNum(), operator, contract.getCustomer(),
-                contract.getBegin(), contract.getEnd(), contract.getContent(), contract.getUserName());
+        int count = contractMapper.insert(contract, operator);
         if (count == 0)
             return ResponseFactory.badRequest("fail to add");
         writeLog(operator, "add contract: " + contract.getName());
-        processMapper.insert(contract.getNum(), OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), contract.getUserName(), contract.getContent());
-        stateMapper.insert(contract.getNum(), Status.DRAFT.getValue());
+        int contractNum = contract.getNum();
+        processMapper.insert(contractNum, OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), contract.getUserName(), contract.getContent());
+        stateMapper.insert(contractNum, Status.DRAFT.getValue());
         return ResponseFactory.success(contract.getName());
     }
 
@@ -62,7 +63,7 @@ public class ContractService extends BaseService {
 //        return ResponseFactory.success(contractNum);
 //    }
 
-    public ResponseEntity<Contract> selectContractByNum(String contractNum) {
+    public ResponseEntity<Contract> selectContractByNum(int contractNum) {
         Contract getterContract = contractMapper.select(contractNum);
         if (getterContract == null)
             return ResponseFactory.badRequest(null);
@@ -84,7 +85,7 @@ public class ContractService extends BaseService {
     }
 
     public ResponseEntity<List<Contract>> selectAllUnAssignedContracts() {
-        List<String> contractNums = processMapper.selectNumOfUnAssigned();
+        List<Integer> contractNums = processMapper.selectNumOfUnAssigned();
         List<Contract> contracts = new ArrayList<>();
         contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
         return ResponseFactory.success(contracts);
@@ -101,21 +102,21 @@ public class ContractService extends BaseService {
     }
 
     public ResponseEntity<List<Contract>> fuzzySelectAllUnAssignedContracts(String content) {
-        List<String> contractNums = processMapper.fuzzySelectNumOfUnAssigned(content);
+        List<Integer> contractNums = processMapper.fuzzySelectNumOfUnAssigned(content);
         List<Contract> contracts = new ArrayList<>();
         contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
         return ResponseFactory.success(contracts);
     }
 
     public ResponseEntity<List<Contract>> selectAllNeededContracts(String operator, int type) {
-        List<String> contractNums = processMapper.selectNumOfNeededProcess(operator, type);
+        List<Integer> contractNums = processMapper.selectNumOfNeededProcess(operator, type);
         List<Contract> contracts = new ArrayList<>();
         contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
         return ResponseFactory.success(contracts);
     }
 
     public ResponseEntity<List<Contract>> fuzzySelectAllNeededContracts(String operator, String content, int type) {
-        List<String> contractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type);
+        List<Integer> contractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type);
         List<Contract> contracts = new ArrayList<>();
         contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
         return ResponseFactory.success(contracts);
@@ -151,7 +152,7 @@ public class ContractService extends BaseService {
         return ResponseFactory.success(process.getContractNum() + " " + process.getType().getDesc());
     }
 
-    public ResponseEntity<String> getContractStatus(String contractNum) {
+    public ResponseEntity<String> getContractStatus(int contractNum) {
         int count = stateMapper.getContractStatus(contractNum);
         String result = "no such contract";
         switch (count) {
@@ -173,7 +174,7 @@ public class ContractService extends BaseService {
         return ResponseFactory.success(result);
     }
 
-    public ResponseEntity<String> deleteContract(String operator, String contractNum) {
+    public ResponseEntity<String> deleteContract(String operator, int contractNum) {
         int count = contractMapper.delete(contractNum);
         if (count == 0)
             return ResponseFactory.badRequest("fail to delete contract.");
