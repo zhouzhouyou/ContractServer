@@ -372,22 +372,22 @@ public class ContractService extends BaseService {
         String result = null;
         switch (count) {
             case 1:
-                result = "Drafted";
+                result = "已起草";
                 break;
             case 2:
-                result = "Assigned";
+                result = "已分配";
                 break;
             case 3:
-                result = "Countersigned";
+                result = "已会签";
                 break;
             case 4:
-                result = "Finalized";
+                result = "已定稿";
                 break;
             case 5:
-                result = "Reviewed";
+                result = "已审核";
                 break;
             case 6:
-                result = "Signed";
+                result = "已签订";
                 break;
             default:
                 break;
@@ -411,35 +411,61 @@ public class ContractService extends BaseService {
         lists.add(reviewers);
         lists.add(signers);
 
-        drafter.add(new DetailContractMessage(contract, contract.getName(), "draft", "finished"));
+        drafter.add(new DetailContractMessage(contract, contract.getName(), "起草", "完成"));
         List<String> assignOperator = processMapper.selectOperator(contractNum, -1);
         if (stateMapper.getContractStatus(contractNum) == 1) {
-
+            assignOperator.forEach(assign -> assigner.add(new DetailContractMessage(contract, assign, "分配", "未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 2) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
+            assignOperator.forEach(assign -> assigner.add(new DetailContractMessage(contract, assign, "分配", "已完成")));
+            countersignOperator.forEach(countersign -> counterSigners.add(new DetailContractMessage(contract, countersign, "会签", "未完成")));
+            finalizeOperator.forEach(finalize -> finalizer.add(new DetailContractMessage(contract, finalize, "定稿", "未完成")));
+            reviewOperator.forEach(review ->reviewers.add(new DetailContractMessage(contract,review,"审核","未完成")));
+            signOperator.forEach(sign->signers.add(new DetailContractMessage(contract,sign,"签订","未完成")));
+
         } else if (stateMapper.getContractStatus(contractNum) == 3) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
+            assignOperator.forEach(assign -> assigner.add(new DetailContractMessage(contract, assign, "分配", "已完成")));
+            countersignOperator.forEach(countersign -> counterSigners.add(new DetailContractMessage(contract, countersign, "会签", "已完成")));
+            finalizeOperator.forEach(finalize -> finalizer.add(new DetailContractMessage(contract, finalize, "定稿", "未完成")));
+            reviewOperator.forEach(review ->reviewers.add(new DetailContractMessage(contract,review,"审核","未完成")));
+            signOperator.forEach(sign->signers.add(new DetailContractMessage(contract,sign,"签订","未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 4) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
+            assignOperator.forEach(assign -> assigner.add(new DetailContractMessage(contract, assign, "分配", "已完成")));
+            countersignOperator.forEach(countersign -> counterSigners.add(new DetailContractMessage(contract, countersign, "会签", "已完成")));
+            finalizeOperator.forEach(finalize -> finalizer.add(new DetailContractMessage(contract, finalize, "定稿", "已完成")));
+            reviewOperator.forEach(review ->reviewers.add(new DetailContractMessage(contract,review,"审核","未完成")));
+            signOperator.forEach(sign->signers.add(new DetailContractMessage(contract,sign,"签订","未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 5) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
+            assignOperator.forEach(assign -> assigner.add(new DetailContractMessage(contract, assign, "分配", "已完成")));
+            countersignOperator.forEach(countersign -> counterSigners.add(new DetailContractMessage(contract, countersign, "会签", "已完成")));
+            finalizeOperator.forEach(finalize -> finalizer.add(new DetailContractMessage(contract, finalize, "定稿", "已完成")));
+            reviewOperator.forEach(review ->reviewers.add(new DetailContractMessage(contract,review,"审核","已完成")));
+            signOperator.forEach(sign->signers.add(new DetailContractMessage(contract,sign,"签订","未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 6) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
+            assignOperator.forEach(assign -> assigner.add(new DetailContractMessage(contract, assign, "分配", "已完成")));
+            countersignOperator.forEach(countersign -> counterSigners.add(new DetailContractMessage(contract, countersign, "会签", "已完成")));
+            finalizeOperator.forEach(finalize -> finalizer.add(new DetailContractMessage(contract, finalize, "定稿", "已完成")));
+            reviewOperator.forEach(review ->reviewers.add(new DetailContractMessage(contract,review,"审核","已完成")));
+            signOperator.forEach(sign->signers.add(new DetailContractMessage(contract,sign,"签订","已完成")));
         }
         return ResponseFactory.success(lists);
     }
