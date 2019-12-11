@@ -1,5 +1,6 @@
 package yuri.contract.server.model;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public class DetailContractMessage {
         this.messageLists = messageLists;
     }
 
+    @Data
+    @ApiModel("各种操作的人员及完成情况")
     public static class Message{
         /**
          * 操作人员
