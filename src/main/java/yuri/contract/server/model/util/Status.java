@@ -8,25 +8,29 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum Status implements EnumValue {
     /**
-     * 起草
+     * 起草完成
      */
-    DRAFT(0, "起草"),
+    DRAFT(0, "起草完成"),
+    /**
+     * 分配完成
+     */
+    ASSIGN(1,"分配完成"),
     /**
      * 会签完成
      */
-    COUNTER_SIGN_FINISHED(1, "会签完成"),
+    COUNTER_SIGN_FINISHED(2, "会签完成"),
     /**
      * 定稿完成
      */
-    FINALIZE_FINISHED(2, "定稿完成"),
+    FINALIZE_FINISHED(3, "定稿完成"),
     /**
      * 审核完成
      */
-    REVIEW_FINISHED(3, "审核完成"),
+    REVIEW_FINISHED(4, "审核完成"),
     /**
      * 签订完成
      */
-    SIGN_FINISHED(4, "签订完成");
+    SIGN_FINISHED(5, "签订完成");
 
     private final Integer value;
 
