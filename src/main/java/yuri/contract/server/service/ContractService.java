@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.model.IProcessableElementTag;
 import yuri.contract.server.mapper.*;
 import yuri.contract.server.model.Contract;
@@ -17,6 +18,9 @@ import yuri.contract.server.model.util.OperationType;
 import yuri.contract.server.model.util.Status;
 import yuri.contract.server.util.response.ResponseFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.util.*;
 
@@ -52,7 +56,25 @@ public class ContractService extends BaseService {
         int contractNum = contract.getNum();
         processMapper.insert(contractNum, OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), contract.getUserName(), contract.getContent());
         stateMapper.insert(contractNum, Status.DRAFT.getValue());
+        String attachmentName = contract.getUserName();
+        String type = attachmentName.substring(attachmentName.lastIndexOf(".") + 1);
+        attachmentMapper.insert(contractNum, contract.getUserName(), "", type);
         return ResponseFactory.success(contract.getName());
+    }
+
+    public ResponseEntity<String> uploadFile(MultipartFile file) {
+        String originName = file.getOriginalFilename();
+        int count = attachmentMapper.getNewFileNameCount(originName);
+        String fileType = originName.substring(originName.lastIndexOf(".") + 1);
+        String newName = originName.substring(0, originName.lastIndexOf(".")) + "(" + count + ")" + fileType;
+        File newFile = new File("./Attachment/" + newName);
+        if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
+        try {
+            file.transferTo(newFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseFactory.success(newName);
     }
 
 //    public ResponseEntity<String> deleteContractByNum(String operator, String contractNum) {

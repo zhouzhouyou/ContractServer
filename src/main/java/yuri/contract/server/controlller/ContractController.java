@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import yuri.contract.server.model.Contract;
 import yuri.contract.server.model.ContractAttachment;
 import yuri.contract.server.model.ContractProcess;
@@ -38,7 +39,7 @@ public class ContractController extends BaseController {
     public ResponseEntity<String> deleteContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.deleteContract(getOperator(),contractNum.contractNum);
+        return contractService.deleteContract(getOperator(), contractNum.contractNum);
     }
 
     @ApiOperation("起草合同(就是添加合同)")
@@ -72,7 +73,17 @@ public class ContractController extends BaseController {
         return contractService.selectAllContracts();
     }
 
-    @ApiOperation("添加附件")
+    @ApiOperation("获取附件本体")
+    @CrossOrigin
+    @PostMapping(value = "/attachment/upload")
+    @ResponseBody
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.uploadFile(file);
+    }
+
+    /*@ApiOperation("添加附件")
     @CrossOrigin
     @PutMapping(value = "/attachment/add")
     @ResponseBody
@@ -81,7 +92,7 @@ public class ContractController extends BaseController {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return contractService.addContractAttachment(getOperator(), attachment);
-    }
+    }*/
 
     @ApiOperation("获取所有未分配的合同")
     @CrossOrigin

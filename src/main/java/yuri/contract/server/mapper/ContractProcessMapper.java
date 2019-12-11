@@ -26,7 +26,7 @@ public interface ContractProcessMapper {
     @Select("select contractNum from contract_process where type = #{type} and userName = #{userName}")
     List<Integer> selectNumOfNeededProcess(String userName,int type);
 
-    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and concat_ws(contractNum,type,state,userName,content,time) like concat('%', #{content}, '%'")
+    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and concat_ws(contractNum,type,state,userName,content,time) like concat('%', #{content}, '%')")
     List<Integer> fuzzySelectNumOfNeededProcess(String userName, String content, int type);
 
     @Select("select count(*) from contract_process where type = #{type} and state = #{state}")
