@@ -44,7 +44,7 @@ public class ContractService extends BaseService {
     }
 
     public ResponseEntity<String> addContract(String operator, Contract contract) {
-        int count = contractMapper.insert(contract.getNum(), contract.getName(), contract.getCustomer(),
+        int count = contractMapper.insert(contract.getNum(), operator, contract.getCustomer(),
                 contract.getBegin(), contract.getEnd(), contract.getContent(), contract.getUserName());
         if (count == 0)
             return ResponseFactory.badRequest("fail to add");
