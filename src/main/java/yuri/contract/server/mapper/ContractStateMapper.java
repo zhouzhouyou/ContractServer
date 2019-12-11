@@ -16,6 +16,9 @@ public interface ContractStateMapper {
     @Select("select * from contract_state")
     List<ContractState> selectAll();
 
+    @Select("select count(*) from contract_state where contractNum =#{contractNum}")
+    int getContractStatus(String contractNum);
+
     @Insert("insert into contract_state values(#{contractNum},#{status},now())")
     int insert(String contractNum, int status);
 

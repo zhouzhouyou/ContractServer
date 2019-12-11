@@ -4,9 +4,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.model.IProcessableElementTag;
 import yuri.contract.server.mapper.*;
 import yuri.contract.server.model.Contract;
+import yuri.contract.server.model.ContractAttachment;
+import yuri.contract.server.model.ContractProcess;
+import yuri.contract.server.model.ContractState;
+import yuri.contract.server.model.util.EnumValue;
+import yuri.contract.server.model.util.OperationState;
+import yuri.contract.server.model.util.OperationType;
+import yuri.contract.server.model.util.Status;
 import yuri.contract.server.util.response.ResponseFactory;
+
+import java.sql.Date;
+import java.util.*;
+
+import static yuri.contract.server.model.util.Status.COUNTER_SIGN_FINISHED;
 
 
 @Service
@@ -30,11 +43,219 @@ public class ContractService extends BaseService {
         this.attachmentMapper = attachmentMapper;
     }
 
-    public ResponseEntity<String> addContract(Contract contract) {
+    public ResponseEntity<String> addContract(String operator, Contract contract) {
         int count = contractMapper.insert(contract.getNum(), contract.getName(), contract.getCustomer(),
                 contract.getBegin(), contract.getEnd(), contract.getContent(), contract.getUserName());
-        return count == 0 ?
-                ResponseFactory.badRequest("fail to insert") :
-                ResponseFactory.success(contract.getName());
+        if (count == 0)
+            return ResponseFactory.badRequest("fail to add");
+        writeLog(operator, "add contract: " + contract.getName());
+        processMapper.insert(contract.getNum(), OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), contract.getUserName(), contract.getContent());
+        stateMapper.insert(contract.getNum(), Status.DRAFT.getValue());
+        return ResponseFactory.success(contract.getName());
     }
+
+//    public ResponseEntity<String> deleteContractByNum(String operator, String contractNum) {
+//        int count = contractMapper.delete(contractNum);
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to delete");
+//        writeLog(operator, "delete contract: " + contractNum);
+//        return ResponseFactory.success(contractNum);
+//    }
+
+    public ResponseEntity<Contract> selectContractByNum(String contractNum) {
+        Contract getterContract = contractMapper.select(contractNum);
+        if (getterContract == null)
+            return ResponseFactory.badRequest(null);
+        else
+            return ResponseFactory.success(getterContract);
+    }
+
+    public ResponseEntity<List<Contract>> selectAllContracts() {
+        List<Contract> contracts = contractMapper.selectAll();
+        return ResponseFactory.success(contracts);
+    }
+
+    public ResponseEntity<String> addContractAttachment(String operator, ContractAttachment attachment) {
+        int count = attachmentMapper.insert(attachment.getContractNum(), attachment.getFileName(), attachment.getPath(), attachment.getType());
+        if (count == 0)
+            return ResponseFactory.badRequest("fail to add contract attachment");
+        writeLog(operator, "add contract attachment for " + attachment.getContractNum());
+        return ResponseFactory.success("add contract attachment for " + attachment.getContractNum());
+    }
+
+    public ResponseEntity<List<Contract>> selectAllUnAssignedContracts() {
+        List<String> contractNums = processMapper.selectNumOfUnAssigned();
+        List<Contract> contracts = new ArrayList<>();
+        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+        return ResponseFactory.success(contracts);
+    }
+
+    public ResponseEntity<String> doAssignJob(String operator, ContractProcess process) {
+        int count = processMapper.insert(process.getContractNum(), process.getType().getValue(),
+                process.getState().getValue(), process.getUserName(),
+                process.getContent());
+        if (count == 0)
+            return ResponseFactory.badRequest("fail to assign");
+        writeLog(operator, " assigned " + process.getContractNum() + " " + process.getType().getDesc() + " to " + process.getUserName());
+        return ResponseFactory.success(process.getContractNum() + " " + process.getType().getDesc());
+    }
+
+    public ResponseEntity<List<Contract>> fuzzySelectAllUnAssignedContracts(String content) {
+        List<String> contractNums = processMapper.fuzzySelectNumOfUnAssigned(content);
+        List<Contract> contracts = new ArrayList<>();
+        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+        return ResponseFactory.success(contracts);
+    }
+
+    public ResponseEntity<List<Contract>> selectAllNeededContracts(String operator, int type) {
+        List<String> contractNums = processMapper.selectNumOfNeededProcess(operator, type);
+        List<Contract> contracts = new ArrayList<>();
+        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+        return ResponseFactory.success(contracts);
+    }
+
+    public ResponseEntity<List<Contract>> fuzzySelectAllNeededContracts(String operator, String content, int type) {
+        List<String> contractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type);
+        List<Contract> contracts = new ArrayList<>();
+        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+        return ResponseFactory.success(contracts);
+    }
+
+    public ResponseEntity<String> doProcessJob(String operator, ContractProcess process, int type) {
+        int count = processMapper.insert(process.getContractNum(), process.getType().getValue(),
+                process.getState().getValue(), process.getUserName(),
+                process.getContent());
+        int createNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.UNFINISHED.getValue());
+        int finishNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.FINISHED.getValue());
+        if (createNumber == finishNumber) {
+            switch (process.getType().getValue()) {
+                case 1:
+                    stateMapper.insert(process.getContractNum(), Status.COUNTER_SIGN_FINISHED.getValue());
+                    break;
+                case 2:
+                    stateMapper.insert(process.getContractNum(), Status.FINALIZE_FINISHED.getValue());
+                    break;
+                case 3:
+                    stateMapper.insert(process.getContractNum(), Status.REVIEW_FINISHED.getValue());
+                    break;
+                case 4:
+                    stateMapper.insert(process.getContractNum(), Status.SIGN_FINISHED.getValue());
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (count == 0)
+            return ResponseFactory.badRequest("fail");
+        writeLog(operator, " countersigned " + process.getContractNum());
+        return ResponseFactory.success(process.getContractNum() + " " + process.getType().getDesc());
+    }
+
+    public ResponseEntity<String> getContractStatus(String contractNum) {
+        int count = stateMapper.getContractStatus(contractNum);
+        String result = "no such contract";
+        switch (count) {
+            case 1:
+                result = "Drafted";
+                break;
+            case 2:
+                result = "Finalized";
+                break;
+            case 3:
+                result = "Reviewed";
+                break;
+            case 4:
+                result = "Signed";
+                break;
+            default:
+                break;
+        }
+        return ResponseFactory.success(result);
+    }
+
+    public ResponseEntity<String> deleteContract(String operator, String contractNum) {
+        int count = contractMapper.delete(contractNum);
+        if (count == 0)
+            return ResponseFactory.badRequest("fail to delete contract.");
+        writeLog(operator, "delete contract: " + contractNum);
+        return ResponseFactory.success("delete contract: " + contractNum);
+    }
+
+
+//    public ResponseEntity<String> addContractProcess(String operator, ContractProcess process) {
+//        int count = processMapper.insert(process.getContractNum(), process.getType().getValue(),
+//                process.getState().getValue(), process.getUserName(),
+//                process.getContent());
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to add contract process");
+//        writeLog(operator, "add contract process: " + process.getContractNum() + " " + process.getType().getDesc());
+//        return ResponseFactory.success(process.getContractNum() + " " + process.getType().getDesc());
+//    }
+
+//    public ResponseEntity<String> deleteContractProcess(String operator, ContractProcess process) {
+//        int count = processMapper.delete(process.getContractNum(), process.getType().getValue(), process.getUserName());
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to delete contract process");
+//        writeLog(operator, "delete contract process: " + process.getContractNum() + " " + process.getType().getDesc());
+//        return ResponseFactory.success(process.getContractNum() + " " + process.getType().getDesc());
+//    }
+//
+//    public ResponseEntity<String> updateContractProcessState(String operator, ContractProcess process) {
+//        int count = processMapper.updateState(process.getState().getValue(), process.getContractNum(), process.getType().getValue(), process.getUserName());
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to update contract process");
+//        writeLog(operator, "update contract process: " + process.getContractNum() + " to " + process.getType().getDesc());
+//        return ResponseFactory.success(process.getContractNum() + " to " + process.getType().getDesc());
+//    }
+//
+//    public ResponseEntity<String> selectContractProcess(ContractProcess process) {
+//        ContractProcess getterProcess = processMapper.select(process.getContractNum(), process.getType().getValue(), process.getUserName());
+//        if (getterProcess == null)
+//            return ResponseFactory.badRequest("no such process");
+//        else
+//            return ResponseFactory.success(getterProcess.getContractNum() + " " + getterProcess.getType().getDesc());
+//    }
+//
+//    public ResponseEntity<String> addContractState(String operator, ContractState state) {
+//        int count = stateMapper.insert(state.getNum(), state.getStatus().getValue());
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to add contract state");
+//        writeLog(operator, "add contract state: " + state.getNum() + " " + state.getStatus().getDesc());
+//        return ResponseFactory.success(state.getNum() + " " + state.getStatus().getDesc());
+//    }
+//
+//    public ResponseEntity<String> deleteContractState(String operator, ContractState state) {
+//        int count = stateMapper.delete(state.getNum());
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to delete state");
+//        writeLog(operator, "delete contract state: " + state.getNum() + " " + state.getStatus().getDesc());
+//        return ResponseFactory.success(state.getNum() + " " + state.getStatus().getDesc());
+//    }
+
+//    public ResponseEntity<String> updateContractStateStatus(String operator, ContractState state) {
+//        int count = stateMapper.updateStatus(state.getNum(), state.getStatus().getValue());
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to update state");
+//        writeLog(operator, "update contract state: " + state.getNum() + " to " + state.getStatus().getDesc());
+//        return ResponseFactory.success(state.getNum() + " to " + state.getStatus().getDesc());
+//    }
+
+//    public ResponseEntity<String> selectContractState(String contractNum) {
+//        ContractState getterState = stateMapper.select(contractNum);
+//        if (getterState == null)
+//            return ResponseFactory.badRequest("no such contract state");
+//        else
+//            return ResponseFactory.success(getterState.getNum() + " " + getterState.getStatus().getDesc());
+//    }
+
+
+//    public ResponseEntity<String> deleteContractAttachment(String operator, String contractNum) {
+//        int count = attachmentMapper.delete(contractNum);
+//        if (count == 0)
+//            return ResponseFactory.badRequest("fail to delete contract attachment");
+//        writeLog(operator, "delete contract attachment for " + contractNum);
+//        return ResponseFactory.success("delete contract attachment for " + contractNum);
+//    }
+
+
 }

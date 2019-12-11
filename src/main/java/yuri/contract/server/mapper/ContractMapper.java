@@ -17,7 +17,7 @@ public interface ContractMapper {
     List<Contract> selectAll();
 
     @Insert("insert into contract values(#{num},#{name},#{customerNum},#{begin},#{end},#{content},#{userName})")
-    int insert(String num, String name, String customerNum, Date begin, Date end, String content, String userName);
+    int insert(String num, String name, int customerNum, Date begin, Date end, String content, String userName);
 
     @Update("update contract set content =#{content} where num =#{num}")
     int updateContent(String num, String content);

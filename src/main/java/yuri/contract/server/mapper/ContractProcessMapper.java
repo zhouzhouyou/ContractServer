@@ -16,8 +16,20 @@ public interface ContractProcessMapper {
     @Select("select * from contract_process")
     List<ContractProcess> selectAll();
 
-    @Select("select from contract_process where type = -1")
+    @Select("select contractNum from contract_process where type = -1")
     List<String> selectNumOfUnAssigned();
+
+    @Select("select contractNum from contract_process where type = -1 and concat_ws(contractNum,type,state,userName,content,time) like concat('%', #{content}, '%')")
+    List<String> fuzzySelectNumOfUnAssigned(String content);
+
+    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName}")
+    List<String> selectNumOfNeededProcess(String userName,int type);
+
+    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and concat_ws(contractNum,type,state,userName,content,time) like concat('%', #{content}, '%'")
+    List<String> fuzzySelectNumOfNeededProcess(String userName,String content,int type);
+
+    @Select("select count(*) from contract_process where type = #{type} and state = #{state}")
+    int getNumberOfNeededTypeState(int type, int state);
 
     @Insert("insert into contract_process values(#{contractNum},#{type},#{state},#{userName},#{content},now())")
     int insert(String contractNum, int type, int state, String userName, String content);

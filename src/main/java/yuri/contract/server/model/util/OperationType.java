@@ -8,6 +8,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum OperationType implements EnumValue {
     /**
+     * 当前还需要分配
+     */
+    ASSIGN(-1,"分配"),
+    /**
      * 当前还需要会签
      */
     COUNTER_SIGH(0, "会签"),

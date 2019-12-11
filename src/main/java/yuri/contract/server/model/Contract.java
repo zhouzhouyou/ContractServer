@@ -28,7 +28,7 @@ public class Contract {
      * 客户编号
      */
     @ApiModelProperty(value = "客户编号")
-    private String customer;
+    private int customer;
 
     /**
      * 开始时间
