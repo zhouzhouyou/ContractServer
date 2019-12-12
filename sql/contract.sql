@@ -221,20 +221,21 @@ CREATE TABLE contract
 
 CREATE TABLE contract_process
 (
-    contractNum int,
+    processNum  integer auto_increment,
+    contractNum integer not null ,
     type        integer not null,
     state       integer not null,
     userName    varchar(40),
     content     text,
     time        date,
-    primary key (contractNum, type, userName),
+    primary key (processNum),
     foreign key (contractNum) REFERENCES contract (num) ON DELETE CASCADE,
     foreign key (userName) REFERENCES user (name) ON DELETE CASCADE
 );
 
 CREATE TABLE contract_state
 (
-    contractNum int,
+    contractNum integer,
     status      integer,
     time        date,
     primary key (contractNum,status),
@@ -243,7 +244,7 @@ CREATE TABLE contract_state
 
 CREATE TABLE contract_log
 (
-    id       int primary key auto_increment,
+    id       integer primary key auto_increment,
     userName varchar(40),
     content  text,
     time     datetime,
@@ -252,7 +253,7 @@ CREATE TABLE contract_log
 
 CREATE TABLE contract_attachment
 (
-    contractNum int,
+    contractNum integer,
     fileName    varchar(100) not null,
     path        varchar(100) not null,
     type        varchar(20)  not null,

@@ -13,6 +13,10 @@ import java.sql.Date;
 @Data
 public class ContractProcess {
     /**
+     * 过程编号
+     */
+    private Integer processNum;
+    /**
      * 合同编号
      */
     private Integer contractNum;
