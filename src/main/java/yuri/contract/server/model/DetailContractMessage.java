@@ -11,7 +11,9 @@ public class DetailContractMessage {
      * 合同
      */
     private Contract contract;
-
+    /**
+     * 信息列表
+     */
     private List<List<Message>> messageLists;
 
     public DetailContractMessage(Contract contract,List<List<Message>> messageLists) {

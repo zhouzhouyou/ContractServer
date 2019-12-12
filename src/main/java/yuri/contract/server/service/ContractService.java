@@ -19,6 +19,7 @@ import yuri.contract.server.model.util.OperationType;
 import yuri.contract.server.model.util.Status;
 import yuri.contract.server.util.response.ResponseFactory;
 import yuri.contract.server.model.DetailContractMessage.Message;
+import yuri.contract.server.model.PreviousProcessMessage.PreviousMessage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -210,16 +211,16 @@ public class ContractService extends BaseService {
             return ResponseFactory.success(contracts);
         switch (type) {
             case 0:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 1);
-                break;
-            case 1:
                 contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
                 break;
-            case 2:
+            case 1:
                 contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
                 break;
-            case 3:
+            case 2:
                 contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
+                break;
+            case 3:
+                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
                 break;
             default:
                 break;
@@ -243,6 +244,7 @@ public class ContractService extends BaseService {
                     break;
                 case 1:
                     stateMapper.insert(process.getContractNum(), Status.FINALIZE_FINISHED.getValue());
+                    contractMapper.updateContent(process.getContractNum(),process.getContent());
                     break;
                 case 2:
                     stateMapper.insert(process.getContractNum(), Status.REVIEW_FINISHED.getValue());
@@ -399,29 +401,29 @@ public class ContractService extends BaseService {
     public ResponseEntity<DetailContractMessage> getDetailContractMessage(String operator, int contractNum) {
         List<List<Message>> lists = new ArrayList<>();
         Contract contract = selectContractByNum(contractNum);
-        List<Message> drafter = new ArrayList<>();
+        //List<Message> drafter = new ArrayList<>();
         List<Message> finalizer = new ArrayList<>();
-        List<Message> assigner = new ArrayList<>();
+        //List<Message> assigner = new ArrayList<>();
         List<Message> counterSigners = new ArrayList<>();
         List<Message> reviewers = new ArrayList<>();
         List<Message> signers = new ArrayList<>();
-        lists.add(drafter);
-        lists.add(assigner);
+        //lists.add(drafter);
+        //lists.add(assigner);
         lists.add(finalizer);
         lists.add(counterSigners);
         lists.add(reviewers);
         lists.add(signers);
 
-        drafter.add(new Message(contract.getName(), "起草", "完成"));
-        List<String> assignOperator = processMapper.selectOperator(contractNum, -1);
-        if (stateMapper.getContractStatus(contractNum) == 1) {
-            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "未完成")));
-        } else if (stateMapper.getContractStatus(contractNum) == 2) {
+        //drafter.add(new Message(contract.getName(), "起草", "完成"));
+        //List<String> assignOperator = processMapper.selectOperator(contractNum, -1);
+//        if (stateMapper.getContractStatus(contractNum) == 1) {
+//            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "未完成")));}
+         if (stateMapper.getContractStatus(contractNum) == 2) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
-            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
+            //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message( countersign, "会签", "未完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "未完成")));
             reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","未完成")));
@@ -432,7 +434,7 @@ public class ContractService extends BaseService {
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
-            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
+            //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "未完成")));
             reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","未完成")));
@@ -442,7 +444,7 @@ public class ContractService extends BaseService {
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
-            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
+            //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
             reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","未完成")));
@@ -452,7 +454,7 @@ public class ContractService extends BaseService {
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
-            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
+            //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
             reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","已完成")));
@@ -462,7 +464,7 @@ public class ContractService extends BaseService {
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
-            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
+            //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message( countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
             reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","已完成")));
@@ -471,6 +473,21 @@ public class ContractService extends BaseService {
         DetailContractMessage detailContractMessage = new DetailContractMessage(contract,lists);
         return ResponseFactory.success(detailContractMessage);
     }
+
+    public ResponseEntity<PreviousProcessMessage> getPreviousProcessMessage(int contractNum,int type){
+        List<List<PreviousMessage>> lists = new ArrayList<>();
+        List<PreviousMessage> drafter = new ArrayList<>();
+        List<PreviousMessage> counterSigners = new ArrayList<>();
+        List<PreviousMessage> finalizer = new ArrayList<>();
+        List<PreviousMessage> reviewers = new ArrayList<>();
+        List<PreviousMessage> signers = new ArrayList<>();
+        Contract contract = selectContractByNum(contractNum);
+
+        PreviousProcessMessage previousProcessMessage = new PreviousProcessMessage(contract,lists);
+        return ResponseFactory.success(previousProcessMessage);
+    }
+
+
 
 
 //    public ResponseEntity<String> addContractProcess(String operator, ContractProcess process) {
