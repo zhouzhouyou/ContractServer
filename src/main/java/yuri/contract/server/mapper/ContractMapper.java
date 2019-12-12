@@ -26,7 +26,7 @@ public interface ContractMapper {
 //    int insert(String name, int customerNum, Date begin, Date end, String content, String userName);
 
     @Insert("insert into contract (name,customerNum,begin,end,content,userName) " +
-            "values(#{contract.name},#{contract.customer},#{contract.begin},#{contract.end}," +
+            "values(#{contract.name},#{contract.customerNum},#{contract.begin},#{contract.end}," +
             "#{contract.content},#{userName})")
     @Options(useGeneratedKeys = true, keyProperty = "contract.num")
     int insert(Contract contract, String userName);

@@ -61,8 +61,11 @@ public class ContractService extends BaseService {
         processMapper.insert(contractNum, OperationType.FINALIZE.getValue(), OperationState.UNFINISHED.getValue(), operator, contract.getContent());
         stateMapper.insert(contractNum, Status.DRAFT.getValue());
         String attachmentName = contract.getUserName();
-        String type = attachmentName.substring(attachmentName.lastIndexOf(".") + 1);
-        attachmentMapper.insert(contractNum, attachmentName, "", type);
+        if (attachmentName != null) {
+            String type = attachmentName.substring(attachmentName.lastIndexOf(".") + 1);
+            attachmentMapper.insert(contractNum, attachmentName, "", type);
+        }
+
         return ResponseFactory.success(contract.getName());
     }
 

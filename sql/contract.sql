@@ -201,6 +201,10 @@ INSERT INTO customer (name, address, tel)
 values ('c2', '北京', '153******19');
 INSERT INTO customer (name, address, tel)
 values ('c3', 'CS', '135********20');
+INSERT INTO customer (name, address, tel)
+values ('c4', 'DUST_2', '7355608');
+INSERT INTO customer (name, address, tel)
+values ('B', 'DUST_2', '735****8');
 
 CREATE TABLE contract
 (

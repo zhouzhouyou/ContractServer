@@ -58,4 +58,14 @@ public class PageController {
     public String contract2(HttpServletRequest request) {
         return "contract";
     }
+
+    @GetMapping("assign")
+    public String assign(HttpServletRequest request) {
+        return "assign";
+    }
+
+    @GetMapping("assign.html")
+    public String assign2(HttpServletRequest request) {
+        return "assign";
+    }
 }
