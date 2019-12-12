@@ -26,4 +26,10 @@ public interface ActMapper {
 
     @Delete("delete from act")
     int deleteAll();
+
+    @Delete("delete from act where username = #{username}")
+    int deleteByUsername(String username);
+
+    @Select("select userName from act where roleId = #{roleId}")
+    List<String> selectByRole(Integer roleId);
 }

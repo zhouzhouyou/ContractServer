@@ -1,6 +1,7 @@
 package yuri.contract.server.controlller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @SuppressWarnings("ConstantConditions")
-@Api(tags = "To Control user operations")
+@Api(tags = "控制用户相关")
 @RestController
 @RequestMapping("/api")
 public class UserController extends BaseController {
@@ -117,6 +118,15 @@ public class UserController extends BaseController {
         return userService.insertUser(getOperator(), user);
     }
 
+    @ApiOperation("当前可以分配任务的用户，顺序为会签，审核，签订")
+    @CrossOrigin
+    @PostMapping("/user/available")
+    @ResponseBody
+    @NeedToken(function = NeedToken.SELECT_USER)
+    public ResponseEntity<List<List<String>>> queryAvailableUsers() {
+        return userService.queryAvailableUsers();
+    }
+
     /**
      * 获取所有用户名，需要 {@link NeedToken#SELECT_USER}
      *
@@ -132,6 +142,7 @@ public class UserController extends BaseController {
     }
 
     @Data
+    @ApiModel(description = "用户名")
     private static class Name {
         private String name;
     }

@@ -24,9 +24,15 @@ public interface BehaviorMapper {
     @Insert("insert into behavior values(#{roleId}, #{num})")
     int insert(Integer roleId, String num);
 
-    @Delete("delete from behavior where roleId =#{roleId} nad num =#{num}")
+    @Delete("delete from behavior where roleId =#{roleId} and num =#{num}")
     int delete(Integer roleId, String num);
 
     @Delete("delete from behavior")
     int deleteAll();
+
+    @Delete("delete from behavior where roleId =#{roleId}")
+    int deleteByRole(Integer roleId);
+
+    @Select("select roleId from behavior where num=#{num}")
+    List<Integer> selectByNum(String num);
 }
