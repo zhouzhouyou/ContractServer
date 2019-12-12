@@ -137,6 +137,13 @@
             <version>2.2.1.RELEASE</version>
         </dependency>
 
+        <!--poi-excel-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.6</version>
+        </dependency>
+
 
     </dependencies>
 
