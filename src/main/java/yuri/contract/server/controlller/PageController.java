@@ -48,4 +48,14 @@ public class PageController {
     public String draft2(HttpServletRequest request) {
         return "draft";
     }
+
+    @GetMapping("contract")
+    public String contract(HttpServletRequest request) {
+        return "contract";
+    }
+
+    @GetMapping("contract.html")
+    public String contract2(HttpServletRequest request) {
+        return "contract";
+    }
 }

@@ -165,7 +165,7 @@
             data: JSON.stringify({
                 "num":"",
                 "name":nameInput.val(),
-                "customer":currentCustomerId,
+                "customerNum":currentCustomerId,
                 "begin": beginTime.value(),
                 "end": endTime.value(),
                 "content": content.val(),
@@ -180,9 +180,8 @@
                 }
             },
 
-            error: function () {
-                alert("未连接到网络，或者无权限");
-            }
+            error: () => alert("未连接到网络，或者无权限")
+
         })
     }
 
@@ -203,9 +202,7 @@
         tableBody = $('#tableBody');
 
         nameInput = $("#name");
-        nameInput.blur(function () {
-            setValid(nameInput, nameInput.val().length !== 0);
-        });
+        nameInput.blur(() => setValid(nameInput, nameInput.val().length !== 0));
 
         openCustomerSelector = $("#customerBtn");
         customerInput = $("#customerInput");
@@ -241,9 +238,7 @@
                     }
                 },
 
-                error: function () {
-                    alert("未连接到网络，或者无权限");
-                }
+                error: () => alert("未连接到网络，或者无权限")
             });
         }
 
@@ -262,9 +257,7 @@
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: function (e) {
-                setValid(beginTime, beginTime.value().length !== 0);
-            }
+            close: () => setValid(beginTime, beginTime.value().length !== 0)
         });
 
         endTime = $("#endTime");
@@ -272,15 +265,11 @@
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: function (e) {
-                setValid(endTime, endTime.value().length !== 0);
-            }
+            close: () => setValid(endTime, endTime.value().length !== 0)
         });
 
         content = $("#content");
-        content.blur(function () {
-            setValid(content, content.val().length !== 0);
-        });
+        content.blur(() => setValid(content, content.val().length !== 0));
 
         attachment = $("#attachment");
         attachment.fileinput({
