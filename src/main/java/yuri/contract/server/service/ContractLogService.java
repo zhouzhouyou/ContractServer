@@ -22,22 +22,22 @@ public class ContractLogService extends BaseService{
     @Autowired
     public ContractLogService(ContractLogMapper logMapper,ContractLogMapper contractLogMapper) {
         super(logMapper);
-        this.contractLogMapper=contractLogMapper;
+        this.contractLogMapper = contractLogMapper;
     }
 
     public ResponseEntity<List<ContractLog>> selectAllLog() {
         return ResponseFactory.success(contractLogMapper.selectAll());
     }
 
-    public ResponseEntity<List<ContractLog>> selectLog(String userName,Date fromTime,Date toTime) {
-        if(fromTime==null){
-            fromTime=Date.valueOf("1900-01-01");
+    public ResponseEntity<List<ContractLog>> filterSelectLog(String userName,Date fromTime,Date toTime) {
+        if(fromTime == null){
+            fromTime = Date.valueOf("1900-01-01");
         }
-        if (toTime==null){
-            toTime=Date.valueOf(LocalDate.now());
+        if (toTime == null){
+            toTime = Date.valueOf("2100-01-01");
         }
-        if(userName==null){
-            return ResponseFactory.success(contractLogMapper.selectLogWithoutUserName(fromTime,toTime));
+        if(userName.equals("")){
+            return ResponseFactory.success(contractLogMapper.selectLogWithoutUserName(fromTime, toTime));
         }else {
             return ResponseFactory.success(contractLogMapper.selectLogWithUserName(userName,fromTime,toTime));
         }

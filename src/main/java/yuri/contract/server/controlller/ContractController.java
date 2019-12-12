@@ -17,7 +17,7 @@ import yuri.contract.server.util.response.ResponseFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@Api(tags = "To Control contract operations")
+@Api(tags = "合同相关操作接口")
 @RestController
 @RequestMapping("/api/contract")
 public class ContractController extends BaseController {
@@ -351,23 +351,41 @@ public class ContractController extends BaseController {
 
     @Data
     private static class ContractNum {
+        /**
+         * 合同编号
+         */
         private int contractNum;
     }
 
     @Data
     private static class FuzzyContent {
+        /**
+         * 模糊查询关键字
+         */
         private String content;
     }
 
     @Data
     private static class Assign {
+        /**
+         * 分配任务列表
+         */
         private List<List<String>> assignLists;
+        /**
+         * 合同编号
+         */
         private int contractNum;
     }
 
     @Data
     private static class Filter {
+        /**
+         * 有无任务判断列表
+         */
         private boolean[] statuses;
+        /**
+         * 客户编号
+         */
         private Integer customerNum;
     }
 }

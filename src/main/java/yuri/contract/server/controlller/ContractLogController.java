@@ -1,5 +1,6 @@
 package yuri.contract.server.controlller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
@@ -25,7 +26,11 @@ import yuri.contract.server.util.toExcel.ExcelUtil;
 
 import java.sql.Date;
 
-public class ContractLogController  extends BaseController{
+
+@Api(tags = "日志查询接口")
+@RestController
+@RequestMapping("/api/contractLog")
+public class ContractLogController extends BaseController{
     private final ContractLogService contractLogService;
 
     @Autowired
@@ -43,32 +48,14 @@ public class ContractLogController  extends BaseController{
         return contractLogService.selectAllLog();
     }
 
-    @ApiOperation("查询")
+    @ApiOperation("条件查询")
     @CrossOrigin
     @ResponseBody
-    @PostMapping("/selectLog")
+    @PostMapping("/filterSelectLog")
     @NeedToken(function = NeedToken.GRANT)
-    public ResponseEntity<List<ContractLog>> fuzzyQuery(@RequestBody LogInfo a, BindingResult bindingResult) {
+    public ResponseEntity<List<ContractLog>> filterQueryLog(@RequestBody LogInfo logInfo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(null);
-        return contractLogService.selectLog(a.userName,a.fromTime,a.toTime);
-    }
-
-    @Data
-    private static class LogInfo {
-        /**
-         * 操作人员
-         */
-        private String userName;
-
-        /**
-         * 起始时间
-         */
-        private Date fromTime;
-
-        /**
-         * 终止时间
-         */
-        private Date toTime;
+        return contractLogService.filterSelectLog(logInfo.userName,logInfo.fromTime,logInfo.toTime);
     }
 
     @ApiOperation("模糊查询")
@@ -76,20 +63,10 @@ public class ContractLogController  extends BaseController{
     @ResponseBody
     @PostMapping("/fuzzyQuery")
     @NeedToken(function = NeedToken.GRANT)
-    public ResponseEntity<List<ContractLog>> fuzzyQuery(@RequestBody Query a, BindingResult bindingResult) {
+    public ResponseEntity<List<ContractLog>> fuzzyQuery(@RequestBody Query query, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(null);
-        return contractLogService.fuzzyQuery(a.query);
+        return contractLogService.fuzzyQuery(query.query);
     }
-
-    @Data
-    @ApiModel(description = "模糊查询请求")
-    private static class Query {
-        /**
-         * 关键字
-         */
-        private String query;
-    }
-
 
     @ApiOperation("转excel")
     @CrossOrigin
@@ -153,5 +130,33 @@ public class ContractLogController  extends BaseController{
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Data
+    @ApiModel
+    private static class LogInfo {
+        /**
+         * 操作人员
+         */
+        private String userName;
+
+        /**
+         * 起始时间
+         */
+        private Date fromTime;
+
+        /**
+         * 终止时间
+         */
+        private Date toTime;
+    }
+
+    @Data
+    @ApiModel(description = "模糊查询请求")
+    private static class Query {
+        /**
+         * 关键字
+         */
+        private String query;
     }
 }

@@ -22,7 +22,7 @@ public interface ContractLogMapper {
     @Select("select * from contract_log where time between #{fromTime} and #{toTime}")
     List<ContractLog> selectLogWithoutUserName(Date fromTime,Date toTime);
 
-    @Select("select * from customer where concat_ws (userName, content, time) " +
+    @Select("select * from contract_log where concat_ws (userName, content, time) " +
             "like concat('%', #{query}, '%');")
     List<ContractLog> fuzzyQuery(String query);
 
