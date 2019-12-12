@@ -16,23 +16,19 @@ function setValid(object, valid) {
     else object.removeClass("is-valid").addClass("is-invalid");
 }
 
-function addTd(object, tr) {
-    let keys = Object.keys(object);
-    for (let i = 0; i < keys.length; i++) {
-        let value = object[keys[i]];
-        let td = $("<td></td>");
-        td.text(value);
-        tr.append(td);
-    }
+function addRows(collection, tableBody, alternative, additional) {
+    collection.forEach(function (element) {
+        let tr = $(`<tr></tr>`);
+        if (alternative === null) Object.keys(element).forEach(value => tr.append($(`<td>${element[value]}</td>`)));
+        else alternative(element, tr);
+        if (additional != null) additional(element, tr);
+        tableBody.append(tr);
+    });
 }
 
-function addTr(collection, tableBody, additionalTr) {
-    for (let i = 0; i < collection.length; i++) {
-        let tr = $("<tr></tr>");
-        addTd(collection[i], tr);
-        additionalTr(collection[i], tr);
-        tableBody.append(tr);
-    }
+function refreshTable(tableBody, collection, alternative, additional ) {
+    tableBody.empty();
+    addRows(collection, tableBody, alternative, additional);
 }
 
 function sendRequest(method, uri, data, successFunc, failFunc) {

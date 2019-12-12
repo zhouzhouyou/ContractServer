@@ -14,13 +14,13 @@ document.getElementById("header").innerHTML = `<link href="css/bootstrap.min.css
                 <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="contractDropdown" role="button">合同操作</a>
                 <div aria-labelledby="contractDropdown" class="dropdown-menu">
                     <a class="dropdown-item" href="draft.html" id="draft_nav">起草合同 </a>
-                    <a class="dropdown-item" href="#" id="finalize_nav">定稿合同 </a>
+                    <a class="dropdown-item" href="finalize.html" id="finalize_nav">定稿合同 </a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#" id="counter_sign_nav">会签合同 </a>
+                    <a class="dropdown-item" href="countersign.html" id="counter_sign_nav">会签合同 </a>
                     <a class="dropdown-item" href="#" id="review_nav">审批合同 </a>
                     <a class="dropdown-item" href="#" id="sign_nav">签订合同 </a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#" id="assign_nav">分配合同 </a>
+                    <a class="dropdown-item" href="assign.html" id="assign_nav">分配合同 </a>
                 </div>
             </li>
             <li class="nav-item"><a class="nav-link" href="contract.html">合同查询</a></li>
@@ -44,7 +44,6 @@ document.getElementById("header").innerHTML = `<link href="css/bootstrap.min.css
         </ul>
     </div>
 </nav>
-
 `;
 // $("#header").load("header.html");
 

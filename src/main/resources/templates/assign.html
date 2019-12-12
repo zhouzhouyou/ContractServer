@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/my-form.css" rel="stylesheet">
+    <style type="text/css">
+        .clearfix:before, .clearfix:after {
+            content: "";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            zoom: 1;
+        }
+    </style>
+
+    <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="js/common.js" type="text/javascript"></script>
+</head>
+
+<body>
+<div id="header"></div>
+<div>
+	<span class="clearfix" style="margin: 20px;">
+		<input autofocus class="form-control" id="name" placeholder="查询合同"
+               required style="float: left; width: 20%; margin-left: 20px; display: inline;"
+               type="text">
+		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button">查询</button>
+	</span>
+    <div class="text-center" style="margin-top: 50px;">
+        <table class="table table-hover" id="contract_table" style="width: 80%; margin-top: 20px; alignment: center">
+            <thead>
+            <tr>
+                <th scope="col">合同编号</th>
+                <th scope="col">合同名称</th>
+                <th scope="col">客户编号</th>
+                <th scope="col">开始时间</th>
+                <th scope="col">结束时间</th>
+                <th scope="col">起草人</th>
+            </tr>
+            </thead>
+            <tbody id="contractTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade assign_modal"
+     data-backdrop="static" id="assignModal"
+     role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 0; font-size: 16px;">
+                <h4 class="modal-title" id="assign_modal_title"></h4>
+            </div>
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="clearfix" style="margin: 10px auto; text-align: center; width: 80%;">
+                        <h4>会签人员</h4>
+                        <div id="countersign_left"
+                             style="overflow: auto; width: 45%; height: 100px; float: left; margin-right: 10px;">
+                        </div>
+                        <div id="countersign_right"
+                             style="overflow: auto; width: 45%; height: 100px; float: left; margin-right: 10px;">
+                        </div>
+                    </div>
+                    <div class="clearfix" style="margin: 10px auto; text-align: center; width: 80%;">
+                        <h4>审批人员</h4>
+                        <div id="finalize_left"
+                             style="overflow: auto; width: 45%; height: 100px; float: left; margin-right: 10px;">
+                        </div>
+                        <div id="finalize_right"
+                             style="overflow: auto; width: 45%; height: 100px; float: left; margin-right: 10px;">
+                        </div>
+                    </div>
+                    <div class="clearfix" style="margin: 10px auto; text-align: center; width: 80%;">
+                        <h4>签订人员</h4>
+                        <div id="sign_left"
+                             style="overflow: auto; width: 45%; height: 100px; float: left; margin-right: 10px;">
+                        </div>
+                        <div id="sign_right"
+                             style="overflow: auto; width: 45%; height: 100px; float: left; margin-right: 10px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="submit" type="button">提交</button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="js/nav.js" type="text/javascript"></script>
+<script>
+    let output = [];
+    for (let i = 0; i < 3; i++) output[i] = [];
+    let contractTableBody;
+    let assignModal;
+    let countersignLeft;
+    let countersignRight;
+    let reviewLeft;
+    let reviewRight;
+    let signLeft;
+    let signRight;
+    let contractNum;
+
+    function initModal(lists) {
+        let counterSignUsers = lists[0];
+        let reviewUsers = lists[1];
+        let signUsers = lists[2];
+
+        countersignLeft.empty();
+        countersignRight.empty();
+        reviewLeft.empty();
+        reviewRight.empty();
+        signLeft.empty();
+        signRight.empty();
+
+        counterSignUsers.forEach((username) => countersignLeft.append($(
+            `<button class="btn btn-outline-primary countersign_button" style="width: 45%;" type="button">${username}</button>`)));
+        reviewUsers.forEach((username) => reviewLeft.append($(
+            `<button class="btn btn-outline-secondary review_button" style="width: 45%;" type="button">${username}</button>`)));
+        signUsers.forEach((username) => signLeft.append($(
+            `<button class="btn btn-outline-warning sign_button" style="width: 45%;" type="button">${username}</button>`)));
+
+        $(".countersign_button").click(countersign_button_click);
+        $(".review_button").click(review_button_click);
+        $(".sign_button").click(sign_button_click);
+    }
+
+    let countersign_button_click = function () {
+        let select_button = $(this);
+        let parent = select_button.parent();
+        console.log(parent.attr("id"));
+        $(this).remove().unbind("click");
+
+        if (parent.attr("id") === "countersign_right") {
+            countersignLeft.append(select_button);
+            output[0].splice(jQuery.inArray(select_button.text(), output), 1);
+            $(this).click(countersign_button_click);
+        } else if (parent.attr("id") === "countersign_left") {
+            $("#countersign_right").append(select_button);
+            output[0].push(select_button.text());
+            $(this).click(countersign_button_click);
+        }
+    };
+
+    let review_button_click = function () {
+        let select_button = $(this);
+        let parent = select_button.parent();
+        console.log(parent.attr("id"));
+        $(this).remove().unbind("click");
+
+        if (parent.attr("id") === "finalize_right") {
+            reviewLeft.append(select_button);
+            output[1].splice(jQuery.inArray(select_button.text(), output), 1);
+            $(this).click(review_button_click);
+        } else if (parent.attr("id") === "finalize_left") {
+            reviewRight.append(select_button);
+            output[1].push(select_button.text());
+            $(this).click(review_button_click);
+        }
+    };
+
+    let sign_button_click = function () {
+        let select_button = $(this);
+        let parent = select_button.parent();
+        console.log(parent.attr("id"));
+        $(this).remove().unbind("click");
+
+        if (parent.attr("id") === "sign_right") {
+            signLeft.append(select_button);
+            output[2].splice(jQuery.inArray(select_button.text(), output), 1);
+            $(this).click(sign_button_click);
+        } else if (parent.attr("id") === "sign_left") {
+            signRight.append(select_button);
+            output[2].push(select_button.text());
+            $(this).click(sign_button_click);
+        }
+    };
+
+    $(function () {
+        contractTableBody = $("#contractTableBody");
+        assignModal = $("#assignModal");
+        countersignLeft = $("#countersign_left");
+        countersignRight = $("#countersign_right");
+        reviewLeft = $("#finalize_left");
+        reviewRight = $("#finalize_right");
+        signLeft = $("#sign_left");
+        signRight = $("#sign_right");
+
+        function refreshContractTable(result) {
+            contractTableBody.empty();
+            result.forEach((contract) => {
+                let tr = $(`<tr></tr>`);
+                let keys = Object.keys(contract);
+                for (let i = 0; i < keys.length; i++) {
+                    let key = keys[i];
+                    if (key === 'content') continue;
+                    tr.append($(`<td>${contract[key]}</td>`));
+                }
+                tr.click(function () {
+                    contractNum = $(this).find("td").eq(0).text();
+                    console.log(contractNum);
+                    $("#assign_modal_title").text(contractNum);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/api/user/available',
+                        headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                        statusCode: {
+                            200: (result) => initModal(result)
+                        },
+                        error: () => alert("未连接到网络，或者无权限")
+                    });
+                    assignModal.modal();
+                });
+                contractTableBody.append(tr);
+            })
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/contract/UnAssigned/select',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (result) => refreshContractTable(result)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        });
+
+        $("#contract_table tr").click(function () {
+
+        });
+
+        $("#submit").click(function () {
+            $.ajax({
+                type: 'PUT',
+                url: '/api/contract/assign/add',
+                headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                data: JSON.stringify({
+                    "assignLists": output,
+                    "contractNum": contractNum
+                }),
+                statusCode: {
+                    200: () => {
+                        alert('分配成功');
+                        refreshContractTable();
+                    }
+                },
+                error: () => alert("未连接到网络，或者无权限")
+            })
+            //TODO: 检查是否有没分配的
+        });
+    })
+</script>
+</html>
