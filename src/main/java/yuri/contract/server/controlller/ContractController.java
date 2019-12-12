@@ -35,9 +35,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.DELETE_CONTRACT)
     public ResponseEntity<String> deleteContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.deleteContract(getOperator(), contractNum.contractNum);
+        return contractService.deleteContract(operator, contractNum.contractNum);
     }
 
     @ApiOperation("起草合同(就是添加合同)")
@@ -46,9 +47,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.DRAFT_CONTRACT)
     public ResponseEntity<String> draftContract(@RequestBody Contract contract, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.addContract(getOperator(), contract);
+        return contractService.addContract(operator, contract);
     }
 
     @ApiOperation("按合同编号查询合同详细信息")
@@ -57,9 +59,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.SELECT_CONTRACT)
     public ResponseEntity<DetailContractMessage> selectContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
-        return contractService.getDetailContractMessage(getOperator(), contractNum.contractNum);
+        return contractService.getDetailContractMessage(operator, contractNum.contractNum);
     }
 
     @ApiOperation("查询所有存在的合同信息")
@@ -148,9 +151,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.ASSIGN)
     public ResponseEntity<String> doAssignJob(@RequestBody Assign assign, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doAssignJob(getOperator(), assign.assignLists, assign.contractNum);
+        return contractService.doAssignJob(operator, assign.assignLists, assign.contractNum);
     }
 
     @ApiOperation("获取可会签的合同列表")
@@ -159,7 +163,8 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.COUNTER_SIGN_CONTRACT)
     public ResponseEntity<List<Contract>> getAllUnCounterSign() {
-        return contractService.selectAllNeededContracts(getOperator(), OperationType.COUNTER_SIGH.getValue());
+        String operator = getOperator();
+        return contractService.selectAllNeededContracts(operator, OperationType.COUNTER_SIGH.getValue());
     }
 
     @ApiOperation("模糊查询可会签的合同列表")
@@ -168,9 +173,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.COUNTER_SIGN_CONTRACT)
     public ResponseEntity<List<Contract>> fuzzyAllUnCounterSign(@RequestBody FuzzyContent content, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
-        return contractService.fuzzySelectAllNeededContracts(getOperator(), content.content, OperationType.COUNTER_SIGH.getValue());
+        return contractService.fuzzySelectAllNeededContracts(operator, content.content, OperationType.COUNTER_SIGH.getValue());
     }
 
     @ApiOperation("进行会签工作")
@@ -179,9 +185,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.COUNTER_SIGN_CONTRACT)
     public ResponseEntity<String> doCountersignJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(getOperator(), process, OperationType.COUNTER_SIGH.getValue());
+        return contractService.doProcessJob(operator, process, OperationType.COUNTER_SIGH.getValue());
     }
 
     @ApiOperation("获取可定稿的合同列表")
@@ -190,7 +197,8 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
     public ResponseEntity<List<Contract>> getAllUnFinalizedContracts() {
-        return contractService.selectAllNeededContracts(getOperator(), OperationType.FINALIZE.getValue());
+        String operator = getOperator();
+        return contractService.selectAllNeededContracts(operator, OperationType.FINALIZE.getValue());
     }
 
     @ApiOperation("模糊查询可定稿的合同列表")
@@ -199,9 +207,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
     public ResponseEntity<List<Contract>> fuzzyGetAllUnFinalizedContracts(@RequestBody FuzzyContent content, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
-        return contractService.fuzzySelectAllNeededContracts(getOperator(), content.content, OperationType.FINALIZE.getValue());
+        return contractService.fuzzySelectAllNeededContracts(operator, content.content, OperationType.FINALIZE.getValue());
     }
 
     @ApiOperation("进行定稿工作")
@@ -210,9 +219,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
     public ResponseEntity<String> doFinalizeJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(getOperator(), process, OperationType.FINALIZE.getValue());
+        return contractService.doProcessJob(operator, process, OperationType.FINALIZE.getValue());
     }
 
     @ApiOperation("获取可审核的合同列表")
@@ -221,7 +231,8 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.REVIEW_CONTRACT)
     public ResponseEntity<List<Contract>> getAllUnReviewedContracts() {
-        return contractService.selectAllNeededContracts(getOperator(), OperationType.REVIEW.getValue());
+        String operator = getOperator();
+        return contractService.selectAllNeededContracts(operator, OperationType.REVIEW.getValue());
     }
 
     @ApiOperation("模糊查询可审核的合同列表")
@@ -230,9 +241,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.REVIEW_CONTRACT)
     public ResponseEntity<List<Contract>> fuzzyGetAllUnReviewedContracts(@RequestBody FuzzyContent content, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
-        return contractService.fuzzySelectAllNeededContracts(getOperator(), content.content, OperationType.REVIEW.getValue());
+        return contractService.fuzzySelectAllNeededContracts(operator, content.content, OperationType.REVIEW.getValue());
     }
 
     @ApiOperation("进行审核工作")
@@ -241,9 +253,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.REVIEW_CONTRACT)
     public ResponseEntity<String> doReviewJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(getOperator(), process, OperationType.REVIEW.getValue());
+        return contractService.doProcessJob(operator, process, OperationType.REVIEW.getValue());
     }
 
     @ApiOperation("获取可签订的合同列表")
@@ -252,7 +265,8 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.SIGN_CONTRACT)
     public ResponseEntity<List<Contract>> getAllUnSignedContracts() {
-        return contractService.selectAllNeededContracts(getOperator(), OperationType.SIGN.getValue());
+        String operator = getOperator();
+        return contractService.selectAllNeededContracts(operator, OperationType.SIGN.getValue());
     }
 
     @ApiOperation("模糊查询可签订的合同列表")
@@ -261,9 +275,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
     public ResponseEntity<List<Contract>> fuzzyGetAllUnSignedContracts(@RequestBody FuzzyContent content, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
-        return contractService.fuzzySelectAllNeededContracts(getOperator(), content.content, OperationType.SIGN.getValue());
+        return contractService.fuzzySelectAllNeededContracts(operator, content.content, OperationType.SIGN.getValue());
     }
 
     @ApiOperation("进行签订工作")
@@ -272,9 +287,10 @@ public class ContractController extends BaseController {
     @ResponseBody
     @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
     public ResponseEntity<String> doSignJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+        String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(getOperator(), process, OperationType.SIGN.getValue());
+        return contractService.doProcessJob(operator, process, OperationType.SIGN.getValue());
     }
 
     @ApiOperation("获取合同状态")
