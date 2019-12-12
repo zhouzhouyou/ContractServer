@@ -32,4 +32,7 @@ public interface BehaviorMapper {
 
     @Delete("delete from behavior where roleId =#{roleId}")
     int deleteByRole(Integer roleId);
+
+    @Select("select * roleId from behavior where num=#{num}")
+    List<Integer> selectByNum(String num);
 }
