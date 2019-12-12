@@ -143,28 +143,26 @@ public class ContractService extends BaseService {
                     OperationState.UNFINISHED.getValue(), countersignUser, "");
             processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
                     OperationState.FINISHED.getValue(), countersignUser, "");
-            stateMapper.insert(contractNum, Status.ASSIGN.getValue());
             writeLog(operator, "assigned " + countersignUser + " to countersign" + contractNum + " contract");
         });
 
+        stateMapper.insert(contractNum, Status.ASSIGN.getValue());
         reviews.forEach(reviewUser -> {
             processMapper.insert(contractNum, OperationType.REVIEW.getValue(),
                     OperationState.UNFINISHED.getValue(), reviewUser, "");
             processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
                     OperationState.FINISHED.getValue(), reviewUser, "");
-            stateMapper.insert(contractNum, Status.ASSIGN.getValue());
             writeLog(operator, "assigned " + reviewUser + " to review" + contractNum + " contract");
         });
-
+        stateMapper.insert(contractNum, Status.ASSIGN.getValue());
         signs.forEach(signUser -> {
             processMapper.insert(contractNum, OperationType.SIGN.getValue(),
                     OperationState.UNFINISHED.getValue(), signUser, "");
             processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
                     OperationState.FINISHED.getValue(), signUser, "");
-            stateMapper.insert(contractNum, Status.ASSIGN.getValue());
             writeLog(operator, "assigned " + signUser + " to sign" + contractNum + " contract");
         });
-
+        stateMapper.insert(contractNum, Status.ASSIGN.getValue());
         return ResponseFactory.success("assign job done.");
 
     }
