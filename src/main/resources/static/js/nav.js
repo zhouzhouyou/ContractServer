@@ -2,6 +2,7 @@
 document.getElementById("header").innerHTML = `<link href="css/bootstrap.min.css" rel="stylesheet">
 <script src="js/jquery-3.4.1.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/js.cookie-2.2.1.min.js"></script>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="#">合同管理系统</a>
@@ -67,7 +68,7 @@ $(function () {
     $.ajax({
         type: "POST",
         url: "/api/contract/UnfinishedJobs/select",
-        headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+        headers: {'Content-Type': 'application/json;charset=utf8', 'token': Cookies.get('token')},
         statusCode: {
             200: (resultList) => addBadges(resultList)
         },

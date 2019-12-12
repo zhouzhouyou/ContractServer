@@ -33,27 +33,27 @@
             </div>
             <div class="col-md-1">
                 <label for="waitingAssign">等待分配</label>
-                <input id="waitingAssign" type="checkbox" checked/>
+                <input checked id="waitingAssign" type="checkbox"/>
             </div>
             <div class="col-md-1">
                 <label for="waitingCounterSign">等待会签</label>
-                <input id="waitingCounterSign" type="checkbox" checked/>
+                <input checked id="waitingCounterSign" type="checkbox"/>
             </div>
             <div class="col-md-1">
                 <label for="waitingFinalize">等待定稿</label>
-                <input id="waitingFinalize" type="checkbox" checked/>
+                <input checked id="waitingFinalize" type="checkbox"/>
             </div>
             <div class="col-md-1">
                 <label for="waitingReview">等待审核</label>
-                <input id="waitingReview" type="checkbox" checked/>
+                <input checked id="waitingReview" type="checkbox"/>
             </div>
             <div class="col-md-1">
                 <label for="waitingSign">等待签订</label>
-                <input id="waitingSign" type="checkbox" checked/>
+                <input checked id="waitingSign" type="checkbox"/>
             </div>
             <div class="col-md-1">
                 <label for="finished">已完成</label>
-                <input id="finished" type="checkbox" checked>
+                <input checked id="finished" type="checkbox">
             </div>
             <div class="col-md-1">
                 <button class="btn btn-primary form-control" onclick="sendFilterQuery();" type="button">条件查询</button>
@@ -63,7 +63,7 @@
 </div>
 
 <div style="padding: 20px">
-    <table class="table" >
+    <table class="table">
         <thead>
         <tr>
             <th scope="col">合同编号</th>
@@ -116,7 +116,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger" data-dismiss="modal" type="button" onclick="resetCustomerId();">重置</button>
+                <button class="btn btn-danger" data-dismiss="modal" onclick="resetCustomerId();" type="button">重置
+                </button>
                 <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
             </div>
         </div>
@@ -127,61 +128,73 @@
         <div class="modal-content">
             <div class="modal-header">合同详情</div>
             <div class="modal-content">
-                <div class="modal-body">
-                    <form>
+                <div class="modal-body" style="display: flex">
+                    <form style="width: 50%">
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-num" style="display: inline">合同编号</label>
+                            <label class="col-sm-2 col-form-label" for="contract-num"
+                                   style="display: inline">合同编号</label>
                             <div class="col-sm-3">
-                                <input class="form-control" readonly id="contract-num"/>
+                                <input class="form-control" id="contract-num" readonly/>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-name" style="display: inline">合同名称</label>
+                            <label class="col-sm-2 col-form-label" for="contract-name"
+                                   style="display: inline">合同名称</label>
                             <div class="col-sm-3">
-                                <input class="form-control" readonly id="contract-name"/>
+                                <input class="form-control" id="contract-name" readonly/>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="contract-customerNum" style="display: inline">客户编号</label>
                             <div class="col-sm-3">
-                                <input class="form-control" readonly id="contract-customerNum"/>
+                                <input class="form-control" id="contract-customerNum" readonly/>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-begin" style="display: inline">开始时间</label>
+                            <label class="col-sm-2 col-form-label" for="contract-begin"
+                                   style="display: inline">开始时间</label>
                             <div class="col-sm-3">
-                                <input class="form-control" readonly id="contract-begin"/>
+                                <input class="form-control" id="contract-begin" readonly/>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-end" style="display: inline">结束时间</label>
+                            <label class="col-sm-2 col-form-label" for="contract-end"
+                                   style="display: inline">结束时间</label>
                             <div class="col-sm-3">
-                                <input class="form-control" readonly id="contract-end"/>
+                                <input class="form-control" id="contract-end" readonly/>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-content" style="display: inline">合同内容</label>
+                            <label class="col-sm-2 col-form-label" for="contract-content"
+                                   style="display: inline">合同内容</label>
                             <div class="col-sm-3">
-                                <textarea class="form-control" readonly id="contract-content"></textarea>
+                                <textarea class="form-control" id="contract-content" readonly></textarea>
                             </div>
 
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-username" style="display: inline">操作员</label>
+                            <label class="col-sm-2 col-form-label" for="contract-username"
+                                   style="display: inline">操作员</label>
                             <div class="col-sm-3">
-                                <input class="form-control" readonly id="contract-username"/>
+                                <input class="form-control" id="contract-username" readonly/>
                             </div>
                         </div>
+
+                    </form>
+                    <form style="width: 50%">
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-drafter" style="display: inline">起草</label>
+                            <label class="col-sm-2 col-form-label" for="contract-drafter"
+                                   style="display: inline">起草</label>
                             <input class="form-control col-sm-3 disabled" id="contract-drafter"/>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-finalizer" style="display: inline">定稿</label>
+                            <label class="col-sm-2 col-form-label" for="contract-finalizer"
+                                   style="display: inline">定稿</label>
                             <input class="form-control col-sm-3 disabled" id="contract-finalizer"/>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-assigner" style="display: inline">分配</label>
+                            <label class="col-sm-2 col-form-label" for="contract-assigner"
+                                   style="display: inline">分配</label>
                             <input class="form-control col-sm-3 disabled" id="contract-assigner"/>
                         </div>
                         <div class="form-group row">
@@ -189,18 +202,22 @@
                             <ul class="list-group" id="contract-counterSigner"></ul>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-reviewer" style="display: inline">审核</label>
+                            <label class="col-sm-2 col-form-label" for="contract-reviewer"
+                                   style="display: inline">审核</label>
                             <ul class="list-group" id="contract-reviewer"></ul>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="contract-signer" style="display: inline">签订</label>
+                            <label class="col-sm-2 col-form-label" for="contract-signer"
+                                   style="display: inline">签订</label>
                             <ul class="list-group" id="contract-signer"></ul>
                         </div>
                     </form>
                 </div>
 
             </div>
-            <div class="modal-footer"><button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
         </div>
     </div>
 </div>
@@ -236,7 +253,7 @@
             type: "POST",
             url: "/api/contract/fuzzyQuery",
             data: JSON.stringify({
-                "content" : fuzzyQuery.val()
+                "content": fuzzyQuery.val()
             }),
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
             statusCode: {
@@ -252,8 +269,8 @@
             url: "/api/contract/filterQuery",
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
             data: JSON.stringify({
-                "customerNum" : currentCustomerId,
-                "statuses" : checkedStatuses()
+                "customerNum": currentCustomerId,
+                "statuses": checkedStatuses()
             }),
             statusCode: {
                 200: (resultList) => loadContractTable(resultList)
