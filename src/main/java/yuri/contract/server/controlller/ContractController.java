@@ -288,6 +288,51 @@ public class ContractController extends BaseController {
         return contractService.getContractStatus(contractNum.contractNum);
     }
 
+    @ApiOperation("会签时获取合同初稿")
+    @CrossOrigin
+    @PostMapping(value = "/countersign_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.COUNTER_SIGN_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getCounterSignNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.COUNTER_SIGH.getValue());
+    }
+
+    @ApiOperation("定稿时获取合同初稿和会签意见")
+    @CrossOrigin
+    @PostMapping(value = "/finalize_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getFinalizeNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.FINALIZE.getValue());
+    }
+
+    @ApiOperation("审核时获取合同终稿和会签意见")
+    @CrossOrigin
+    @PostMapping(value = "/review_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.REVIEW_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getReviewNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.REVIEW.getValue());
+    }
+
+    @ApiOperation("签订时获取合同终稿和审核意见")
+    @CrossOrigin
+    @PostMapping(value = "/sign_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.REVIEW_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getSignNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.SIGN.getValue());
+    }
+
+
     @Data
     private static class ContractNum {
         private int contractNum;

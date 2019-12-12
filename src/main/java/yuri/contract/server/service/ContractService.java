@@ -475,15 +475,35 @@ public class ContractService extends BaseService {
     }
 
     public ResponseEntity<PreviousProcessMessage> getPreviousProcessMessage(int contractNum,int type){
-        List<List<PreviousMessage>> lists = new ArrayList<>();
         List<PreviousMessage> drafter = new ArrayList<>();
         List<PreviousMessage> counterSigners = new ArrayList<>();
-        List<PreviousMessage> finalizer = new ArrayList<>();
+        List<PreviousMessage> finalizerNeeds = new ArrayList<>();
         List<PreviousMessage> reviewers = new ArrayList<>();
-        List<PreviousMessage> signers = new ArrayList<>();
         Contract contract = selectContractByNum(contractNum);
+        PreviousProcessMessage previousProcessMessage = null;
+        switch (type){
+            case 0:
+                drafter.add(new PreviousMessage(contract.getUserName(),"起草",contract.getContent()));
+                previousProcessMessage = new PreviousProcessMessage(contract,drafter);
+                break;
+            case 1:
+                List<ContractProcess> countersign = processMapper.selectFinishedProcesses(contractNum,0);
+                countersign.forEach(process -> counterSigners.add(new PreviousMessage(process.getUserName(),"会签",process.getContent())));
+                previousProcessMessage = new PreviousProcessMessage(contract,counterSigners);
+                break;
+            case 2:
+                List<ContractProcess> finalizeNeed = processMapper.selectFinishedProcesses(contractNum,0);
+                finalizeNeed.forEach(process -> finalizerNeeds.add(new PreviousMessage(process.getUserName(),"会签",process.getContent())));
+                previousProcessMessage = new PreviousProcessMessage(contract,finalizerNeeds);
+                break;
+            case 3:
+                List<ContractProcess> review = processMapper.selectFinishedProcesses(contractNum,2);
+                review.forEach(process -> reviewers.add(new PreviousMessage(process.getUserName(),"审核",process.getContent())));
+                previousProcessMessage = new PreviousProcessMessage(contract,reviewers);
+                break;
+        }
 
-        PreviousProcessMessage previousProcessMessage = new PreviousProcessMessage(contract,lists);
+
         return ResponseFactory.success(previousProcessMessage);
     }
 

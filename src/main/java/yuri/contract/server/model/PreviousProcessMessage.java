@@ -15,11 +15,11 @@ public class PreviousProcessMessage {
     /**
      * 信息列表
      */
-    private List<List<PreviousMessage>> messageList;
+    private List<PreviousMessage> messageList;
 
-    public PreviousProcessMessage(Contract contract,List<List<PreviousMessage>> messageList) {
+    public PreviousProcessMessage(Contract contract,List<PreviousMessage> messageList) {
         this.contract = contract;
-       this.messageList = messageList;
+        this.messageList = messageList;
     }
 
 

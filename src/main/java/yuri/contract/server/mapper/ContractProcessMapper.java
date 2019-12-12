@@ -17,6 +17,9 @@ public interface ContractProcessMapper {
     @Select("select * from contract_process")
     List<ContractProcess> selectAll();
 
+    @Select("select * from contract_process where contractNum =#{contractNum} and type = #{type} and state = 1")
+    List<ContractProcess> selectFinishedProcesses(int contractNum, int type);
+
     @Select("select contractNum from contract_process where type = -1")
     List<Integer> selectNumOfUnAssigned();
 
