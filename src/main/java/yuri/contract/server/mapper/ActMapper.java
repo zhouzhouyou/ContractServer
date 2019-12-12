@@ -26,4 +26,9 @@ public interface ActMapper {
 
     @Delete("delete from act")
     int deleteAll();
+
+    @Delete("delete from act where username = #{username}")
+    int deleteByUsername(String username);
+
+
 }
