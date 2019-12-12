@@ -11,6 +11,11 @@ function isValid(control) {
     return control.hasClass("is-valid");
 }
 
+function setValid(object, valid) {
+    if (valid) object.removeClass("is-invalid").addClass("is-valid");
+    else object.removeClass("is-valid").addClass("is-invalid");
+}
+
 function addTd(object, tr) {
     let keys = Object.keys(object);
     for (let i = 0; i < keys.length; i++) {

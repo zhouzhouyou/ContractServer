@@ -11,19 +11,19 @@ import java.util.List;
 @Component
 public interface ContractStateMapper {
     @Select("select * from contract_state where contractNum =#{contractNum} and status =#{status}")
-    ContractState select(String contractNum, int status);
+    ContractState select(int contractNum, int status);
 
     @Select("select * from contract_state")
     List<ContractState> selectAll();
 
     @Select("select count(*) from contract_state where contractNum =#{contractNum}")
-    int getContractStatus(String contractNum);
+    int getContractStatus(int contractNum);
 
     @Insert("insert into contract_state values(#{contractNum},#{status},now())")
-    int insert(String contractNum, int status);
+    int insert(int contractNum, int status);
 
     @Delete("delete from contract_state where contractNum =#{contractNum}")
-    int delete(String contractNum);
+    int delete(int contractNum);
 
     @Delete("delete from contract_state")
     int deleteAll();

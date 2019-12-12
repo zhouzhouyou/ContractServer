@@ -7,9 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import yuri.contract.server.model.Contract;
-import yuri.contract.server.model.ContractAttachment;
-import yuri.contract.server.model.ContractProcess;
+import org.springframework.web.multipart.MultipartFile;
+import yuri.contract.server.model.*;
 import yuri.contract.server.model.util.OperationType;
 import yuri.contract.server.service.ContractService;
 import yuri.contract.server.util.annotation.NeedToken;
@@ -38,7 +37,7 @@ public class ContractController extends BaseController {
     public ResponseEntity<String> deleteContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.deleteContract(getOperator(),contractNum.contractNum);
+        return contractService.deleteContract(getOperator(), contractNum.contractNum);
     }
 
     @ApiOperation("起草合同(就是添加合同)")
@@ -52,27 +51,59 @@ public class ContractController extends BaseController {
         return contractService.addContract(getOperator(), contract);
     }
 
-    @ApiOperation("按合同编号查询合同")
+    @ApiOperation("按合同编号查询合同详细信息")
     @CrossOrigin
     @PostMapping(value = "/select")
     @ResponseBody
     @NeedToken(function = NeedToken.SELECT_CONTRACT)
-    public ResponseEntity<Contract> selectContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
+    public ResponseEntity<DetailContractMessage> selectContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
-        return contractService.selectContractByNum(contractNum.contractNum);
+        return contractService.getDetailContractMessage(getOperator(), contractNum.contractNum);
     }
 
-    @ApiOperation("查询所有存在的合同")
+    @ApiOperation("查询所有存在的合同信息")
     @CrossOrigin
     @PostMapping(value = "/selectAll")
     @ResponseBody
     @NeedToken(function = NeedToken.SELECT_CONTRACT)
-    public ResponseEntity<List<Contract>> selectAllContracts() {
-        return contractService.selectAllContracts();
+    public ResponseEntity<List<ContractWithState>> selectAllContracts() {
+        return contractService.selectAllContractsWithState();
     }
 
-    @ApiOperation("添加附件")
+    @ApiOperation("模糊查询所有存在的合同信息")
+    @CrossOrigin
+    @PostMapping(value = "/fuzzyQuery")
+    @ResponseBody
+    @NeedToken(function = NeedToken.SELECT_CONTRACT)
+    public ResponseEntity<List<ContractWithState>> fuzzyQueryAllContracts(@RequestBody FuzzyContent content, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.fuzzyQueryAllContract(content.content);
+    }
+
+    @ApiOperation("条件查询所有存在的合同信息")
+    @CrossOrigin
+    @PostMapping(value = "/filterQuery")
+    @ResponseBody
+    @NeedToken(function = NeedToken.SELECT_CONTRACT)
+    public ResponseEntity<List<ContractWithState>> filterQueryAllContents(@RequestBody Filter filter, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.filterQueryAllContract(filter.statuses, filter.customerNum);
+    }
+
+    @ApiOperation("上传附件本体")
+    @CrossOrigin
+    @PostMapping(value = "/attachment/upload")
+    @ResponseBody
+    public ResponseEntity<String> uploadFile(@RequestParam("file_data") MultipartFile file, HttpServletRequest request) {
+//        if (bindingResult.hasErrors())
+//            return ResponseFactory.badRequest(null);
+        return contractService.uploadFile(file);
+    }
+
+    /*@ApiOperation("添加附件")
     @CrossOrigin
     @PutMapping(value = "/attachment/add")
     @ResponseBody
@@ -81,6 +112,14 @@ public class ContractController extends BaseController {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
         return contractService.addContractAttachment(getOperator(), attachment);
+    }*/
+
+    @ApiOperation("查询此用户是否有未完成的工作")
+    @CrossOrigin
+    @PostMapping(value = "/UnfinishedJobs/select")
+    @ResponseBody
+    public ResponseEntity<List<Boolean>> hasJobsToDo() {
+        return contractService.hasJobsToDo(getOperator());
     }
 
     @ApiOperation("获取所有未分配的合同")
@@ -108,10 +147,10 @@ public class ContractController extends BaseController {
     @PutMapping(value = "/assign/add")
     @ResponseBody
     @NeedToken(function = NeedToken.ASSIGN)
-    public ResponseEntity<String> doAssignJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+    public ResponseEntity<String> doAssignJob(@RequestBody Assign assign, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doAssignJob(getOperator(), process);
+        return contractService.doAssignJob(getOperator(), assign.assignLists, assign.contractNum);
     }
 
     @ApiOperation("获取可会签的合同列表")
@@ -249,13 +288,70 @@ public class ContractController extends BaseController {
         return contractService.getContractStatus(contractNum.contractNum);
     }
 
+    @ApiOperation("会签时获取合同初稿")
+    @CrossOrigin
+    @PostMapping(value = "/countersign_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.COUNTER_SIGN_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getCounterSignNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.COUNTER_SIGH.getValue());
+    }
+
+    @ApiOperation("定稿时获取合同初稿和会签意见")
+    @CrossOrigin
+    @PostMapping(value = "/finalize_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getFinalizeNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.FINALIZE.getValue());
+    }
+
+    @ApiOperation("审核时获取合同终稿和会签意见")
+    @CrossOrigin
+    @PostMapping(value = "/review_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.REVIEW_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getReviewNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.REVIEW.getValue());
+    }
+
+    @ApiOperation("签订时获取合同终稿和审核意见")
+    @CrossOrigin
+    @PostMapping(value = "/sign_need_message/select")
+    @ResponseBody
+    @NeedToken(function = NeedToken.REVIEW_CONTRACT)
+    public ResponseEntity<PreviousProcessMessage> getSignNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.getPreviousProcessMessage(contractNum.contractNum,OperationType.SIGN.getValue());
+    }
+
+
     @Data
     private static class ContractNum {
-        private String contractNum;
+        private int contractNum;
     }
 
     @Data
     private static class FuzzyContent {
         private String content;
+    }
+
+    @Data
+    private static class Assign {
+        private List<List<String>> assignLists;
+        private int contractNum;
+    }
+
+    @Data
+    private static class Filter {
+        private boolean[] statuses;
+        private Integer customerNum;
     }
 }

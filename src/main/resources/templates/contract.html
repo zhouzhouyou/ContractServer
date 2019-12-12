@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="js/common.js" type="text/javascript"></script>
+</head>
+<body style="text-align: center">
+<div id="header"></div>
+<div class="text-center">
+    <br><br>
+    <form>
+        <div class="form-group row">
+            <label class="col-form-label col-sm-2" for="fuzzyQuery" style="display: inline">模糊查询</label>
+            <div class="col-sm-8">
+                <input class="form-control" id="fuzzyQuery" placeholder="模糊查询" style="display: inline;" type="text">
+            </div>
+            <div class="col-sm-1">
+                <button class="form-control btn btn-primary" onclick="sendFuzzyQuery();" type="button">模糊查询</button>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-form-label col-sm-2" for="customerBtn" style="display: inline">选择客户</label>
+            <div class="col-md-2">
+                <input class="form-control" data-target=".customer-modal" data-toggle="modal" id="customerBtn"
+                       placeholder="选择客户" type="button"/>
+            </div>
+            <div class="col-md-1">
+                <label for="waitingAssign">等待分配</label>
+                <input checked id="waitingAssign" type="checkbox"/>
+            </div>
+            <div class="col-md-1">
+                <label for="waitingCounterSign">等待会签</label>
+                <input checked id="waitingCounterSign" type="checkbox"/>
+            </div>
+            <div class="col-md-1">
+                <label for="waitingFinalize">等待定稿</label>
+                <input checked id="waitingFinalize" type="checkbox"/>
+            </div>
+            <div class="col-md-1">
+                <label for="waitingReview">等待审核</label>
+                <input checked id="waitingReview" type="checkbox"/>
+            </div>
+            <div class="col-md-1">
+                <label for="waitingSign">等待签订</label>
+                <input checked id="waitingSign" type="checkbox"/>
+            </div>
+            <div class="col-md-1">
+                <label for="finished">已完成</label>
+                <input checked id="finished" type="checkbox">
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary form-control" onclick="sendFilterQuery();" type="button">条件查询</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div style="padding: 20px">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">合同编号</th>
+            <th scope="col">合同名称</th>
+            <th scope="col">客户编号</th>
+            <th scope="col">开始时间</th>
+            <th scope="col">结束时间</th>
+            <th scope="col">起草人</th>
+            <th scope="col">当前状态</th>
+            <th scope="col">查看详情</th>
+            <th scope="col">删除合同</th>
+        </tr>
+        </thead>
+        <tbody id="contractTableBody">
+
+        </tbody>
+    </table>
+</div>
+
+
+<div class="modal fade customer-modal" id="customerModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">选择用户</h4>
+                <button class="close" data-dismiss="modal" type="button">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-body">
+                    <input class="form-control" id="customerInput" placeholder="模糊查询" style="display: inline;"
+                           type="text">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">序号</th>
+                            <th scope="col">名称</th>
+                            <th scope="col">地址</th>
+                            <th scope="col">电话</th>
+                            <th scope="col">传真</th>
+                            <th scope="col">邮编</th>
+                            <th scope="col">银行</th>
+                            <th scope="col">账户</th>
+                            <th scope="col">备注</th>
+                            <th scope="col">确定</th>
+                        </tr>
+                        </thead>
+                        <tbody id="customerTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-dismiss="modal" onclick="resetCustomerId();" type="button">重置
+                </button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade contract-modal" id="contractModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">合同详情</div>
+            <div class="modal-content">
+                <div class="modal-body" style="display: flex">
+                    <form style="width: 50%">
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-num"
+                                   style="display: inline">合同编号</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="contract-num" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-name"
+                                   style="display: inline">合同名称</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="contract-name" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-customerNum" style="display: inline">客户编号</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="contract-customerNum" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-begin"
+                                   style="display: inline">开始时间</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="contract-begin" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-end"
+                                   style="display: inline">结束时间</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="contract-end" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-content"
+                                   style="display: inline">合同内容</label>
+                            <div class="col-sm-3">
+                                <textarea class="form-control" id="contract-content" readonly></textarea>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-username"
+                                   style="display: inline">操作员</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="contract-username" readonly/>
+                            </div>
+                        </div>
+
+                    </form>
+                    <form style="width: 50%">
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-drafter"
+                                   style="display: inline">起草</label>
+                            <input class="form-control col-sm-3 disabled" id="contract-drafter"/>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-finalizer"
+                                   style="display: inline">定稿</label>
+                            <input class="form-control col-sm-3 disabled" id="contract-finalizer"/>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-assigner"
+                                   style="display: inline">分配</label>
+                            <input class="form-control col-sm-3 disabled" id="contract-assigner"/>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-counterSigner" style="display: inline">会签</label>
+                            <ul class="list-group" id="contract-counterSigner"></ul>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-reviewer"
+                                   style="display: inline">审核</label>
+                            <ul class="list-group" id="contract-reviewer"></ul>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="contract-signer"
+                                   style="display: inline">签订</label>
+                            <ul class="list-group" id="contract-signer"></ul>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/nav.js" type="text/javascript"></script>
+<script>
+    let fuzzyQuery;
+    let currentCustomerId = null;
+    let waitingAssign;
+    let waitingCounterSign;
+    let waitingFinalize;
+    let waitingReview;
+    let waitingSign;
+    let finished;
+    let contractTableBody;
+    let customerTableBody;
+    let customerModal;
+    let contractModal;
+    let customerInput;
+    let customerBtn;
+
+    function isChecked(cb) {
+        return cb.is(' :checked');
+    }
+
+    function checkedStatuses() {
+        return [isChecked(waitingAssign), isChecked(waitingCounterSign), isChecked(waitingFinalize),
+            isChecked(waitingReview), isChecked(waitingSign), isChecked(finished)];
+    }
+
+    function sendFuzzyQuery() {
+        $.ajax({
+            type: "POST",
+            url: "/api/contract/fuzzyQuery",
+            data: JSON.stringify({
+                "content": fuzzyQuery.val()
+            }),
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (resultList) => loadContractTable(resultList)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+    function sendFilterQuery() {
+        $.ajax({
+            type: "POST",
+            url: "/api/contract/filterQuery",
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "customerNum": currentCustomerId,
+                "statuses": checkedStatuses()
+            }),
+            statusCode: {
+                200: (resultList) => loadContractTable(resultList)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+    function addContractTableTd(result, tr) {
+        let contract = result["contract"];
+        let num = contract['num'];
+
+        tr.append($(`<td>${num}</td>`));
+        tr.append($(`<td>${contract['name']}</td>`));
+        tr.append($(`<td>${contract['customerNum']}</td>`));
+        tr.append($(`<td>${contract['begin']}</td>`));
+        tr.append($(`<td>${contract['end']}</td>`));
+        tr.append($(`<td>${contract['userName']}</td>`));
+        tr.append($(`<td>${result['status']}</td>`));
+
+        let detailBtn = $(`<td><button class="btn btn-primary" data-target=".contract-modal" data-toggle="modal">详情</button></td>`);
+        detailBtn.click(() => seeDetail(num));
+        tr.append(detailBtn);
+
+        let deleteBtn = $(`<td><button class="btn btn-danger">删除</button></td>`);
+        deleteBtn.click(() => deleteContract(num));
+        tr.append(deleteBtn);
+    }
+
+    function addContractTableTr(result) {
+        console.log(result);
+        let tr = $(`<tr></tr>`);
+        addContractTableTd(result, tr);
+        contractTableBody.append(tr);
+    }
+
+    function loadContractTable(resultList) {
+        contractTableBody.empty();
+        resultList.forEach((result) => addContractTableTr(result));
+    }
+
+    function refreshContractTable() {
+        $.ajax({
+            type: "POST",
+            url: "/api/contract/selectAll",
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (resultList) => loadContractTable(resultList)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+    let addSelectBtn = function (customer, tr) {
+        let select = $(`<td><button class="btn btn-primary">确定</button></td>`);
+        select.click(function () {
+            currentCustomerId = customer.num;
+            customerBtn.val(`编号: ${customer.num}, 姓名: ${customer.name}`);
+        });
+        tr.append(select);
+    };
+
+    function queryCustomer() {
+        $.ajax({
+            type: "POST",
+            url: "api/customer/fuzzyQuery",
+            data: JSON.stringify({
+                "query": customerInput.val()
+            }),
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: function (result) {
+                    customerTableBody.empty();
+                    addTr(result, customerTableBody, addSelectBtn);
+                }
+            },
+
+            error: function () {
+                alert("未连接到网络，或者无权限");
+            }
+        })
+    }
+
+    function resetCustomerId() {
+        currentCustomerId = null;
+        customerBtn.val("");
+    }
+
+    function seeDetail(num) {
+        contractModal.modal();
+        $.ajax({
+            type: "POST",
+            url: "/api/contract/select",
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "contractNum": num
+            }),
+            statusCode: {
+                200: (result) => loadDetailInfo(result)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+    function deleteContract(num) {
+        if (confirm(`你确定要删除合同${num}吗?`)) {
+            $.ajax({
+                type: "DELETE",
+                url: "/api/contract/delete",
+                data: JSON.stringify({
+                    "contractNum": num
+                }),
+                headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                statusCode: {
+                    200: () => refreshContractTable()
+                },
+                error: () => alert("未连接到网络，或者无权限")
+            })
+        }
+
+    }
+
+    function loadDetailInfo(info) {
+        let contract = info['contract'];
+        console.log(contract);
+        $("#contract-num").val(contract['num']);
+        $("#contract-name").val(contract['name']);
+        $("#contract-customerNum").val(contract['customerNum']);
+        $("#contract-begin").val(contract['begin']);
+        $("#contract-end").val(contract['end']);
+        $("#contract-content").val(contract['content']);
+        $("#contract-username").val(contract['userName']);
+
+
+    }
+
+    $(function () {
+        contractModal = $("#contractModal");
+        contractTableBody = $("#contractTableBody");
+        customerTableBody = $("#customerTableBody");
+        fuzzyQuery = $("#fuzzyQuery");
+        waitingAssign = $("#waitingAssign");
+        waitingCounterSign = $("#waitingCounterSign");
+        waitingFinalize = $("#waitingFinalize");
+        waitingReview = $("#waitingReview");
+        waitingSign = $("#waitingSign");
+        finished = $("#finished");
+        customerBtn = $("#customerBtn");
+        customerModal = $("#customerModal");
+        customerInput = $("#customerInput");
+        customerBtn.click(function () {
+            customerModal.modal();
+            queryCustomer();
+        });
+        customerInput.bind('keypress', function (event) {
+            if (event === 13) queryCustomer();
+        });
+        refreshContractTable();
+    })
+</script>
+</html>

@@ -15,7 +15,7 @@ public class ContractProcess {
     /**
      * 合同编号
      */
-    private String contractNum;
+    private Integer contractNum;
 
     /**
      * 操作类型（需要会签、定稿、审核还是签订？）
