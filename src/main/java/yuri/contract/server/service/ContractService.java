@@ -148,8 +148,6 @@ public class ContractService extends BaseService {
                     OperationState.FINISHED.getValue(), countersignUser, "");
             writeLog(operator, "assigned " + countersignUser + " to countersign" + contractNum + " contract");
         });
-
-        stateMapper.insert(contractNum, Status.ASSIGN.getValue());
         reviews.forEach(reviewUser -> {
             processMapper.insert(contractNum, OperationType.REVIEW.getValue(),
                     OperationState.UNFINISHED.getValue(), reviewUser, "");
@@ -157,7 +155,6 @@ public class ContractService extends BaseService {
                     OperationState.FINISHED.getValue(), reviewUser, "");
             writeLog(operator, "assigned " + reviewUser + " to review" + contractNum + " contract");
         });
-        stateMapper.insert(contractNum, Status.ASSIGN.getValue());
         signs.forEach(signUser -> {
             processMapper.insert(contractNum, OperationType.SIGN.getValue(),
                     OperationState.UNFINISHED.getValue(), signUser, "");
