@@ -14,6 +14,9 @@ public interface ContractProcessMapper {
     @Select("select distinct userName from contract_process where contractNum =#{contractNum} and type = #{type}")
     List<String> selectOperator(int contractNum, int type);
 
+    @Select("select distinct userName from contract_process where contractNum =#{contractNum} and type = 2 and state = 2")
+    List<String> rejectOperator(int contractNum);
+
     @Select("select * from contract_process")
     List<ContractProcess> selectAll();
 
@@ -29,6 +32,9 @@ public interface ContractProcessMapper {
     @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and state = #{state}")
     List<Integer> selectUnfinishedContractNum(String userName, int type, int state);
 
+    @Select("select contractNum from contract_process where type = 2 and state = 2")
+    List<Integer> selectRejectContractNums();
+
     @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and state = #{state} and concat_ws(contractNum,type,state,userName,content,time) like concat('%',#{content},'%')")
     List<Integer> fuzzySelectNumOfNeededProcess(String userName, String content, int type, int state);
 
@@ -36,7 +42,7 @@ public interface ContractProcessMapper {
     int getNumberOfNeededTypeState(int type, int state);
 
     @Select("select count(*) from contract_process where type = #{type} and state != 1 and contractNum = #{contractNum}")
-    int getUnfinishedOrDeniedProcess(int type,int contractNum);
+    int getUnfinishedOrDeniedProcess(int type, int contractNum);
 
     @Insert("insert into contract_process (contractNum, type, state, userName, content, time) values(#{contractNum},#{type},#{state},#{userName},#{content},now())")
     int insert(int contractNum, int type, int state, String userName, String content);

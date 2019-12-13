@@ -24,7 +24,7 @@ public enum Status implements EnumValue {
      */
     FINALIZE_FINISHED(3, "定稿完成"),
     /**
-     * 审核完成
+     * 审核完成/或拒绝
      */
     REVIEW_FINISHED(4, "审核完成"),
     /**
