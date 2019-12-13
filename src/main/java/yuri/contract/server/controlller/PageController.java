@@ -109,4 +109,10 @@ public class PageController {
     public String sign2(HttpServletRequest request) {
         return "sign";
     }
+
+    @GetMapping("log")
+    public String log(HttpServletRequest request){return "log";}
+
+    @GetMapping("log.html")
+    public String log2(HttpServletRequest request){return "log";}
 }

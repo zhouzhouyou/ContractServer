@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <title>Title</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/my-form.css" rel="stylesheet">
+    <link href="css/gijgo.min.css" rel="stylesheet">
+
+    <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+
+    <script src="js/common.js" type="text/javascript"></script>
+    <script src="js/gijgo.min.js" type="text/javascript"></script>
+    <script src="js/messages.zh-cn.min.js" type="text/javascript"></script>
+</head>
+<body style="text-align: center">
+<div id="header"></div>
+<div class="text-center">
+    <span class="clearfix" style="margin: 20px;">
+		<input autofocus class="form-control" id="content" placeholder="查询日志"
+               required style="float: left; width: 20%; margin-left: 20px; display: inline;"
+               type="text">
+		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button"
+                onclick="sendFuzzyQuery()">查询</button>
+	</span>
+    <form>
+        <div class="form-group row">
+            <label class="col-form-label col-sm-1" style="display: inline">选择用户</label>
+            <div class="dropdown col-sm-2">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="userSelector" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false" >
+                    选择用户
+                </button>
+                <div class="dropdown-menu" id="users" aria-labelledby="dropdownMenuButton">
+                </div>
+            </div>
+
+            <label class="col-form-label col-sm-1" for="beginTime" style="display: inline">开始时间</label>
+            <div class="form-group col-sm-2">
+                <input id="beginTime" width="200"/>
+            </div>
+            <label class="col-sm-1 col-form-label" for="endTime" style="display: inline">结束时间</label>
+            <div class="form-group col-sm-2">
+                <input id="endTime" width="200"/>
+            </div>
+
+            <div class="col-sm-1">
+                <button class="btn btn-primary form-control" onclick="sendFilterQuery();" type="button">条件查询</button>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+<div class="text-center" style="margin-top: 50px;">
+    <table class="table table-hover" id="log_table" style=" margin-top: 20px; alignment: center">
+        <thead>
+        <tr>
+            <th scope="col">日志编号</th>
+            <th scope="col">用户名</th>
+            <th scope="col">日志内容</th>
+            <th scope="col">日志时间</th>
+        </tr>
+        </thead>
+        <tbody id="logTableBody">
+        </tbody>
+    </table>
+</div>
+
+</body>
+
+<script src="js/nav.js" type="text/javascript"></script>
+<script>
+
+    let content;
+    let logTableBody;
+    let tableBody;
+    let beginTime;
+    let endTime;
+    let users;
+    let userSelector;
+    let today = new Date();
+
+    $(function () {
+        content = $("#content");
+        logTableBody = $("#logTableBody");
+        tableBody = $("#tableBody");
+        users = $("#users");
+        userSelector = $("#userSelector");
+        beginTime = $("#beginTime");
+
+        beginTime.datepicker({
+            uiLibrary: 'bootstrap4',
+            locale: 'zh-cn',
+            format: 'yyyy-mm-dd',
+            close: () => beginDateCheck()
+        });
+
+        endTime = $("#endTime");
+        endTime.datepicker({
+            uiLibrary: 'bootstrap4',
+            locale: 'zh-cn',
+            format: 'yyyy-mm-dd',
+            close: () => endDateCheck()
+        });
+
+        sendFuzzyQuery();
+        loadUsers();
+    });
+
+    function sendFuzzyQuery() {
+        $.ajax({
+            type: "POST",
+            url: "api/contractLog/fuzzyQuery",
+            data: JSON.stringify({
+                "query": content.val()
+            }),
+
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+
+            statusCode: {
+                200: (resultList) => loadLogTable(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+
+    function sendFilterQuery() {
+        $.ajax({
+            type: "POST",
+            url: "api/contractLog/filterSelectLog",
+            data: JSON.stringify({
+                "userName": userSelector.text(),
+                "fromTime": beginTime.value(),
+                "toTime": endTime.value()
+            }),
+
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+
+            statusCode: {
+                200: (resultList) => loadLogTable(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+    function loadUsers() {
+        $.ajax({
+            type: "GET",
+            url: "api/user/selectAll",
+
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+
+            statusCode: {
+                200: (resultList) => addUser(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
+
+    }
+
+    function addUser(resultList) {
+        resultList.forEach(function (element) {
+            let a = $(`<a class="dropdown-item">${element}</a>`);
+            a.click(() => userSelector.text(element));
+            users.append(a);
+        });
+    }
+
+    function loadLogTable(resultList) {
+        //refreshTable(logTableBody, resultList, addLodTableTd, null);
+        refreshTable(logTableBody, resultList, null, null);
+    }
+
+    function isLater(a, b) {
+        if (a.getUTCFullYear() !== b.getUTCFullYear()) return a.getUTCFullYear() > b.getUTCFullYear();
+        if (a.getUTCMonth() !== b.getUTCMonth()) return a.getUTCMonth() > b.getUTCFullYear();
+        return a.getUTCDate() > b.getUTCDate();
+    }
+
+    function beginDateCheck() {
+        if (beginTime.value().length !== 0) {
+            let beginDate = new Date(beginTime.value());
+            if (isLater(beginDate, today)) {
+                setValid(beginTime, false);
+                return;
+            }
+            if (endTime.value.length !== 0) {
+                if (isLater(beginDate, new Date(endTime.value()))) {
+                    setValid(beginTime, false);
+                    return;
+                }
+            }
+        }
+        setValid(beginTime, true);
+    }
+
+    function endDateCheck() {
+        if (endTime.value().length !== 0) {
+            let endDate = new Date(endTime.value());
+            if (isLater(endDate, today)) {
+                setValid(endTime, false);
+                return;
+            }
+            if (beginTime.value.length !== 0) {
+                if (isLater(new Date(beginTime.value()), endDate)) {
+                    setValid(endTime, false);
+                    return;
+                }
+            }
+        }
+        setValid(endTime, true);
+    }
+
+</script>
+</html>
