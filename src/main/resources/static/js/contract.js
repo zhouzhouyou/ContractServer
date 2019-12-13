@@ -81,6 +81,7 @@ function loadNewTable(url, trClick) {
 }
 
 function refreshContractTable(resultList, trClick) {
+    checkMyJob();
     contractTableBody.empty();
     resultList.forEach((contract) => {
         let tr = $(`<tr></tr>`);

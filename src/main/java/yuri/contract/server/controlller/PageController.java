@@ -89,4 +89,24 @@ public class PageController {
     public String finalize2(HttpServletRequest request) {
         return "finalize";
     }
+
+    @GetMapping("review")
+    public String review(HttpServletRequest request) {
+        return "review";
+    }
+
+    @GetMapping("review.html")
+    public String review2(HttpServletRequest request) {
+        return "review";
+    }
+
+    @GetMapping("sign")
+    public String sign(HttpServletRequest request) {
+        return "sign";
+    }
+
+    @GetMapping("sign.html")
+    public String sign2(HttpServletRequest request) {
+        return "sign";
+    }
 }

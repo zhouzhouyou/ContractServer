@@ -16,8 +16,8 @@
     <br><br>
     <form>
         <div class="form-group row">
-            <label class="col-form-label col-sm-2" for="fuzzyQuery" style="display: inline">模糊查询</label>
-            <div class="col-sm-8">
+            <label class="col-form-label col-sm-1" for="fuzzyQuery" style="display: inline">模糊查询</label>
+            <div class="col-sm-9">
                 <input class="form-control" id="fuzzyQuery" placeholder="模糊查询" style="display: inline;" type="text">
             </div>
             <div class="col-sm-1">
@@ -26,36 +26,40 @@
         </div>
 
         <div class="form-group row">
-            <label class="col-form-label col-sm-2" for="customerBtn" style="display: inline">选择客户</label>
+            <label class="col-form-label col-sm-1" for="customerBtn" style="display: inline">选择客户</label>
             <div class="col-md-2">
                 <input class="form-control" data-target=".customer-modal" data-toggle="modal" id="customerBtn"
                        placeholder="选择客户" type="button"/>
             </div>
-            <div class="col-md-1">
+            <div class="col-sm-1">
                 <label for="waitingAssign">等待分配</label>
                 <input checked id="waitingAssign" type="checkbox"/>
             </div>
-            <div class="col-md-1">
+            <div class="col-sm-1">
                 <label for="waitingCounterSign">等待会签</label>
                 <input checked id="waitingCounterSign" type="checkbox"/>
             </div>
-            <div class="col-md-1">
+            <div class="col-sm-1">
                 <label for="waitingFinalize">等待定稿</label>
                 <input checked id="waitingFinalize" type="checkbox"/>
             </div>
-            <div class="col-md-1">
+            <div class="col-sm-1">
                 <label for="waitingReview">等待审核</label>
                 <input checked id="waitingReview" type="checkbox"/>
             </div>
-            <div class="col-md-1">
+            <div class="col-sm-1">
                 <label for="waitingSign">等待签订</label>
                 <input checked id="waitingSign" type="checkbox"/>
             </div>
-            <div class="col-md-1">
+            <div class="col-sm-1">
                 <label for="finished">已完成</label>
                 <input checked id="finished" type="checkbox">
             </div>
-            <div class="col-md-1">
+            <div class="col-sm-1">
+                <label for="reject">已否决</label>
+                <input checked id="reject" type="checkbox">
+            </div>
+            <div class="col-sm-1">
                 <button class="btn btn-primary form-control" onclick="sendFilterQuery();" type="button">条件查询</button>
             </div>
         </div>
@@ -163,6 +167,7 @@
     let waitingReview;
     let waitingSign;
     let finished;
+    let reject;
     let contractTableBody;
     let customerTableBody;
     let customerModal;
@@ -177,7 +182,7 @@
 
     function checkedStatuses() {
         return [isChecked(waitingAssign), isChecked(waitingCounterSign), isChecked(waitingFinalize),
-            isChecked(waitingReview), isChecked(waitingSign), isChecked(finished)];
+            isChecked(waitingReview), isChecked(waitingSign), isChecked(finished), isChecked(reject)];
     }
 
     function sendFuzzyQuery() {
@@ -342,6 +347,7 @@
         waitingReview = $("#waitingReview");
         waitingSign = $("#waitingSign");
         finished = $("#finished");
+        reject = $("#reject");
         customerBtn = $("#customerBtn");
         customerModal = $("#customerModal");
         customerInput = $("#customerInput");

@@ -1,25 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="utf-8">
-    <title></title>
+    <meta charset="UTF-8">
+    <title>Title</title>
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/my-form.css" rel="stylesheet">
-    <style type="text/css">
-        .clearfix:before, .clearfix:after {
-            content: "";
-            display: table;
-        }
-
-        .clearfix:after {
-            clear: both;
-        }
-
-        .clearfix {
-            zoom: 1;
-        }
-    </style>
+    
     <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
     <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
     <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
@@ -36,8 +23,8 @@
 	</span>
 </div>
 <div id="default-contract-table" style="padding: 20px"></div>
-<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade finalizeModal" data-backdrop="static"
-     id="finalizeModal"
+<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade reviewModal" data-backdrop="static"
+     id="reviewModal"
      role="dialog" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
@@ -48,21 +35,22 @@
                 <div class="modal-body" style="display: flex">
                     <form id="default-contract-modal-form" style="width: 60%"></form>
                     <div style="width: 40%">
-
                         <form class="text-center">
                             <div id="accordionContainer"></div>
                             <div class="form-group row">
-                                <label class="col-form-label" for="newContractContent">新合同内容</label></div>
+                                <label class="col-form-label" for="reviewComment">审核意见</label></div>
                             <div class="form-group row">
-                            <textarea class="form-control col-sm-10" id="newContractContent" rows="9"
+                            <textarea class="form-control col-sm-10" id="reviewComment" rows="9"
                                       style="float: left; width: 40%; border: none; outline: none;"></textarea>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger" id="submit" type="button">提交</button>
+                <button class="btn btn-danger" id="yes" type="button" onclick="sendReviewRequest(1)">通过</button>
+                <button class="btn btn-warning" id="no" type="button" onclick="sendReviewRequest(2)">否决</button>
                 <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
             </div>
         </div>
@@ -74,10 +62,10 @@
 <script>
     let contractNum;
     let contractTableBody;
-    let finalizeModal;
+    let reviewModal;
     let accordion;
-    let newContractContent;
-    let url = '/api/contract/finalize/select';
+    let reviewContent;
+    let url = '/api/contract/review/select';
 
     function initModal(result) {
         let contract = result['contract'];
@@ -85,15 +73,41 @@
         let csInfos = result['messageList'];
         accordion.empty();
         csInfos.forEach((csInfo) => accordion.append(createCard(csInfo['operator'], csInfo['content'])));
-        finalizeModal.modal();
+        reviewModal.modal();
+    }
+
+    function sendReviewRequest(state) {
+        let content = reviewContent.val();
+        if (content.length === 0) {
+            alert("请输入意见");
+            return;
+        }
+        $.ajax({
+            type:'PUT',
+            url:'/api/contract/review/add',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "content": content,
+                "contractNum": contractNum,
+                "state": state
+            }),
+            statusCode: {
+                200: () => {
+                    alert('成功了');
+                    reviewModal.modal('hide');
+                    loadNewTable(url, trClick);
+                }
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
     }
 
     function trClick(num) {
         contractNum = num;
         $("#modal-title").text(contractNum);
         $.ajax({
-            type: 'POST',
-            url: '/api/contract/finalize_need_message/select',
+            type:'POST',
+            url:'/api/contract/review_need_message/select',
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
             data: JSON.stringify({
                 "contractNum": contractNum
@@ -107,37 +121,10 @@
 
     $(function () {
         contractTableBody = $('#contractTableBody');
-        finalizeModal = $('#finalizeModal');
+        reviewModal = $('#reviewModal');
         accordion = $('#accordion');
-        newContractContent = $("#newContractContent");
+        reviewContent = $('#reviewComment');
         loadNewTable(url, trClick);
-
-        $("#submit").click(function () {
-            let content = newContractContent.val();
-            if (content.length === 0) {
-                alert("请输入意见");
-                return;
-            }
-            $.ajax({
-                type:'PUT',
-                url:'/api/contract/finalize/add',
-                headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-                data: JSON.stringify({
-                    "content": content,
-                    "contractNum": contractNum,
-                    "state": 1
-                }),
-                statusCode: {
-                    200: () => {
-                        alert('成功了');
-                        finalizeModal.modal('hide');
-                        loadNewTable(url, trClick);
-                    }
-                },
-                error: () => alert("未连接到网络，或者无权限")
-            })
-        });
-
     });
 </script>
 </html>

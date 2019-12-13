@@ -17,8 +17,8 @@ document.getElementById("header").innerHTML = `<link href="css/bootstrap.min.css
                     <a class="dropdown-item" href="finalize.html" id="finalize_nav">定稿合同 </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="countersign.html" id="counter_sign_nav">会签合同 </a>
-                    <a class="dropdown-item" href="#" id="review_nav">审批合同 </a>
-                    <a class="dropdown-item" href="#" id="sign_nav">签订合同 </a>
+                    <a class="dropdown-item" href="review.html" id="review_nav">审批合同 </a>
+                    <a class="dropdown-item" href="sign.html" id="sign_nav">签订合同 </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="assign.html" id="assign_nav">分配合同 </a>
                 </div>
@@ -31,39 +31,33 @@ document.getElementById("header").innerHTML = `<link href="css/bootstrap.min.css
                     <a class="dropdown-item" href="#">角色管理</a>
                 </div>
             </li>
-            <li class="nav-item dropdown">
-                <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="userDropdown" role="button">个人资料<span class="sr-only">(current)</span></a>
-                <div aria-labelledby="userDropdown" class="dropdown-menu">
-                    <a class="dropdown-item" href="draft.html">重置密码</a>
-                    <a class="dropdown-item" href="#">创建账户</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="login.html">更换账户</a>
-                    <a class="dropdown-item" href="#">注销登录</a>
-                </div>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="log.html">日志查询</a></li>
+            <li class="nav-item"><a class="nav-link" href="my.html">个人信息</a></li>
         </ul>
     </div>
 </nav>
 `;
 // $("#header").load("header.html");
 
-$(function () {
-    let contractDropdown = $("#contractDropdown");
-    let draftNav = $("#draft_nav");
-    let finalizeNav = $("#finalize_nav");
-    let counterSignNav = $("#counter_sign_nav");
-    let reviewNav = $("#review_nav");
-    let signNav = $("#sign_nav");
-    let assignNav = $("#assign_nav");
-    function addBadges(resultList) {
-        console.log(resultList);
-        if (resultList[0])addBadge(contractDropdown);
-        if (resultList[1])addBadge(finalizeNav);
-        if (resultList[2])addBadge(counterSignNav);
-        if (resultList[3])addBadge(reviewNav);
-        if (resultList[4])addBadge(signNav);
-        if (resultList[5])addBadge(assignNav);
-    }
+let contractDropdown;
+let finalizeNav;
+let counterSignNav;
+let reviewNav;
+let signNav;
+let assignNav;
+
+function addBadges(resultList) {
+    console.log(resultList);
+
+    if (resultList[0])addBadge(contractDropdown);
+    if (resultList[1])addBadge(finalizeNav);
+    if (resultList[2])addBadge(counterSignNav);
+    if (resultList[3])addBadge(reviewNav);
+    if (resultList[4])addBadge(signNav);
+    if (resultList[5])addBadge(assignNav);
+}
+
+function checkMyJob() {
     $.ajax({
         type: "POST",
         url: "/api/contract/UnfinishedJobs/select",
@@ -73,9 +67,22 @@ $(function () {
         },
         error: () => alert("未连接到网络，或者无权限")
     })
+}
+
+$(function () {
+    contractDropdown = $("#contractDropdown");
+
+    finalizeNav = $("#finalize_nav");
+    counterSignNav = $("#counter_sign_nav");
+    reviewNav = $("#review_nav");
+    signNav = $("#sign_nav");
+    assignNav = $("#assign_nav");
+
+    checkMyJob();
 });
 
 function addBadge(nav) {
+    nav.children().remove("span");
     let badge = document.createElement("span");
     badge.className = "badge badge-pill badge-danger";
     badge.textContent = "!";

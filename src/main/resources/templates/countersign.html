@@ -76,8 +76,8 @@
 	let countersignComment;
 	let url = '/api/contract/countersign/select';
 
-	function trClick(tr) {
-        contractNum = tr.find("td").eq(0).text();
+	function trClick(num) {
+        contractNum = num;
         console.log(contractNum);
         $("#contract-title").text(contractNum);
         $.ajax({
@@ -124,8 +124,8 @@
                 statusCode: {
                     200: () => {
                         alert('成功');
-                        loadNewTable(url, trClick)
                         finalizeModal.modal('hide');
+                        loadNewTable(url, trClick);
                     }
                 },
                 error: () => alert("未连接到网络，或者无权限")
