@@ -79,4 +79,14 @@ public class PageController {
     public String countersign2(HttpServletRequest request) {
         return "countersign";
     }
+
+    @GetMapping("finalize")
+    public String finalize(HttpServletRequest request) {
+        return "finalize";
+    }
+
+    @GetMapping("finalize.html")
+    public String finalize2(HttpServletRequest request) {
+        return "finalize";
+    }
 }

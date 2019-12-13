@@ -60,7 +60,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger" data-dismiss="modal" id="submit" type="button">提交</button>
+                <button class="btn btn-danger" id="submit" type="button">提交</button>
                 <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
             </div>
         </div>
@@ -73,17 +73,13 @@
     let contractNum;
     let contractTableBody;
     let countersignModal;
+    let countersignComment;
 
     function refreshContractTable(result) {
         contractTableBody.empty();
         result.forEach((contract) => {
             let tr = $(`<tr></tr>`);
-            let keys = Object.keys(contract);
-            for (let i = 0; i < keys.length; i++) {
-                let key = keys[i];
-                if (key === 'content') continue;
-                tr.append($(`<td>${contract[key]}</td>`));
-            }
+            loadContractTableWithoutContent(contract, tr);
             tr.click(function () {
                 contractNum = $(this).find("td").eq(0).text();
                 console.log(contractNum);
@@ -114,7 +110,7 @@
     $(function () {
         contractTableBody = $("#contractTableBody");
         countersignModal = $("#countersignModal");
-
+        countersignComment = $("#countersign-comment");
         $.ajax({
             type: 'POST',
             url: '/api/contract/countersign/select',
@@ -125,13 +121,31 @@
             error: () => alert("未连接到网络，或者无权限")
         });
 
-        // $("#submit").click(function () {
-        //     if ($("#countersignModal").find("textarea").eq(1).val() === "") {
-        //         alert("请输入意见");
-        //     }
-        // });
-        // var li_number = $(".list-group li").length;
-        // $("#countersignModal").find("textarea").eq(1).attr("row", li_number * 3);
+        $("#submit").click(function () {
+            let comment = countersignComment.val();
+            if (comment.trim().length === 0) {
+                alert("请输入意见");
+                return;
+            }
+            $.ajax({
+                type: 'PUT',
+                url: '/api/contract/countersign/add',
+                headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                data: JSON.stringify({
+                    "content": comment,
+                    "contractNum": contractNum,
+                    "state": 1
+                }),
+                statusCode: {
+                    200: (resultList) => {
+                        alert('成功');
+                        refreshContractTable(resultList);
+                        finalizeModal.modal('hide');
+                    }
+                },
+                error: () => alert("未连接到网络，或者无权限")
+            })
+        });
     })
 
 </script>
