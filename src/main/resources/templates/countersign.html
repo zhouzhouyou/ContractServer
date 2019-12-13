@@ -43,7 +43,7 @@
     <div class="modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header" style="height: 50px;">
-                <h4 class="modal-title" id="contract-name"></h4>
+                <h4 class="modal-title" id="contract-title"></h4>
                 <button class="close" data-dismiss="modal" type="button">&times;</button>
             </div>
             <div class="modal-content">
@@ -87,7 +87,7 @@
             tr.click(function () {
                 contractNum = $(this).find("td").eq(0).text();
                 console.log(contractNum);
-                $("#contract-name").text(contractNum);
+                $("#contract-title").text(contractNum);
                 $.ajax({
                     type: 'POST',
                     url: '/api/contract/countersign_need_message/select',
@@ -111,24 +111,9 @@
         loadDetailContractInfo(contract);
     }
 
-    // function sendFuzzyQuery() {
-    // 	$.ajax({
-    // 		type: "POST",
-    // 		url: "/api/contract/fuzzyQuery",
-    // 		data: JSON.stringify({
-    // 			"content": fuzzyQuery.val()
-    // 		}),
-    // 		headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-    // 		statusCode: {
-    // 			200: (resultList) => loadContractTable(resultList)
-    // 		},
-    // 		error: () => alert("未连接到网络，或者无权限")
-    // 	})
-    // }
-
     $(function () {
         contractTableBody = $("#contractTableBody");
-        contractModal = $("#contractModal");
+        countersignModal = $("#countersignModal");
 
         $.ajax({
             type: 'POST',

@@ -39,7 +39,7 @@
         <div class="form-group row">
             <label class="col-sm-2 col-form-label" for="customerBtn" style="display: inline">客户编号</label>
             <div class="col-sm-9">
-                <input class="form-control" data-target=".bd-example-modal-xl" data-toggle="modal" id="customerBtn"
+                <input class="form-control" data-target=".customer-modal" data-toggle="modal" id="customerBtn"
                        placeholder="点击选择"
                        type="text"/>
                 <div class="invalid-feedback"><small>请选择！</small></div>
@@ -89,8 +89,7 @@
 
 </div>
 
-
-<div class="modal fade bd-example-modal-xl" id="customerModal" role="dialog" tabindex="-1">
+<div class="modal fade customer-modal" id="customerModal" role="dialog" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -128,6 +127,7 @@
     </div>
 </div>
 </body>
+
 <script src="js/nav.js" type="text/javascript"></script>
 <script>
     let currentCustomerId = null;
@@ -165,7 +165,7 @@
             data: JSON.stringify({
                 "num":"",
                 "name":nameInput.val(),
-                "customer":currentCustomerId,
+                "customerNum":currentCustomerId,
                 "begin": beginTime.value(),
                 "end": endTime.value(),
                 "content": content.val(),
@@ -180,9 +180,7 @@
                 }
             },
 
-            error: function () {
-                alert("未连接到网络，或者无权限");
-            }
+            error: () => alert("未连接到网络，或者无权限")
         })
     }
 
@@ -197,15 +195,14 @@
         endTime.value('');
         setValid(endTime, false);
         attachment.fileinput('clear');
+        finalName = null;
     }
 
     $(function () {
         tableBody = $('#tableBody');
 
         nameInput = $("#name");
-        nameInput.blur(function () {
-            setValid(nameInput, nameInput.val().length !== 0);
-        });
+        nameInput.blur(() => setValid(nameInput, nameInput.val().length !== 0));
 
         openCustomerSelector = $("#customerBtn");
         customerInput = $("#customerInput");
@@ -221,6 +218,7 @@
                 currentCustomerId = customer.num;
                 openCustomerSelector.val(`编号: ${customer.num}, 姓名: ${customer.name}, 地址：${customer.address}, 电话：${customer.tel}`);
                 setValid(openCustomerSelector, true);
+                customerModal.modal('hide');
             });
             tr.append(select);
         };
@@ -235,15 +233,10 @@
                 headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
 
                 statusCode: {
-                    200: function (result) {
-                        tableBody.empty();
-                        addTr(result, tableBody, addSelectBtn);
-                    }
+                    200:  (result) => refreshTable(tableBody, result, null, addSelectBtn)
                 },
 
-                error: function () {
-                    alert("未连接到网络，或者无权限");
-                }
+                error: () => alert("未连接到网络，或者无权限")
             });
         }
 
@@ -257,14 +250,58 @@
             setValid(openCustomerSelector, currentCustomerId !== null);
         });
 
+        let today = new Date();
+
+        function isLater(a, b) {
+            if (a.getUTCFullYear() !== b.getUTCFullYear()) return a.getUTCFullYear() > b.getUTCFullYear();
+            if (a.getUTCMonth() !==  b.getUTCMonth()) return a.getUTCMonth() > b.getUTCFullYear();
+            return a.getUTCDate() > b.getUTCDate();
+        }
+
+        function beginDateCheck() {
+            if (beginTime.value().length === 0) {
+                setValid(beginTime, false);
+                return;
+            }
+            let beginDate = new Date(beginTime.value());
+            if (isLater(today, beginDate)) {
+                setValid(beginTime, false);
+                return;
+            }
+            if (endTime.value.length !== 0) {
+                if (isLater(beginDate, new Date(endTime.value()))) {
+                    setValid(beginTime, false);
+                    return;
+                }
+            }
+            setValid(beginTime, true);
+        }
+
+        function endDateCheck() {
+            if (endTime.value().length === 0) {
+                setValid(endTime, false);
+                return;
+            }
+            let endDate = new Date(endTime.value());
+            if (isLater(today, endDate)) {
+                setValid(endTime, false);
+                return;
+            }
+            if (beginTime.value.length !== 0) {
+                if (isLater(new Date(beginTime.value()), endDate)) {
+                    setValid(endTime, false);
+                    return;
+                }
+            }
+            setValid(endTime, true);
+        }
+
         beginTime = $("#beginTime");
         beginTime.datepicker({
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: function (e) {
-                setValid(beginTime, beginTime.value().length !== 0);
-            }
+            close: () => beginDateCheck()
         });
 
         endTime = $("#endTime");
@@ -272,15 +309,11 @@
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: function (e) {
-                setValid(endTime, endTime.value().length !== 0);
-            }
+            close: () => endDateCheck()
         });
 
         content = $("#content");
-        content.blur(function () {
-            setValid(content, content.val().length !== 0);
-        });
+        content.blur(() => setValid(content, content.val().length !== 0));
 
         attachment = $("#attachment");
         attachment.fileinput({
@@ -304,6 +337,8 @@
             console.log(event);
             console.log(data);
             console.log(msg);
+        }).on('fileremoved', function (event, id, index) {
+            finalName = null;
         })
     });
 </script>
