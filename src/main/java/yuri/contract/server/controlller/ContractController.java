@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import yuri.contract.server.model.*;
+import yuri.contract.server.model.util.OperationState;
 import yuri.contract.server.model.util.OperationType;
 import yuri.contract.server.service.ContractService;
 import yuri.contract.server.util.annotation.NeedToken;
@@ -184,11 +185,11 @@ public class ContractController extends BaseController {
     @PutMapping(value = "/countersign/add")
     @ResponseBody
     @NeedToken(function = NeedToken.COUNTER_SIGN_CONTRACT)
-    public ResponseEntity<String> doCountersignJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+    public ResponseEntity<String> doCountersignJob(@RequestBody ProcessJob processJob, BindingResult bindingResult) {
         String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(operator, process, OperationType.COUNTER_SIGH.getValue());
+        return contractService.doProcessJob(operator, processJob.contractNum,processJob.content, OperationType.COUNTER_SIGH.getValue(),processJob.state);
     }
 
     @ApiOperation("获取可定稿的合同列表")
@@ -218,11 +219,11 @@ public class ContractController extends BaseController {
     @PutMapping(value = "/finalize/add")
     @ResponseBody
     @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
-    public ResponseEntity<String> doFinalizeJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+    public ResponseEntity<String> doFinalizeJob(@RequestBody ProcessJob processJob, BindingResult bindingResult) {
         String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(operator, process, OperationType.FINALIZE.getValue());
+        return contractService.doProcessJob(operator, processJob.contractNum,processJob.content, OperationType.FINALIZE.getValue(),processJob.state);
     }
 
     @ApiOperation("获取可审核的合同列表")
@@ -252,11 +253,11 @@ public class ContractController extends BaseController {
     @PutMapping(value = "/review/add")
     @ResponseBody
     @NeedToken(function = NeedToken.REVIEW_CONTRACT)
-    public ResponseEntity<String> doReviewJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+    public ResponseEntity<String> doReviewJob(@RequestBody ProcessJob processJob, BindingResult bindingResult) {
         String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(operator, process, OperationType.REVIEW.getValue());
+        return contractService.doProcessJob(operator, processJob.contractNum,processJob.content, OperationType.REVIEW.getValue(),processJob.state);
     }
 
     @ApiOperation("获取可签订的合同列表")
@@ -286,11 +287,11 @@ public class ContractController extends BaseController {
     @PutMapping(value = "/sign/add")
     @ResponseBody
     @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
-    public ResponseEntity<String> doSignJob(@RequestBody ContractProcess process, BindingResult bindingResult) {
+    public ResponseEntity<String> doSignJob(@RequestBody ProcessJob processJob, BindingResult bindingResult) {
         String operator = getOperator();
         if (bindingResult.hasErrors())
             return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        return contractService.doProcessJob(operator, process, OperationType.SIGN.getValue());
+        return contractService.doProcessJob(operator, processJob.contractNum,processJob.content, OperationType.SIGN.getValue(),processJob.state);
     }
 
     @ApiOperation("获取合同状态")
@@ -387,5 +388,21 @@ public class ContractController extends BaseController {
          * 客户编号
          */
         private Integer customerNum;
+    }
+
+    @Data
+    private static class ProcessJob{
+        /**
+         * 合同号
+         */
+        private Integer contractNum;
+        /**
+         * 操作内容
+         */
+        private String content;
+        /**
+         * 操作结果
+         */
+        private Integer state;
     }
 }

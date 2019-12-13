@@ -1,33 +1,22 @@
 package yuri.contract.server.service;
 
-import io.swagger.models.auth.In;
-import lombok.Data;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.model.IProcessableElementTag;
 import yuri.contract.server.mapper.*;
 import yuri.contract.server.model.*;
-import yuri.contract.server.model.util.EnumValue;
 import yuri.contract.server.model.util.OperationState;
 import yuri.contract.server.model.util.OperationType;
 import yuri.contract.server.model.util.Status;
 import yuri.contract.server.util.response.ResponseFactory;
 import yuri.contract.server.model.DetailContractMessage.Message;
 import yuri.contract.server.model.PreviousProcessMessage.PreviousMessage;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.sql.Date;
 import java.util.*;
-
-import static yuri.contract.server.model.util.Status.COUNTER_SIGN_FINISHED;
 
 
 @Service
@@ -178,84 +167,121 @@ public class ContractService extends BaseService {
     }
 
     public ResponseEntity<List<Contract>> selectAllNeededContracts(String operator, int type) {
-        List<Integer> contractNums = processMapper.selectNumOfNeededProcess(operator, type);
+        List<Integer> unfinishedContractNums = processMapper.selectUnfinishedContractNum(operator, type, OperationState.UNFINISHED.getValue());
+        List<Integer> finishedContractNums = processMapper.selectUnfinishedContractNum(operator, type, OperationState.FINISHED.getValue());
         List<Contract> contracts = new ArrayList<>();
-        if (contractNums == null || contractNums.size() == 0)
+        if (unfinishedContractNums == null || unfinishedContractNums.size() == 0)
             return ResponseFactory.success(contracts);
-        switch (type) {
-            case 0:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 1);
-                break;
-            case 1:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
-                break;
-            case 2:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
-                break;
-            case 3:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
-                break;
-            default:
-                break;
-        }
-        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+//        switch (type) {
+//            case 0:
+//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 1);
+//                break;
+//            case 1:
+//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
+//                break;
+//            case 2:
+//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
+//                break;
+//            case 3:
+//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
+//                break;
+//            default:
+//                break;
+//        }
+//        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+        Set<Integer> unfinishedSet = new HashSet<>(unfinishedContractNums);
+        Set<Integer> finishedSet = new HashSet<>(finishedContractNums);
+        unfinishedSet.removeAll(finishedSet);
+        unfinishedSet.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
         return ResponseFactory.success(contracts);
     }
 
     public ResponseEntity<List<Contract>> fuzzySelectAllNeededContracts(String operator, String content, int type) {
-        List<Integer> contractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type);
-        List<Contract> contracts = new ArrayList<>();
-        if (contractNums == null || contractNums.size() == 0)
-            return ResponseFactory.success(contracts);
+        List<Integer> unfinishedContractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type, OperationState.UNFINISHED.getValue());
+        List<Integer> finishedContractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type, OperationState.FINISHED.getValue());
+        List<Contract> processContracts = new ArrayList<>();
+        List<Contract> fuzzyContracts = contractMapper.fuzzyQuery(content);
+//        if (unfinishedContractNums == null || unfinishedContractNums.size() == 0)
+//            return ResponseFactory.success(processContracts);
+//        switch (type) {
+//            case 0:
+//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
+//                break;
+//            case 1:
+//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
+//                break;
+//            case 2:
+//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
+//                break;
+//            case 3:
+//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
+//                break;
+//            default:
+//                break;
+//        }
+        Set<Integer> unfinishedSet = new HashSet<>(unfinishedContractNums);
+        Set<Integer> finishedSet = new HashSet<>(finishedContractNums);
+        unfinishedSet.removeAll(finishedSet);
+        unfinishedSet.forEach(contractNum -> processContracts.add(contractMapper.select(contractNum)));
+
+        Set<Contract> originContract = new HashSet<>(processContracts);
+        Set<Contract> fuzzyContract = new HashSet<>(fuzzyContracts);
+        fuzzyContract.removeAll(originContract);
+        originContract.addAll(fuzzyContract);
+
+        List<Contract> finalContracts = new ArrayList<>(originContract);
+        return ResponseFactory.success(finalContracts);
+    }
+
+    public ResponseEntity<String> doProcessJob(String operator, int contractNum, String content, int type, int state) {
+        int count = processMapper.insert(contractNum, type,
+                state, operator,
+                content);
+        if (count == 0)
+            return ResponseFactory.badRequest("fail");
+
         switch (type) {
             case 0:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
+                writeLog(operator, "countersigned contract: " + contractNum);
                 break;
             case 1:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
+                writeLog(operator, "finalized contract: " + contractNum);
                 break;
             case 2:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
+                writeLog(operator, "reviewed contract: " + contractNum);
                 break;
             case 3:
-                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
+                writeLog(operator, "signed contract: " + contractNum);
                 break;
             default:
                 break;
         }
-        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
-        return ResponseFactory.success(contracts);
-    }
-
-    public ResponseEntity<String> doProcessJob(String operator, ContractProcess process, int type) {
-        int count = processMapper.insert(process.getContractNum(), process.getType().getValue(),
-                process.getState().getValue(), operator,
-                process.getContent());
-        if (count == 0)
-            return ResponseFactory.badRequest("fail");
         int createNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.UNFINISHED.getValue());
         int finishNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.FINISHED.getValue());
         if (createNumber == finishNumber) {
-            switch (process.getType().getValue()) {
+            switch (type) {
                 case 0:
-                    stateMapper.insert(process.getContractNum(), Status.COUNTER_SIGN_FINISHED.getValue());
+                    stateMapper.insert(contractNum, Status.COUNTER_SIGN_FINISHED.getValue());
+                    writeLog(operator, "countersign contract: " + contractNum + " finish.");
                     break;
                 case 1:
-                    stateMapper.insert(process.getContractNum(), Status.FINALIZE_FINISHED.getValue());
-                    contractMapper.updateContent(process.getContractNum(),process.getContent());
+                    stateMapper.insert(contractNum, Status.FINALIZE_FINISHED.getValue());
+                    contractMapper.updateContent(contractNum, content);
+                    writeLog(operator, "finalize contract: " + contractNum + " finish.");
                     break;
                 case 2:
-                    stateMapper.insert(process.getContractNum(), Status.REVIEW_FINISHED.getValue());
+                    stateMapper.insert(contractNum, Status.REVIEW_FINISHED.getValue());
+                    writeLog(operator, "review contract: " + contractNum + " finish.");
                     break;
                 case 3:
-                    stateMapper.insert(process.getContractNum(), Status.SIGN_FINISHED.getValue());
+                    stateMapper.insert(contractNum, Status.SIGN_FINISHED.getValue());
+                    writeLog(operator, "sign contract: " + contractNum + " finish.");
                     break;
                 default:
                     break;
             }
         }
-        writeLog(operator, " countersigned " + process.getContractNum());
-        return ResponseFactory.success(process.getContractNum() + " " + process.getType().getDesc());
+        return ResponseFactory.success("Job finished");
     }
 
     public ResponseEntity<String> getContractStatus(int contractNum) {
@@ -416,16 +442,16 @@ public class ContractService extends BaseService {
         //List<String> assignOperator = processMapper.selectOperator(contractNum, -1);
 //        if (stateMapper.getContractStatus(contractNum) == 1) {
 //            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "未完成")));}
-         if (stateMapper.getContractStatus(contractNum) == 2) {
+        if (stateMapper.getContractStatus(contractNum) == 2) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
             //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
-            countersignOperator.forEach(countersign -> counterSigners.add(new Message( countersign, "会签", "未完成")));
+            countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "未完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "未完成")));
-            reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","未完成")));
-            signOperator.forEach(sign->signers.add(new Message(sign,"签订","未完成")));
+            reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "未完成")));
+            signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
 
         } else if (stateMapper.getContractStatus(contractNum) == 3) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
@@ -435,8 +461,8 @@ public class ContractService extends BaseService {
             //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "未完成")));
-            reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","未完成")));
-            signOperator.forEach(sign->signers.add(new Message(sign,"签订","未完成")));
+            reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "未完成")));
+            signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 4) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
@@ -445,8 +471,8 @@ public class ContractService extends BaseService {
             //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
-            reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","未完成")));
-            signOperator.forEach(sign->signers.add(new Message(sign,"签订","未完成")));
+            reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "未完成")));
+            signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 5) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
@@ -455,57 +481,55 @@ public class ContractService extends BaseService {
             //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
-            reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","已完成")));
-            signOperator.forEach(sign->signers.add(new Message(sign,"签订","未完成")));
+            reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "已完成")));
+            signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 6) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
             //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
-            countersignOperator.forEach(countersign -> counterSigners.add(new Message( countersign, "会签", "已完成")));
+            countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
-            reviewOperator.forEach(review ->reviewers.add(new Message(review,"审核","已完成")));
-            signOperator.forEach(sign->signers.add(new Message(sign,"签订","已完成")));
+            reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "已完成")));
+            signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "已完成")));
         }
-        DetailContractMessage detailContractMessage = new DetailContractMessage(contract,lists);
+        DetailContractMessage detailContractMessage = new DetailContractMessage(contract, lists);
         return ResponseFactory.success(detailContractMessage);
     }
 
-    public ResponseEntity<PreviousProcessMessage> getPreviousProcessMessage(int contractNum,int type){
+    public ResponseEntity<PreviousProcessMessage> getPreviousProcessMessage(int contractNum, int type) {
         List<PreviousMessage> drafter = new ArrayList<>();
         List<PreviousMessage> counterSigners = new ArrayList<>();
         List<PreviousMessage> finalizerNeeds = new ArrayList<>();
         List<PreviousMessage> reviewers = new ArrayList<>();
         Contract contract = selectContractByNum(contractNum);
         PreviousProcessMessage previousProcessMessage = null;
-        switch (type){
+        switch (type) {
             case 0:
-                drafter.add(new PreviousMessage(contract.getUserName(),"起草",contract.getContent()));
-                previousProcessMessage = new PreviousProcessMessage(contract,drafter);
+                drafter.add(new PreviousMessage(contract.getUserName(), "起草", contract.getContent()));
+                previousProcessMessage = new PreviousProcessMessage(contract, drafter);
                 break;
             case 1:
-                List<ContractProcess> countersign = processMapper.selectFinishedProcesses(contractNum,0);
-                countersign.forEach(process -> counterSigners.add(new PreviousMessage(process.getUserName(),"会签",process.getContent())));
-                previousProcessMessage = new PreviousProcessMessage(contract,counterSigners);
+                List<ContractProcess> countersign = processMapper.selectFinishedProcesses(contractNum, 0);
+                countersign.forEach(process -> counterSigners.add(new PreviousMessage(process.getUserName(), "会签", process.getContent())));
+                previousProcessMessage = new PreviousProcessMessage(contract, counterSigners);
                 break;
             case 2:
-                List<ContractProcess> finalizeNeed = processMapper.selectFinishedProcesses(contractNum,0);
-                finalizeNeed.forEach(process -> finalizerNeeds.add(new PreviousMessage(process.getUserName(),"会签",process.getContent())));
-                previousProcessMessage = new PreviousProcessMessage(contract,finalizerNeeds);
+                List<ContractProcess> finalizeNeed = processMapper.selectFinishedProcesses(contractNum, 0);
+                finalizeNeed.forEach(process -> finalizerNeeds.add(new PreviousMessage(process.getUserName(), "会签", process.getContent())));
+                previousProcessMessage = new PreviousProcessMessage(contract, finalizerNeeds);
                 break;
             case 3:
-                List<ContractProcess> review = processMapper.selectFinishedProcesses(contractNum,2);
-                review.forEach(process -> reviewers.add(new PreviousMessage(process.getUserName(),"审核",process.getContent())));
-                previousProcessMessage = new PreviousProcessMessage(contract,reviewers);
+                List<ContractProcess> review = processMapper.selectFinishedProcesses(contractNum, 2);
+                review.forEach(process -> reviewers.add(new PreviousMessage(process.getUserName(), "审核", process.getContent())));
+                previousProcessMessage = new PreviousProcessMessage(contract, reviewers);
                 break;
         }
 
 
         return ResponseFactory.success(previousProcessMessage);
     }
-
-
 
 
 //    public ResponseEntity<String> addContractProcess(String operator, ContractProcess process) {

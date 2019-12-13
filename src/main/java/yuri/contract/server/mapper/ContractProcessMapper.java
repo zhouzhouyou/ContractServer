@@ -26,11 +26,11 @@ public interface ContractProcessMapper {
     @Select("select contractNum from contract_process where type = -1 and concat_ws(contractNum,type,state,userName,content,time) like concat('%', #{content}, '%')")
     List<Integer> fuzzySelectNumOfUnAssigned(String content);
 
-    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName}")
-    List<Integer> selectNumOfNeededProcess(String userName, int type);
+    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and state = #{state}")
+    List<Integer> selectUnfinishedContractNum(String userName, int type, int state);
 
-    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and concat_ws(contractNum,type,state,userName,content,time) like concat('%', #{content}, '%')")
-    List<Integer> fuzzySelectNumOfNeededProcess(String userName, String content, int type);
+    @Select("select contractNum from contract_process where type = #{type} and userName = #{userName} and state = #{state} and concat_ws(contractNum,type,state,userName,content,time) like concat('%',#{content},'%')")
+    List<Integer> fuzzySelectNumOfNeededProcess(String userName, String content, int type, int state);
 
     @Select("select count(*) from contract_process where type = #{type} and state = #{state}")
     int getNumberOfNeededTypeState(int type, int state);
