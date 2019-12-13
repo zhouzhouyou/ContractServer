@@ -1,9 +1,10 @@
 $(function () {
     let defaultContractTable = document.getElementById('default-contract-table');
     console.log(defaultContractTable);
+
     if (defaultContractTable !== null) {
         console.log('loading contract table');
-        document.getElementById('default-contract-table').innerHTML = `<table class="table">
+        defaultContractTable.innerHTML = `<table class="table">
         <thead>
         <tr>
             <th scope="col">合同编号</th>
@@ -18,11 +19,12 @@ $(function () {
         </tbody>
     </table>`;
     }
+
     let defaultContractModalForm = document.getElementById("default-contract-modal-form");
     console.log(defaultContractModalForm);
     if (defaultContractModalForm !== null) {
         console.log('loading contract modal form');
-        document.getElementById("default-contract-modal-form").innerHTML =
+        defaultContractModalForm.innerHTML =
             `<div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="contract-num" style="display: inline">合同编号</label>
                 <div class="col-sm-8">
@@ -59,6 +61,11 @@ $(function () {
             </div>`;
     }
 
+    let accordionContainer = document.getElementById("accordionContainer");
+    if (accordionContainer !== null) {
+        accordionContainer.innerHTML = `<div class="accordion" id="accordion"></div>`;
+    }
+
 });
 
 function loadContractTableWithoutContent(contract, tr) {
@@ -78,4 +85,28 @@ function loadDetailContractInfo(contract) {
     $("#contract-end").val(contract['end']);
     $("#contract-content").val(contract['content']);
     $("#contract-username").val(contract['userName']);
+}
+
+function createCard(operator, message) {
+    let cardHeaderName = `${'card_' + operator}`;
+    let cardInfoName = `${'card_info_' + operator}`;
+    return $(`<div class="card form-group">
+                            <div class="card-header" id=${cardHeaderName}>
+                                <h2 class="mb-0">
+                                    <button aria-controls=${cardInfoName} aria-expanded="true"
+                                            class="btn btn-link"
+                                            data-target=${'#card_info_' + operator} data-toggle="collapse"
+                                            type="button">
+                                        ${operator}
+                                    </button>
+                                </h2>
+                            </div>
+                            <div aria-labelledby=${cardHeaderName} class="collapse show"
+                                 data-parent="#accordion"
+                                 id=${cardInfoName}
+                                <div class="card-body">
+                                    ${message}
+                                </div>
+                            </div>
+                        </div>`);
 }

@@ -50,10 +50,7 @@
                     <div style="width: 40%">
 
                         <form class="text-center">
-                            <div>
-                                <div class="accordion" id="assignAccordion">
-                                </div>
-                            </div>
+                            <div id="accordionContainer"></div>
                             <div class="form-group row">
                                 <label class="col-form-label" for="newContractContent">新合同内容</label></div>
                             <div class="form-group row">
@@ -66,7 +63,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger" data-dismiss="modal" id="submit" type="button">提交</button>
+                <button class="btn btn-danger" id="submit" type="button">提交</button>
                 <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
             </div>
         </div>
@@ -79,36 +76,15 @@
     let contractNum;
     let contractTableBody;
     let finalizeModal;
+    let accordion;
 
-    function createCounterSignCard(counterSigner, counterSignMessage) {
-        let cardHeaderName = `${'card_' + counterSigner}`;
-        let cardInfoName = `${'card_info_' + counterSigner}`;
-        return $(`<div class="card form-group">
-                            <div class="card-header" id=${cardHeaderName}>
-                                <h2 class="mb-0">
-                                    <button aria-controls=${cardInfoName} aria-expanded="true"
-                                            class="btn btn-link"
-                                            data-target=${'#card_info_' + cardInfoName} data-toggle="collapse"
-                                            type="button">
-                                        ${counterSigner}
-                                    </button>
-                                </h2>
-                            </div>
-                            <div aria-labelledby=${cardHeaderName} class="collapse show"
-                                 data-parent="#assignAccordion"
-                                 id=${cardInfoName}
-                                <div class="card-body">
-                                    ${counterSignMessage}
-                                </div>
-                            </div>
-                        </div>`)
-    }
 
     function initModal(result) {
         let contract = result['contract'];
         loadDetailContractInfo(contract);
         let csInfos = result['messageList'];
-        csInfos.forEach((csInfo) => createCounterSignCard(csInfo['operator'], csInfo['content']));
+        accordion.empty();
+        csInfos.forEach((csInfo) => accordion.append(createCard(csInfo['operator'], csInfo['content'])));
         finalizeModal.modal();
     }
 
@@ -119,7 +95,7 @@
             loadContractTableWithoutContent(contract, tr);
             tr.click(function () {
                 contractNum = $(this).find("td").eq(0).text();
-                $("modal-title").text(contractNum);
+                $("#modal-title").text(contractNum);
                 $.ajax({
                     type: 'POST',
                     url: '/api/contract/finalize_need_message/select',
@@ -130,6 +106,7 @@
                     statusCode: {
                         200: (result) => initModal(result)
                     },
+                    error: () => alert("未连接到网络，或者无权限")
                 })
             });
             contractTableBody.append(tr);
@@ -139,7 +116,7 @@
     $(function () {
         contractTableBody = $('#contractTableBody');
         finalizeModal = $('#finalizeModal');
-
+        accordion = $('#accordion');
         $.ajax({
             type:'POST',
             url:'/api/contract/finalize/select',
@@ -147,17 +124,16 @@
             statusCode: {
                 200: (resultList) => loadContractTable(resultList)
             },
+            error: () => alert("未连接到网络，或者无权限")
         });
 
         $("#submit").click(function () {
             if ($("#finalizeModal").find("textarea").eq(0).val() === "") {
                 alert("请输入意见");
+                return;
             }
         });
 
-        // var li_number = $("#textarea_card_con .card").length;
-        // console.log(li_number + "das");
-        // $("#finalizeModal").find("textarea").eq(0).attr({"rows": li_number * 2});
     });
 
 
