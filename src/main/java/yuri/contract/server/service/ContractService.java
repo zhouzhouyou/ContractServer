@@ -133,22 +133,28 @@ public class ContractService extends BaseService {
         countersigns.forEach(countersignUser -> {
             processMapper.insert(contractNum, OperationType.COUNTER_SIGH.getValue(),
                     OperationState.UNFINISHED.getValue(), countersignUser, "");
-            processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
-                    OperationState.FINISHED.getValue(), countersignUser, "");
+//            processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
+//                    OperationState.FINISHED.getValue(), countersignUser, "");
+            processMapper.updateState(OperationState.FINISHED.getValue(), contractNum,
+                    OperationType.ASSIGN.getValue(), operator);
             writeLog(operator, "assigned " + countersignUser + " to countersign" + contractNum + " contract");
         });
         reviews.forEach(reviewUser -> {
             processMapper.insert(contractNum, OperationType.REVIEW.getValue(),
                     OperationState.UNFINISHED.getValue(), reviewUser, "");
-            processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
-                    OperationState.FINISHED.getValue(), reviewUser, "");
+//            processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
+//                    OperationState.FINISHED.getValue(), reviewUser, "");
+            processMapper.updateState(OperationState.FINISHED.getValue(), contractNum,
+                    OperationType.ASSIGN.getValue(), operator);
             writeLog(operator, "assigned " + reviewUser + " to review" + contractNum + " contract");
         });
         signs.forEach(signUser -> {
             processMapper.insert(contractNum, OperationType.SIGN.getValue(),
                     OperationState.UNFINISHED.getValue(), signUser, "");
-            processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
-                    OperationState.FINISHED.getValue(), signUser, "");
+//            processMapper.insert(contractNum, OperationType.ASSIGN.getValue(),
+//                    OperationState.FINISHED.getValue(), signUser, "");
+            processMapper.updateState(OperationState.FINISHED.getValue(), contractNum,
+                    OperationType.ASSIGN.getValue(), operator);
             writeLog(operator, "assigned " + signUser + " to sign" + contractNum + " contract");
         });
         stateMapper.insert(contractNum, Status.ASSIGN.getValue());
@@ -168,78 +174,73 @@ public class ContractService extends BaseService {
 
     public ResponseEntity<List<Contract>> selectAllNeededContracts(String operator, int type) {
         List<Integer> unfinishedContractNums = processMapper.selectUnfinishedContractNum(operator, type, OperationState.UNFINISHED.getValue());
-        List<Integer> finishedContractNums = processMapper.selectUnfinishedContractNum(operator, type, OperationState.FINISHED.getValue());
+        //List<Integer> finishedContractNums = processMapper.selectUnfinishedContractNum(operator, type, OperationState.FINISHED.getValue());
         List<Contract> contracts = new ArrayList<>();
         if (unfinishedContractNums == null || unfinishedContractNums.size() == 0)
             return ResponseFactory.success(contracts);
-//        switch (type) {
-//            case 0:
-//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 1);
-//                break;
-//            case 1:
-//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
-//                break;
-//            case 2:
-//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
-//                break;
-//            case 3:
-//                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
-//                break;
-//            default:
-//                break;
-//        }
+        switch (type) {
+            case 0:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
+                break;
+            case 1:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
+                break;
+            case 2:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
+                break;
+            case 3:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
+                break;
+            default:
+                break;
+        }
 //        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
-        Set<Integer> unfinishedSet = new HashSet<>(unfinishedContractNums);
-        Set<Integer> finishedSet = new HashSet<>(finishedContractNums);
-        unfinishedSet.removeAll(finishedSet);
-        unfinishedSet.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+        unfinishedContractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
         return ResponseFactory.success(contracts);
     }
 
     public ResponseEntity<List<Contract>> fuzzySelectAllNeededContracts(String operator, String content, int type) {
         List<Integer> unfinishedContractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type, OperationState.UNFINISHED.getValue());
-        List<Integer> finishedContractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type, OperationState.FINISHED.getValue());
+        //List<Integer> finishedContractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type, OperationState.FINISHED.getValue());
         List<Contract> processContracts = new ArrayList<>();
         List<Contract> fuzzyContracts = contractMapper.fuzzyQuery(content);
-//        if (unfinishedContractNums == null || unfinishedContractNums.size() == 0)
-//            return ResponseFactory.success(processContracts);
-//        switch (type) {
-//            case 0:
-//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
-//                break;
-//            case 1:
-//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
-//                break;
-//            case 2:
-//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
-//                break;
-//            case 3:
-//                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
-//                break;
-//            default:
-//                break;
-//        }
-        Set<Integer> unfinishedSet = new HashSet<>(unfinishedContractNums);
-        Set<Integer> finishedSet = new HashSet<>(finishedContractNums);
-        unfinishedSet.removeAll(finishedSet);
-        unfinishedSet.forEach(contractNum -> processContracts.add(contractMapper.select(contractNum)));
+        if (unfinishedContractNums == null || unfinishedContractNums.size() == 0)
+            return ResponseFactory.success(processContracts);
+        switch (type) {
+            case 0:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
+                break;
+            case 1:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
+                break;
+            case 2:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
+                break;
+            case 3:
+                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
+                break;
+            default:
+                break;
+        }
+        unfinishedContractNums.forEach(contractNum -> processContracts.add(contractMapper.select(contractNum)));
 
-        Set<Contract> originContract = new HashSet<>(processContracts);
-        Set<Contract> fuzzyContract = new HashSet<>(fuzzyContracts);
-        fuzzyContract.removeAll(originContract);
-        originContract.addAll(fuzzyContract);
+        Set<Contract> originContracts = new HashSet<>(processContracts);
+        Set<Contract> fuzzyContractSet = new HashSet<>(fuzzyContracts);
+        fuzzyContractSet.removeAll(originContracts);
+        originContracts.addAll(fuzzyContracts);
 
-        List<Contract> finalContracts = new ArrayList<>(originContract);
+        List<Contract> finalContracts = new ArrayList<>(originContracts);
         return ResponseFactory.success(finalContracts);
     }
 
     public ResponseEntity<String> doProcessJob(String operator, int contractNum, String content, int type, int state) {
-        int count = processMapper.insert(contractNum, type,
-                state, operator,
-                content);
+//        int count = processMapper.insert(contractNum, type,
+//                state, operator,
+//                content);
+        int count = processMapper.updateState(state, contractNum, type, operator);
+        processMapper.updateContent(content, contractNum, type, operator);
         if (count == 0)
             return ResponseFactory.badRequest("fail");
-
         switch (type) {
             case 0:
                 writeLog(operator, "countersigned contract: " + contractNum);
@@ -256,9 +257,10 @@ public class ContractService extends BaseService {
             default:
                 break;
         }
-        int createNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.UNFINISHED.getValue());
-        int finishNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.FINISHED.getValue());
-        if (createNumber == finishNumber) {
+//        int createNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.UNFINISHED.getValue());
+//        int finishNumber = processMapper.getNumberOfNeededTypeState(type, OperationState.FINISHED.getValue());
+        int unfinishedCount = processMapper.getUnfinishedOrDeniedProcess(type, contractNum);
+        if (unfinishedCount == 0) {
             switch (type) {
                 case 0:
                     stateMapper.insert(contractNum, Status.COUNTER_SIGN_FINISHED.getValue());
@@ -289,22 +291,22 @@ public class ContractService extends BaseService {
         String result = "no such contract";
         switch (count) {
             case 1:
-                result = "Drafted";
+                result = "Drafted";//未分配
                 break;
             case 2:
-                result = "Assigned";
+                result = "Assigned";//未会签
                 break;
             case 3:
-                result = "Countersigned";
+                result = "Countersigned";//未定稿
                 break;
             case 4:
-                result = "Finalized";
+                result = "Finalized";//未审核
                 break;
             case 5:
-                result = "Reviewed";
+                result = "Reviewed";//未签订
                 break;
             case 6:
-                result = "Signed";
+                result = "Signed";//未结束
                 break;
             default:
                 break;

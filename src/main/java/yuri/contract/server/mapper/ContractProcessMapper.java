@@ -35,6 +35,9 @@ public interface ContractProcessMapper {
     @Select("select count(*) from contract_process where type = #{type} and state = #{state}")
     int getNumberOfNeededTypeState(int type, int state);
 
+    @Select("select count(*) from contract_process where type = #{type} and state != 1 and contractNum = #{contractNum}")
+    int getUnfinishedOrDeniedProcess(int type,int contractNum);
+
     @Insert("insert into contract_process (contractNum, type, state, userName, content, time) values(#{contractNum},#{type},#{state},#{userName},#{content},now())")
     int insert(int contractNum, int type, int state, String userName, String content);
 
