@@ -101,6 +101,7 @@
     let signLeft;
     let signRight;
     let contractNum;
+    let url = '/api/contract/UnAssigned/select';
 
     function initModal(lists) {
         let counterSignUsers = lists[0];
@@ -177,6 +178,22 @@
         }
     };
 
+    function trClick(num) {
+        contractNum = num;
+        console.log(contractNum);
+        $("#assign_modal_title").text(contractNum);
+        $.ajax({
+            type: 'POST',
+            url: '/api/user/available',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (result) => initModal(result)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        });
+        assignModal.modal();
+    }
+
     $(function () {
         contractTableBody = $("#contractTableBody");
         assignModal = $("#assignModal");
@@ -187,44 +204,7 @@
         signLeft = $("#sign_left");
         signRight = $("#sign_right");
 
-        function refreshContractTable(result) {
-            contractTableBody.empty();
-            result.forEach((contract) => {
-                let tr = $(`<tr></tr>`);
-                let keys = Object.keys(contract);
-                for (let i = 0; i < keys.length; i++) {
-                    let key = keys[i];
-                    if (key === 'content') continue;
-                    tr.append($(`<td>${contract[key]}</td>`));
-                }
-                tr.click(function () {
-                    contractNum = $(this).find("td").eq(0).text();
-                    console.log(contractNum);
-                    $("#assign_modal_title").text(contractNum);
-                    $.ajax({
-                        type: 'POST',
-                        url: '/api/user/available',
-                        headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-                        statusCode: {
-                            200: (result) => initModal(result)
-                        },
-                        error: () => alert("未连接到网络，或者无权限")
-                    });
-                    assignModal.modal();
-                });
-                contractTableBody.append(tr);
-            })
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: '/api/contract/UnAssigned/select',
-            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-            statusCode: {
-                200: (result) => refreshContractTable(result)
-            },
-            error: () => alert("未连接到网络，或者无权限")
-        });
+        loadNewTable(url, trClick);
 
         $("#submit").click(function () {
             if (output[0].length === 0) {
@@ -250,7 +230,7 @@
                 statusCode: {
                     200: () => {
                         alert('分配成功');
-                        refreshContractTable();
+                        loadNewTable(url, trClick);
                         assignModal.modal('hide');
                     }
                 },

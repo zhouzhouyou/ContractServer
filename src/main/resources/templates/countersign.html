@@ -32,7 +32,7 @@
 <div class="text-center">
 	<span class="clearfix" style="margin: 20px;">
 		<input autofocus class="form-control" id="name" placeholder="查询合同"
-               required style="float: left; width: 20%; margin-left: 20px; display: inline;" type="text">
+			   required style="float: left; width: 20%; margin-left: 20px; display: inline;" type="text">
 		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button" onclick="sendFuzzyQuery()">查询</button>
 	</span>
 </div>
@@ -48,7 +48,7 @@
             </div>
             <div class="modal-content">
                 <div class="modal-body" style="display: flex">
-                    <form style="width: 60%" id="default-contract-modal-form"></form>
+					<form style="width: 60%" id="default-contract-modal-form"></form>
                     <form class="text-center" style="width: 40%;">
                         <div class="form-group row"><label class="col-sm-10" for="countersign-comment">会签意见</label>
                         </div>
@@ -70,56 +70,41 @@
 <script src="js/nav.js" type="text/javascript"></script>
 <script src="js/contract.js" type="text/javascript"></script>
 <script>
-    let contractNum;
-    let contractTableBody;
-    let countersignModal;
-    let countersignComment;
+	let contractNum;
+	let contractTableBody;
+	let countersignModal;
+	let countersignComment;
+	let url = '/api/contract/countersign/select';
 
-    function refreshContractTable(result) {
-        contractTableBody.empty();
-        result.forEach((contract) => {
-            let tr = $(`<tr></tr>`);
-            loadContractTableWithoutContent(contract, tr);
-            tr.click(function () {
-                contractNum = $(this).find("td").eq(0).text();
-                console.log(contractNum);
-                $("#contract-title").text(contractNum);
-                $.ajax({
-                    type: 'POST',
-                    url: '/api/contract/countersign_need_message/select',
-                    headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-                    data: JSON.stringify({
-                        "contractNum": contractNum
-                    }),
-                    statusCode: {
-                        200: (result) => initModal(result)
-                    },
-                    error: () => alert("未连接到网络，或者无权限")
-                });
-                countersignModal.modal();
-            });
-            contractTableBody.append(tr);
-        })
-    }
-
-    function initModal(result) {
-        let contract = result['contract'];
-        loadDetailContractInfo(contract);
-    }
-
-    $(function () {
-        contractTableBody = $("#contractTableBody");
-        countersignModal = $("#countersignModal");
-        countersignComment = $("#countersign-comment");
+	function trClick(tr) {
+        contractNum = tr.find("td").eq(0).text();
+        console.log(contractNum);
+        $("#contract-title").text(contractNum);
         $.ajax({
             type: 'POST',
-            url: '/api/contract/countersign/select',
+            url: '/api/contract/countersign_need_message/select',
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "contractNum": contractNum
+            }),
             statusCode: {
-                200: (resultList) => refreshContractTable(resultList)
+                200: (result) => initModal(result)
             },
             error: () => alert("未连接到网络，或者无权限")
         });
+        countersignModal.modal();
+    }
+
+	function initModal(result) {
+		let contract = result['contract'];
+		loadDetailContractInfo(contract);
+	}
+    
+    $(function () {
+    	contractTableBody = $("#contractTableBody");
+        countersignModal = $("#countersignModal");
+        countersignComment = $("#countersign-comment");
+		loadNewTable(url, trClick);
 
         $("#submit").click(function () {
             let comment = countersignComment.val();
@@ -137,9 +122,9 @@
                     "state": 1
                 }),
                 statusCode: {
-                    200: (resultList) => {
+                    200: () => {
                         alert('成功');
-                        refreshContractTable(resultList);
+                        loadNewTable(url, trClick)
                         finalizeModal.modal('hide');
                     }
                 },

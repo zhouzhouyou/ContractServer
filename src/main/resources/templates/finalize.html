@@ -58,7 +58,6 @@
                                       style="float: left; width: 40%; border: none; outline: none;"></textarea>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
@@ -77,7 +76,8 @@
     let contractTableBody;
     let finalizeModal;
     let accordion;
-
+    let newContractContent;
+    let url = '/api/contract/finalize/select';
 
     function initModal(result) {
         let contract = result['contract'];
@@ -88,28 +88,20 @@
         finalizeModal.modal();
     }
 
-    function loadContractTable(resultList) {
-        contractTableBody.empty();
-        resultList.forEach((contract) => {
-            let tr = $(`<tr></tr>`);
-            loadContractTableWithoutContent(contract, tr);
-            tr.click(function () {
-                contractNum = $(this).find("td").eq(0).text();
-                $("#modal-title").text(contractNum);
-                $.ajax({
-                    type: 'POST',
-                    url: '/api/contract/finalize_need_message/select',
-                    headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-                    data: JSON.stringify({
-                        "contractNum": contractNum
-                    }),
-                    statusCode: {
-                        200: (result) => initModal(result)
-                    },
-                    error: () => alert("未连接到网络，或者无权限")
-                })
-            });
-            contractTableBody.append(tr);
+    function trClick(num) {
+        contractNum = num;
+        $("#modal-title").text(contractNum);
+        $.ajax({
+            type: 'POST',
+            url: '/api/contract/finalize_need_message/select',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "contractNum": contractNum
+            }),
+            statusCode: {
+                200: (result) => initModal(result)
+            },
+            error: () => alert("未连接到网络，或者无权限")
         })
     }
 
@@ -117,25 +109,31 @@
         contractTableBody = $('#contractTableBody');
         finalizeModal = $('#finalizeModal');
         accordion = $('#accordion');
-        $.ajax({
-            type:'POST',
-            url:'/api/contract/finalize/select',
-            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-            statusCode: {
-                200: (resultList) => loadContractTable(resultList)
-            },
-            error: () => alert("未连接到网络，或者无权限")
-        });
+        newContractContent = $("#newContractContent");
+        loadNewTable(url, trClick);
 
         $("#submit").click(function () {
-            if ($("#finalizeModal").find("textarea").eq(0).val() === "") {
+            let content = newContractContent.val();
+            if (content.length === 0) {
                 alert("请输入意见");
                 return;
             }
+            $.ajax({
+                type:'PUT',
+                url:'/api/contract/finalize/add',
+                headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                data: JSON.stringify({
+                    "content": content,
+                    "contractNum": contractNum,
+                    "state": 1
+                }),
+                statusCode: {
+                    200: alert('成功了')
+                },
+                error: () => alert("未连接到网络，或者无权限")
+            })
         });
 
     });
-
-
 </script>
 </html>

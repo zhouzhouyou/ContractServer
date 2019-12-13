@@ -68,6 +68,30 @@ $(function () {
 
 });
 
+function loadNewTable(url, trClick) {
+    $.ajax({
+        type: 'POST',
+        url: url,
+        headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+        statusCode: {
+            200: (result) => refreshContractTable(result, trClick)
+        },
+        error: () => alert("未连接到网络，或者无权限")
+    });
+}
+
+function refreshContractTable(resultList, trClick) {
+    contractTableBody.empty();
+    resultList.forEach((contract) => {
+        let tr = $(`<tr></tr>`);
+        loadContractTableWithoutContent(contract, tr);
+        tr.click(function () {
+            trClick(contract['num']);
+        });
+        contractTableBody.append(tr);
+    })
+}
+
 function loadContractTableWithoutContent(contract, tr) {
     let keys = Object.keys(contract);
     for (let i = 0; i < keys.length; i++) {
