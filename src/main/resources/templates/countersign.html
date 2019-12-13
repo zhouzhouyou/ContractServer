@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title></title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/my-form.css" rel="stylesheet">
+
+    <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="js/common.js" type="text/javascript"></script>
+
+    <style type="text/css">
+        .clearfix:before, .clearfix:after {
+            content: "";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            zoom: 1;
+        }
+    </style>
+</head>
+<body style="text-align: center">
+<div id="header"></div>
+<div class="text-center">
+	<span class="clearfix" style="margin: 20px;">
+		<input autofocus class="form-control" id="name" placeholder="查询合同"
+               required style="float: left; width: 20%; margin-left: 20px; display: inline;" type="text">
+		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button" onclick="sendFuzzyQuery()">查询</button>
+	</span>
+</div>
+<div style="padding: 20px" id="default-contract-table"></div>
+<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade counterSignModal" data-backdrop="static"
+     id="countersignModal"
+     role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="height: 50px;">
+                <h4 class="modal-title" id="contract-name"></h4>
+                <button class="close" data-dismiss="modal" type="button">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-body" style="display: flex">
+                    <form style="width: 60%" id="default-contract-modal-form"></form>
+                    <form class="text-center" style="width: 40%;">
+                        <div class="form-group row"><label class="col-sm-10" for="countersign-comment">会签意见</label>
+                        </div>
+                        <div class="form-group row">
+                            <textarea class="col-sm-10 form-control" id="countersign-comment" placeholder="请在这里输入意见"
+                                      rows="9"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-dismiss="modal" id="submit" type="button">提交</button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/nav.js" type="text/javascript"></script>
+<script src="js/contract.js" type="text/javascript"></script>
+<script>
+    let contractNum;
+    let contractTableBody;
+    let countersignModal;
+
+    function refreshContractTable(result) {
+        contractTableBody.empty();
+        result.forEach((contract) => {
+            let tr = $(`<tr></tr>`);
+            let keys = Object.keys(contract);
+            for (let i = 0; i < keys.length; i++) {
+                let key = keys[i];
+                if (key === 'content') continue;
+                tr.append($(`<td>${contract[key]}</td>`));
+            }
+            tr.click(function () {
+                contractNum = $(this).find("td").eq(0).text();
+                console.log(contractNum);
+                $("#contract-name").text(contractNum);
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/contract/countersign_need_message/select',
+                    headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                    data: JSON.stringify({
+                        "contractNum": contractNum
+                    }),
+                    statusCode: {
+                        200: (result) => initModal(result)
+                    },
+                    error: () => alert("未连接到网络，或者无权限")
+                });
+                countersignModal.modal();
+            });
+            contractTableBody.append(tr);
+        })
+    }
+
+    function initModal(result) {
+        let contract = result['contract'];
+        loadDetailContractInfo(contract);
+    }
+
+    // function sendFuzzyQuery() {
+    // 	$.ajax({
+    // 		type: "POST",
+    // 		url: "/api/contract/fuzzyQuery",
+    // 		data: JSON.stringify({
+    // 			"content": fuzzyQuery.val()
+    // 		}),
+    // 		headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+    // 		statusCode: {
+    // 			200: (resultList) => loadContractTable(resultList)
+    // 		},
+    // 		error: () => alert("未连接到网络，或者无权限")
+    // 	})
+    // }
+
+    $(function () {
+        contractTableBody = $("#contractTableBody");
+        contractModal = $("#contractModal");
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/contract/countersign/select',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (resultList) => refreshContractTable(resultList)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        });
+
+        // $("#submit").click(function () {
+        //     if ($("#countersignModal").find("textarea").eq(1).val() === "") {
+        //         alert("请输入意见");
+        //     }
+        // });
+        // var li_number = $(".list-group li").length;
+        // $("#countersignModal").find("textarea").eq(1).attr("row", li_number * 3);
+    })
+
+</script>
+</html>

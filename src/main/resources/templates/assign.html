@@ -36,21 +36,7 @@
                type="text">
 		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button">查询</button>
 	</span>
-    <div class="text-center" style="margin-top: 50px;">
-        <table class="table table-hover" id="contract_table" style="width: 80%; margin-top: 20px; alignment: center">
-            <thead>
-            <tr>
-                <th scope="col">合同编号</th>
-                <th scope="col">合同名称</th>
-                <th scope="col">客户编号</th>
-                <th scope="col">开始时间</th>
-                <th scope="col">结束时间</th>
-                <th scope="col">起草人</th>
-            </tr>
-            </thead>
-            <tbody id="contractTableBody">
-            </tbody>
-        </table>
+    <div class="text-center" style="margin-top: 50px;" id="default-contract-table">
     </div>
 </div>
 <div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade assign_modal"
@@ -102,6 +88,7 @@
 
 </body>
 <script src="js/nav.js" type="text/javascript"></script>
+<script src="js/contract.js" type="text/javascript"></script>
 <script>
     let output = [];
     for (let i = 0; i < 3; i++) output[i] = [];
@@ -239,11 +226,19 @@
             error: () => alert("未连接到网络，或者无权限")
         });
 
-        $("#contract_table tr").click(function () {
-
-        });
-
         $("#submit").click(function () {
+            if (output[0].length === 0) {
+                alert('你还没有分配会签人员');
+                return;
+            }
+            if (output[1].length === 0) {
+                alert('你还没有分配审核人员');
+                return;
+            }
+            if (output[2].length === 0) {
+                alert('你还没有分配签订人员');
+                return;
+            }
             $.ajax({
                 type: 'PUT',
                 url: '/api/contract/assign/add',
@@ -256,11 +251,11 @@
                     200: () => {
                         alert('分配成功');
                         refreshContractTable();
+                        assignModal.modal('hide');
                     }
                 },
                 error: () => alert("未连接到网络，或者无权限")
             })
-            //TODO: 检查是否有没分配的
         });
     })
 </script>

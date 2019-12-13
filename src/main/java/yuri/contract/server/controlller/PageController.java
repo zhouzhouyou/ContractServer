@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Api("提供网址位置")
+@SuppressWarnings("unused")
+@Api(tags = "提供网址位置")
 @Controller
 public class PageController {
     @GetMapping("login")
@@ -67,5 +68,15 @@ public class PageController {
     @GetMapping("assign.html")
     public String assign2(HttpServletRequest request) {
         return "assign";
+    }
+
+    @GetMapping("countersign")
+    public String countersign(HttpServletRequest request) {
+        return "countersign";
+    }
+
+    @GetMapping("countersign.html")
+    public String countersign2(HttpServletRequest request) {
+        return "countersign";
     }
 }
