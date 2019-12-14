@@ -276,7 +276,7 @@ public class ContractController extends BaseController {
     @CrossOrigin
     @PostMapping(value = "/fuzzy/sign/select")
     @ResponseBody
-    @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
+    @NeedToken(function = NeedToken.SIGN_CONTRACT)
     public ResponseEntity<List<Contract>> fuzzyGetAllUnSignedContracts(@RequestBody FuzzyContent content, BindingResult bindingResult) {
         String operator = getOperator();
         if (bindingResult.hasErrors())
@@ -288,7 +288,7 @@ public class ContractController extends BaseController {
     @CrossOrigin
     @PutMapping(value = "/sign/add")
     @ResponseBody
-    @NeedToken(function = NeedToken.FINALIZE_CONTRACT)
+    @NeedToken(function = NeedToken.SIGN_CONTRACT)
     public ResponseEntity<String> doSignJob(@RequestBody ProcessJob processJob, BindingResult bindingResult) {
         String operator = getOperator();
         if (bindingResult.hasErrors())
@@ -344,7 +344,7 @@ public class ContractController extends BaseController {
     @CrossOrigin
     @PostMapping(value = "/sign_need_message/select")
     @ResponseBody
-    @NeedToken(function = NeedToken.REVIEW_CONTRACT)
+    @NeedToken(function = NeedToken.SIGN_CONTRACT)
     public ResponseEntity<PreviousProcessMessage> getSignNeed(@RequestBody ContractNum contractNum,BindingResult bindingResult){
         if(bindingResult.hasErrors())
             return ResponseFactory.badRequest(null);
