@@ -66,7 +66,37 @@ $(function () {
         accordionContainer.innerHTML = `<div class="accordion" id="accordion"></div>`;
     }
 
+    let fuzzyQueryContainer = document.getElementById("fuzzyQueryContainer");
+    if (fuzzyQueryContainer !== null) {
+        fuzzyQueryContainer.innerHTML = `<span class="clearfix" style="margin: 20px;">
+<input autofocus class="form-control" id="fuzzyQuery" placeholder="查询合同" 
+required style="float: left; width: 20%; margin-left: 20px; display: inline;" type="text">
+<button class="btn btn-primary" onclick="sendFuzzyQuery()" style="float: left; margin-left: 20px;" type="button">模糊查询</button>
+</span>`;
+        let fuzzyQueryInput = $('#fuzzyQuery');
+        fuzzyQueryInput.bind('keypress', function (event) {
+            if (event.keyCode === 13) {
+                sendFuzzyQuery();
+            }
+        });
+    }
+
 });
+
+function sendSimpleFuzzyQuery(url, data, trClick) {
+    $.ajax({
+        type: 'POST',
+        url: url,
+        headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+        data: JSON.stringify({
+            "content": data
+        }),
+        statusCode: {
+            200: (result) => refreshContractTable(result, trClick)
+        },
+        error: () => alert("未连接到网络，或者无权限")
+    });
+}
 
 function loadNewTable(url, trClick) {
     $.ajax({

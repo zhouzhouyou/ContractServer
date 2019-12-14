@@ -27,14 +27,7 @@
 </head>
 <body>
 <div id="header"></div>
-<div class="text-center">
-	<span class="clearfix" style="margin: 20px;">
-		<input autofocus class="form-control" id="name" placeholder="查询合同"
-			   required style="float: left; width: 20%; margin-left: 20px; display: inline;" type="text">
-		<button class="btn btn-primary" onclick="sendFuzzyQuery()" style="float: left; margin-left: 20px;"
-				type="button">查询</button>
-	</span>
-</div>
+<div class="text-center" id="fuzzyQueryContainer"></div>
 <div id="default-contract-table" style="padding: 20px"></div>
 <div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade signModal" data-backdrop="static"
 	 id="signModal"
@@ -77,6 +70,10 @@
 	let accordion;
 	let signComment;
 	let url = '/api/contract/sign/select';
+
+	function sendFuzzyQuery() {
+		sendSimpleFuzzyQuery('/api/contract/fuzzy/sign/select',$("#fuzzyQuery").val(), trClick)
+	}
 
 	function initModal(result) {
 		let contract = result['contract'];

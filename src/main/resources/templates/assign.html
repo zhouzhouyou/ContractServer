@@ -29,16 +29,8 @@
 
 <body>
 <div id="header"></div>
-<div>
-	<span class="clearfix" style="margin: 20px;">
-		<input autofocus class="form-control" id="name" placeholder="查询合同"
-               required style="float: left; width: 20%; margin-left: 20px; display: inline;"
-               type="text">
-		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button">查询</button>
-	</span>
-    <div class="text-center" style="margin-top: 50px;" id="default-contract-table">
-    </div>
-</div>
+<div class="text-center" id="fuzzyQueryContainer"></div>
+<div style="padding: 20px" id="default-contract-table"></div>
 <div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade assign_modal"
      data-backdrop="static" id="assignModal"
      role="dialog" tabindex="-1">
@@ -102,6 +94,10 @@
     let signRight;
     let contractNum;
     let url = '/api/contract/UnAssigned/select';
+
+    function sendFuzzyQuery() {
+        sendSimpleFuzzyQuery('/api/contract/fuzzy/UnAssigned/select',$("#fuzzyQuery").val(), trClick)
+    }
 
     function initModal(lists) {
         let counterSignUsers = lists[0];
