@@ -96,7 +96,7 @@
     let endTime;
     let users;
     let userSelector;
-    let today = new Date();
+    let today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     let operatorSelected = false;
 
     $(function () {
@@ -208,12 +208,9 @@
     }
 
     function isLater(a, b) {
-        if (a === null || b === null) return false;
-        if (a.getUTCFullYear() !== b.getUTCFullYear()) return a.getUTCFullYear() > b.getUTCFullYear();
-        if (a.getUTCMonth() !== b.getUTCMonth()) return a.getUTCMonth() > b.getUTCMonth();
-        console.log(a.getUTCDate());
-        console.log(b.getUTCDate());
-        return a.getUTCDate() > b.getUTCDate();
+        if (a.getFullYear() !== b.getFullYear()) return a.getFullYear() > b.getFullYear();
+        if (a.getMonth() !==  b.getMonth()) return a.getMonth() > b.getMonth();
+        return a.getDate() > b.getDate();
     }
 
     function dateCheck() {

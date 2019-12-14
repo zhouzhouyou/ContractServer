@@ -254,12 +254,12 @@
             setValid(openCustomerSelector, currentCustomerId !== null);
         });
 
-        let today = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
+        let today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
 
         function isLater(a, b) {
-            if (a.getUTCFullYear() !== b.getUTCFullYear()) return a.getUTCFullYear() > b.getUTCFullYear();
-            if (a.getUTCMonth() !==  b.getUTCMonth()) return a.getUTCMonth() > b.getUTCFullYear();
-            return a.getUTCDate() > b.getUTCDate();
+            if (a.getFullYear() !== b.getFullYear()) return a.getFullYear() > b.getFullYear();
+            if (a.getMonth() !==  b.getMonth()) return a.getMonth() > b.getMonth();
+            return a.getDate() > b.getDate();
         }
 
         function dateCheck() {
