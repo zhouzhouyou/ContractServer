@@ -81,38 +81,38 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="c-name" style="display: inline">客户名称</label>
                             <div class="col-sm-8">
-                                <input class="form-control" id="c-name"/>
+                                <input class="form-control" id="c-name" maxlength="40"/>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="address" style="display: inline">地址</label>
                             <div class="col-sm-8">
-                                <input class="form-control" id="address"/>
+                                <input class="form-control" id="address" maxlength="100"/>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="tel" style="display: inline">电话</label>
-                            <div class="col-sm-8"><input class="form-control" id="tel"/></div>
+                            <div class="col-sm-8"><input class="form-control" id="tel" maxlength="20"/></div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="fax" style="display: inline">传真</label>
-                            <div class="col-sm-8"><input class="form-control" id="fax"/></div>
+                            <div class="col-sm-8"><input class="form-control" id="fax" maxlength="20"/></div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="code" style="display: inline">邮编</label>
-                            <div class="col-sm-8"><input class="form-control" id="code"/></div>
+                            <div class="col-sm-8"><input class="form-control" id="code" maxlength="10"/></div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="bank" style="display: inline">银行名称</label>
-                            <div class="col-sm-8"><input class="form-control" id="bank"/></div>
+                            <div class="col-sm-8"><input class="form-control" id="bank" maxlength="50"/></div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="account" style="display: inline">银行账户</label>
-                            <div class="col-sm-8"><input class="form-control" id="account"/></div>
+                            <div class="col-sm-8"><input class="form-control" id="account" maxlength="50"/></div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="other" style="display: inline">备注</label>
-                            <div class="col-sm-8"><textarea class="form-control" id="other" rows="5"></textarea></div>
+                            <div class="col-sm-8"><textarea class="form-control" id="other" rows="5"  maxlength="100"></textarea></div>
                         </div>
                     </form>
                 </div>
@@ -248,11 +248,11 @@
 
         selectAll();
 
-       function sendCustomerRequest(type, url) {
-           if (c_name.val().length === 0) {
-               alert("必须填写姓名");
-               return;
-           }
+        function sendCustomerRequest(type, url) {
+            if (c_name.val().length === 0) {
+                alert("必须填写姓名");
+                return;
+            }
             $.ajax({
                 type:type,
                 url:url,

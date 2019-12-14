@@ -34,7 +34,7 @@ $(function () {
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="contract-name" style="display: inline">合同名称</label>
                 <div class="col-sm-8">
-                    <input class="form-control" id="contract-name" readonly/>
+                    <input class="form-control" id="contract-name" maxlength="40" readonly/>
                  </div>
             </div>
             <div class="form-group row">
