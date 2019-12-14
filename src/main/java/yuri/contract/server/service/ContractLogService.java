@@ -9,6 +9,7 @@ import yuri.contract.server.model.ContractLog;
 import yuri.contract.server.util.response.ResponseFactory;
 
 import javax.xml.crypto.Data;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -36,11 +37,13 @@ public class ContractLogService extends BaseService{
         if (toTime == null){
             toTime = Date.valueOf("2100-01-01");
         }
+        Timestamp begin = new Timestamp(fromTime.getTime());
+        Timestamp end = new Timestamp(toTime.getTime() + 86400000);
         if(userName.equals("")){
-            List<ContractLog> contractLogs = contractLogMapper.selectLogWithoutUserName(fromTime, toTime);
+            List<ContractLog> contractLogs = contractLogMapper.selectLogWithoutUserName(begin, end);
             return ResponseFactory.success(contractLogs);
         }else {
-            List<ContractLog> contractLogs = contractLogMapper.selectLogWithUserName(userName,fromTime,toTime);
+            List<ContractLog> contractLogs = contractLogMapper.selectLogWithUserName(userName,begin,end);
             return ResponseFactory.success(contractLogs);
         }
     }

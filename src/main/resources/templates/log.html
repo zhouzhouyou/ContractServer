@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Title</title>
+    <title>日志管理</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/my-form.css" rel="stylesheet">
     <link href="css/gijgo.min.css" rel="stylesheet">
+    <style type="text/css">
+        .clearfix:before, .clearfix:after {
+            content: "";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            zoom: 1;
+        }
+    </style>
 
     <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
     <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
@@ -40,11 +54,11 @@
 
             <label class="col-form-label col-sm-1" for="beginTime" style="display: inline">开始时间</label>
             <div class="form-group col-sm-2">
-                <input id="beginTime" width="200"/>
+                <input id="beginTime"/>
             </div>
             <label class="col-sm-1 col-form-label" for="endTime" style="display: inline">结束时间</label>
             <div class="form-group col-sm-2">
-                <input id="endTime" width="200"/>
+                <input id="endTime"/>
             </div>
 
             <div class="col-sm-1">
@@ -83,6 +97,7 @@
     let users;
     let userSelector;
     let today = new Date();
+    let operatorSelected = false;
 
     $(function () {
         changeActive(logQueryNav);
@@ -98,7 +113,8 @@
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: () => beginDateCheck()
+            maxDate: today,
+            close: () => dateCheck()
         });
 
         endTime = $("#endTime");
@@ -106,7 +122,8 @@
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: () => endDateCheck()
+            maxDate: today,
+            close: () => dateCheck()
         });
 
         sendFuzzyQuery();
@@ -137,7 +154,7 @@
             type: "POST",
             url: "api/contractLog/filterSelectLog",
             data: JSON.stringify({
-                "userName": userSelector.text(),
+                "userName": operatorSelected ? userSelector.text() : '',
                 "fromTime": beginTime.value(),
                 "toTime": endTime.value()
             }),
@@ -169,10 +186,19 @@
     }
 
     function addUser(resultList) {
+        let b = $(`<a class="dropdown-item">取消选择</a>`);
+        b.click(() => {
+            userSelector.text('选择客户');
+            operatorSelected = false;
+        });
+        users.append(b);
         resultList.forEach(function (element) {
-              let a = $(`<a class="dropdown-item">${element}</a>`);
-              a.click(() => userSelector.text(element));
-              users.append(a);
+            let a = $(`<a class="dropdown-item">${element}</a>`);
+            a.click(() => {
+                userSelector.text(element);
+                operatorSelected = true;
+            });
+            users.append(a);
         });
     }
 
@@ -182,44 +208,36 @@
     }
 
     function isLater(a, b) {
+        if (a === null || b === null) return false;
         if (a.getUTCFullYear() !== b.getUTCFullYear()) return a.getUTCFullYear() > b.getUTCFullYear();
-        if (a.getUTCMonth() !== b.getUTCMonth()) return a.getUTCMonth() > b.getUTCFullYear();
+        if (a.getUTCMonth() !== b.getUTCMonth()) return a.getUTCMonth() > b.getUTCMonth();
+        console.log(a.getUTCDate());
+        console.log(b.getUTCDate());
         return a.getUTCDate() > b.getUTCDate();
     }
 
-    function beginDateCheck() {
-        if (beginTime.value().length !== 0) {
-            let beginDate = new Date(beginTime.value());
-            if (isLater(beginDate, today)) {
-                setValid(beginTime, false);
-                return;
-            }
-            if (endTime.value.length !== 0) {
-                if (isLater(beginDate, new Date(endTime.value()))) {
-                    setValid(beginTime, false);
-                    return;
-                }
-            }
-        }
-        setValid(beginTime, true);
-    }
+    function dateCheck() {
+        let beginValue = beginTime.value();
+        let endValue = endTime.value();
+        let beginDate = beginValue.length === 0 ? null : new Date(beginValue);
+        let endDate = endValue.length === 0 ? null : new Date(endValue);
 
-    function endDateCheck() {
-        if (endTime.value().length !== 0) {
-            let endDate = new Date(endTime.value());
-            if (isLater(endDate, today)) {
-                setValid(endTime, false);
-                return;
-            }
-            if (beginTime.value.length !== 0) {
-                if (isLater(new Date(beginTime.value()), endDate)) {
-                    setValid(endTime, false);
-                    return;
-                }
-            }
-        }
-        setValid(endTime, true);
-    }
+        let isBeginValid = function() {
+            if (beginDate === null) return true;
+            if (isLater(beginDate, today)) return false;
+            if (endDate === null) return true;
+            return !isLater(beginDate, endDate);
+        };
 
+        let isEndValid = function() {
+            if (endDate === null) return true;
+            if (isLater(endDate, today)) return false;
+            if (beginDate === null) return true;
+            return !isLater(beginDate, endDate);
+        };
+
+        setValid(beginTime, isBeginValid(beginDate));
+        setValid(endTime, isEndValid(endDate));
+    }
 </script>
 </html>

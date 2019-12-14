@@ -248,11 +248,11 @@
 
         selectAll();
 
-        function sendCustomerRequest(type, url) {
-            if (c_name.val().length === 0) {
-                alert("必须填写姓名");
-                return;
-            }
+       function sendCustomerRequest(type, url) {
+           if (c_name.val().length === 0) {
+               alert("必须填写姓名");
+               return;
+           }
             $.ajax({
                 type:type,
                 url:url,

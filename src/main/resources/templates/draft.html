@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Title</title>
+    <title>起草</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/my-form.css" rel="stylesheet">
     <link href="css/gijgo.min.css" rel="stylesheet">
@@ -48,14 +48,14 @@
         <div class="form-group row">
             <label class="col-sm-2 col-form-label" for="beginTime" style="display: inline">开始时间</label>
             <div class="col-sm-9">
-                <input id="beginTime" width="276"/>
+                <input id="beginTime"/>
                 <div class="invalid-feedback"><small>请选择！</small></div>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label" for="endTime" style="display: inline">结束时间</label>
             <div class="col-sm-9">
-                <input id="endTime" width="276"/>
+                <input id="endTime"/>
                 <div class="invalid-feedback"><small>请选择！</small></div>
             </div>
         </div>
@@ -232,7 +232,7 @@
                 type: "POST",
                 url: "api/customer/fuzzyQuery",
                 data: JSON.stringify({
-                    "query": customerInput.val()
+                    "content": customerInput.val()
                 }),
                 headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
 
@@ -254,7 +254,7 @@
             setValid(openCustomerSelector, currentCustomerId !== null);
         });
 
-        let today = new Date();
+        let today = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
 
         function isLater(a, b) {
             if (a.getUTCFullYear() !== b.getUTCFullYear()) return a.getUTCFullYear() > b.getUTCFullYear();
@@ -262,42 +262,28 @@
             return a.getUTCDate() > b.getUTCDate();
         }
 
-        function beginDateCheck() {
-            if (beginTime.value().length === 0) {
-                setValid(beginTime, false);
-                return;
-            }
-            let beginDate = new Date(beginTime.value());
-            if (isLater(today, beginDate)) {
-                setValid(beginTime, false);
-                return;
-            }
-            if (endTime.value.length !== 0) {
-                if (isLater(beginDate, new Date(endTime.value()))) {
-                    setValid(beginTime, false);
-                    return;
-                }
-            }
-            setValid(beginTime, true);
-        }
+        function dateCheck() {
+            let beginValue = beginTime.value();
+            let endValue = endTime.value();
+            let beginDate = beginValue.length === 0 ? null : new Date(beginValue);
+            let endDate = endValue.length === 0 ? null : new Date(endValue);
 
-        function endDateCheck() {
-            if (endTime.value().length === 0) {
-                setValid(endTime, false);
-                return;
-            }
-            let endDate = new Date(endTime.value());
-            if (isLater(today, endDate)) {
-                setValid(endTime, false);
-                return;
-            }
-            if (beginTime.value.length !== 0) {
-                if (isLater(new Date(beginTime.value()), endDate)) {
-                    setValid(endTime, false);
-                    return;
-                }
-            }
-            setValid(endTime, true);
+            let isBeginValid = function () {
+                if (beginDate === null) return false;
+                if (isLater(today, beginDate)) return false;
+                if (endDate === null) return true;
+                return !isLater(beginDate, endDate);
+            };
+
+            let isEndValid = function () {
+                if (endDate === null) return false;
+                if (isLater(today, endDate)) return false;
+                if (beginDate === null) return true;
+                return !isLater(beginDate, endDate);
+            };
+
+            setValid(beginTime, isBeginValid());
+            setValid(endTime, isEndValid());
         }
 
         beginTime = $("#beginTime");
@@ -305,7 +291,8 @@
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: () => beginDateCheck()
+            minDate: today,
+            close: () => dateCheck()
         });
 
         endTime = $("#endTime");
@@ -313,7 +300,8 @@
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
             format: 'yyyy-mm-dd',
-            close: () => endDateCheck()
+            minDate: today,
+            close: () => dateCheck()
         });
 
         content = $("#content");

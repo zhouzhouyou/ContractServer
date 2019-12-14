@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import yuri.contract.server.model.ContractLog;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Mapper
@@ -17,10 +18,10 @@ public interface ContractLogMapper {
     List<ContractLog> selectByUserName(String userName);
 
     @Select("select * from contract_log where userName =#{userName} and (time between #{fromTime} and #{toTime})")
-    List<ContractLog> selectLogWithUserName(String userName,Date fromTime,Date toTime);
+    List<ContractLog> selectLogWithUserName(String userName,Timestamp fromTime, Timestamp toTime);
 
     @Select("select * from contract_log where time between #{fromTime} and #{toTime}")
-    List<ContractLog> selectLogWithoutUserName(Date fromTime,Date toTime);
+    List<ContractLog> selectLogWithoutUserName(Timestamp fromTime, Timestamp toTime);
 
     @Select("select * from contract_log where concat_ws (userName, content, time) " +
             "like concat('%', #{query}, '%');")
