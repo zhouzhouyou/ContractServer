@@ -226,6 +226,7 @@
                 statusCode: {
                     200: () => {
                         alert('分配成功');
+                        for (let i = 0; i < 3; i++) output[i] = [];
                         assignModal.modal('hide');
                         loadNewTable(url, trClick);
                     }
