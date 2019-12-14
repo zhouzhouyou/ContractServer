@@ -25,16 +25,14 @@
                type="text">
 		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button"
                 onclick="sendFuzzyQuery()">查询</button>
-        <button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button" onclick="toExcel()"
-        >导出为Excel</button>
 	</span>
     <form>
         <div class="form-group row">
             <label class="col-form-label col-sm-1" style="display: inline">选择用户</label>
             <div class="dropdown col-sm-2">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="userSelector" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                    全体用户
+                        aria-haspopup="true" aria-expanded="false" >
+                    选择用户
                 </button>
                 <div class="dropdown-menu" id="users" aria-labelledby="dropdownMenuButton">
                 </div>
@@ -87,6 +85,8 @@
     let today = new Date();
 
     $(function () {
+        changeActive(logQueryNav);
+
         content = $("#content");
         logTableBody = $("#logTableBody");
         tableBody = $("#tableBody");
@@ -113,10 +113,6 @@
         loadUsers();
     });
 
-    function toExcel() {
-
-    }
-
     function sendFuzzyQuery() {
         $.ajax({
             type: "POST",
@@ -137,14 +133,11 @@
 
 
     function sendFilterQuery() {
-        let userSelectText = userSelector.text();
-        if (userSelectText === "全体用户")
-            userSelectText = "";
         $.ajax({
             type: "POST",
             url: "api/contractLog/filterSelectLog",
             data: JSON.stringify({
-                "userName": userSelectText,
+                "userName": userSelector.text(),
                 "fromTime": beginTime.value(),
                 "toTime": endTime.value()
             }),
@@ -176,13 +169,10 @@
     }
 
     function addUser(resultList) {
-        let def = $(`<a class="dropdown-item">全体用户</a>`);
-        def.click(() => userSelector.text("全体用户"));
-        users.append(def);
         resultList.forEach(function (element) {
-            let a = $(`<a class="dropdown-item">${element}</a>`);
-            a.click(() => userSelector.text(element));
-            users.append(a);
+              let a = $(`<a class="dropdown-item">${element}</a>`);
+              a.click(() => userSelector.text(element));
+              users.append(a);
         });
     }
 

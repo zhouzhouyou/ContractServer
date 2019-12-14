@@ -20,13 +20,13 @@ public interface CustomerMapper {
     List<Customer> selectAll();
 
     @Insert("insert into customer (name, address, tel, fax, code, bank, account, other) " +
-            "values(#{name},#{address},#{tel},#{fax},#{code},#{bank},#{account})")
+            "values(#{name},#{address},#{tel},#{fax},#{code},#{bank},#{account},#{other})")
     int insert(String name, String address,
                String tel, String fax, String code,
                String bank, String account, String other);
 
     @Update("update customer set name=#{name}, address=#{address}, tel=#{tel}, fax=#{fax}, " +
-            "code=#{code}, bank=#{bank}, account=#{account} where num=#{num}")
+            "code=#{code}, bank=#{bank}, account=#{account}, other=#{other} where num=#{num}")
     int update(Integer num ,String name, String address,
                String tel, String fax, String code,
                String bank, String account, String other);

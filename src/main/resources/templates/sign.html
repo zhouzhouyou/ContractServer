@@ -1,139 +1,140 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-	<meta charset="utf-8">
-	<title></title>
-	<meta content="width=device-width, initial-scale=1" name="viewport">
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<link href="css/my-form.css" rel="stylesheet">
-	<style type="text/css">
-		.clearfix:before, .clearfix:after {
-			content: "";
-			display: table;
-		}
+    <meta charset="utf-8">
+    <title></title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/my-form.css" rel="stylesheet">
+    <style type="text/css">
+        .clearfix:before, .clearfix:after {
+            content: "";
+            display: table;
+        }
 
-		.clearfix:after {
-			clear: both;
-		}
+        .clearfix:after {
+            clear: both;
+        }
 
-		.clearfix {
-			zoom: 1;
-		}
-	</style>
-	<script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
-	<script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
-	<script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
-	<script src="js/common.js" type="text/javascript"></script>
+        .clearfix {
+            zoom: 1;
+        }
+    </style>
+    <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="js/common.js" type="text/javascript"></script>
 </head>
 <body>
 <div id="header"></div>
 <div class="text-center" id="fuzzyQueryContainer"></div>
 <div id="default-contract-table" style="padding: 20px"></div>
 <div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade signModal" data-backdrop="static"
-	 id="signModal"
-	 role="dialog" tabindex="-1">
-	<div class="modal-dialog modal-dialog-scrollable modal-xl">
-		<div class="modal-content">
-			<div class="modal-header" style="padding: 0; font-size: 16px;">
-				<h4 class="modal-title" id="modal-title"></h4>
-			</div>
-			<div class="modal-content">
-				<div class="modal-body" style="display: flex">
-					<form id="default-contract-modal-form" style="width: 60%"></form>
-					<div style="width: 40%">
-						<form class="text-center">
-							<div id="accordionContainer"></div>
-							<div class="form-group row">
-								<label class="col-form-label" for="signComment">签订意见</label></div>
-							<div class="form-group row">
+     id="signModal"
+     role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 0; font-size: 16px;">
+                <h4 class="modal-title" id="modal-title"></h4>
+            </div>
+            <div class="modal-content">
+                <div class="modal-body" style="display: flex">
+                    <form id="default-contract-modal-form" style="width: 60%"></form>
+                    <div style="width: 40%">
+                        <form class="text-center">
+                            <div id="accordionContainer"></div>
+                            <div class="form-group row">
+                                <label class="col-form-label" for="signComment">签订意见</label></div>
+                            <div class="form-group row">
                             <textarea class="form-control col-sm-10" id="signComment" rows="9"
-									  style="float: left; width: 40%; border: none; outline: none;"></textarea>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-danger" id="submit" type="button">提交</button>
-				<button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
-			</div>
-		</div>
-	</div>
+                                      style="float: left; width: 40%; border: none; outline: none;"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="submit" type="button">提交</button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script src="js/nav.js" type="text/javascript"></script>
 <script src="js/contract.js" type="text/javascript"></script>
 <script>
-	let contractNum;
-	let contractTableBody;
-	let signModal;
-	let accordion;
-	let signComment;
-	let url = '/api/contract/sign/select';
+    let contractNum;
+    let contractTableBody;
+    let signModal;
+    let accordion;
+    let signComment;
+    let url = '/api/contract/sign/select';
 
-	function sendFuzzyQuery() {
-		sendSimpleFuzzyQuery('/api/contract/fuzzy/sign/select',$("#fuzzyQuery").val(), trClick)
-	}
+    function sendFuzzyQuery() {
+        sendSimpleFuzzyQuery('/api/contract/fuzzy/sign/select', $("#fuzzyQuery").val(), trClick)
+    }
 
-	function initModal(result) {
-		let contract = result['contract'];
-		loadDetailContractInfo(contract);
-		let csInfos = result['messageList'];
-		accordion.empty();
-		csInfos.forEach((csInfo) => accordion.append(createCard(csInfo['operator'], csInfo['content'])));
-		signModal.modal();
-	}
+    function initModal(result) {
+        let contract = result['contract'];
+        loadDetailContractInfo(contract);
+        let csInfos = result['messageList'];
+        accordion.empty();
+        csInfos.forEach((csInfo) => accordion.append(createCard(csInfo['operator'], csInfo['content'])));
+        signModal.modal();
+    }
 
-	function trClick(num) {
-		contractNum = num;
-		$("#modal-title").text(contractNum);
-		$.ajax({
-			type: 'POST',
-			url: '/api/contract/sign_need_message/select',
-			headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-			data: JSON.stringify({
-				"contractNum": contractNum
-			}),
-			statusCode: {
-				200: (result) => initModal(result)
-			},
-			error: () => alert("未连接到网络，或者无权限")
-		})
-	}
+    function trClick(num) {
+        contractNum = num;
+        $("#modal-title").text(contractNum);
+        $.ajax({
+            type: 'POST',
+            url: '/api/contract/sign_need_message/select',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "contractNum": contractNum
+            }),
+            statusCode: {
+                200: (result) => initModal(result)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
 
-	$(function () {
-		contractTableBody = $('#contractTableBody');
-		signModal = $('#signModal');
-		accordion = $('#accordion');
-		signComment = $("#signComment");
-		loadNewTable(url, trClick);
+    $(function () {
+        changeActive(contractManagementNav);
 
-		$("#submit").click(function () {
-			let content = signComment.val();
-			if (content.length === 0) {
-				alert("请输入意见");
-				return;
-			}
-			$.ajax({
-				type:'PUT',
-				url:'/api/contract/sign/add',
-				headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-				data: JSON.stringify({
-					"content": content,
-					"contractNum": contractNum,
-					"state": 1
-				}),
-				statusCode: {
-					200: () => {
-						signModal.modal('hide');
-						alert('成功了');
-						loadNewTable(url, trClick);
-					}
-				},
-				error: () => alert("未连接到网络，或者无权限")
-			})
-		});
+        contractTableBody = $('#contractTableBody');
+        signModal = $('#signModal');
+        accordion = $('#accordion');
+        signComment = $("#signComment");
+        loadNewTable(url, trClick);
 
-	});
+        $("#submit").click(function () {
+            let content = signComment.val();
+            if (content.length === 0) {
+                alert("请输入意见");
+                return;
+            }
+            $.ajax({
+                type: 'PUT',
+                url: '/api/contract/sign/add',
+                headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                data: JSON.stringify({
+                    "content": content,
+                    "contractNum": contractNum,
+                    "state": 1
+                }),
+                statusCode: {
+                    200: () => {
+                        signModal.modal('hide');
+                        alert('成功了');
+                        loadNewTable(url, trClick);
+                    }
+                },
+                error: () => alert("未连接到网络，或者无权限")
+            })
+        });
+    });
 </script>
 </html>

@@ -1,6 +1,7 @@
 package yuri.contract.server.controlller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class CustomerController extends BaseController{
     @NeedToken(function = NeedToken.SELECT_CUSTOMER)
     public ResponseEntity<List<Customer>> fuzzyQuery(@RequestBody Query a, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return ResponseFactory.badRequest(null);
-        return customerService.fuzzyQuery(a.query);
+        return customerService.fuzzyQuery(a.content);
     }
 
     @ApiOperation("查询所有的客户")
@@ -66,8 +67,25 @@ public class CustomerController extends BaseController{
         return customerService.update(customer, getOperator());
     }
 
+    @ApiOperation("删除客户")
+    @DeleteMapping("/delete")
+    @CrossOrigin
+    @ResponseBody
+    @NeedToken(function = NeedToken.DELETE_CUSTOMER)
+    public ResponseEntity<String> delete(@RequestBody Num num, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+        return customerService.delete(num.num, getOperator());
+    }
+
     @Data
+    @ApiModel
     private static class Query {
-        private String query;
+        private String content;
+    }
+
+    @Data
+    @ApiModel
+    private static class Num {
+        private Integer num;
     }
 }

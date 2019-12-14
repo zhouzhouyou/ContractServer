@@ -99,6 +99,8 @@
 	}
     
     $(function () {
+        changeActive(contractManagementNav);
+
     	contractTableBody = $("#contractTableBody");
         countersignModal = $("#countersignModal");
         countersignComment = $("#countersign-comment");
@@ -122,7 +124,7 @@
                 statusCode: {
                     200: () => {
                         alert('成功');
-                        finalizeModal.modal('hide');
+                        countersignModal.modal('hide');
                         loadNewTable(url, trClick);
                     }
                 },

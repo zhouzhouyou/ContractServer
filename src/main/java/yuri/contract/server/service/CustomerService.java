@@ -35,7 +35,7 @@ public class CustomerService extends BaseService{
                 customer.getAccount(),
                 customer.getOther());
         if (flag == 0) return ResponseFactory.badRequest("");
-        writeLog(operator, " insert a customer " + customer.getName());
+        writeLog(operator, " 新增了一个客户，客户名为" + customer.getName());
         return ResponseFactory.success("");
     }
 
@@ -52,11 +52,18 @@ public class CustomerService extends BaseService{
                 customer.getOther()
         );
         if (flag == 0) return ResponseFactory.badRequest("");
-        writeLog(operator, " update a customer " + customer.getName());
+        writeLog(operator, " 更新了一个客户，客户名为" + customer.getName());
         return ResponseFactory.success("");
     }
 
     public ResponseEntity<List<Customer>> fuzzyQuery(String a) {
         return ResponseFactory.success(customerMapper.fuzzyQuery(a));
+    }
+
+    public ResponseEntity<String> delete(Integer num, String operator) {
+        int flag = customerMapper.delete(num);
+        if (flag == 0) return ResponseFactory.badRequest("");
+        writeLog(operator, "删除了一个客户，客户编号为" + num);
+        return ResponseFactory.success(String.valueOf(num));
     }
 }

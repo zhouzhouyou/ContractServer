@@ -115,4 +115,14 @@ public class PageController {
 
     @GetMapping("log.html")
     public String log2(HttpServletRequest request){return "log";}
+
+    @GetMapping("customer")
+    public String customer(HttpServletRequest request) {
+        return "customer";
+    }
+
+    @GetMapping("customer.html")
+    public String customer2(HttpServletRequest request) {
+        return "customer";
+    }
 }
