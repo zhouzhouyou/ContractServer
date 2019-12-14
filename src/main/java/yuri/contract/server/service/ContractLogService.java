@@ -37,9 +37,11 @@ public class ContractLogService extends BaseService{
             toTime = Date.valueOf("2100-01-01");
         }
         if(userName.equals("")){
-            return ResponseFactory.success(contractLogMapper.selectLogWithoutUserName(fromTime, toTime));
+            List<ContractLog> contractLogs = contractLogMapper.selectLogWithoutUserName(fromTime, toTime);
+            return ResponseFactory.success(contractLogs);
         }else {
-            return ResponseFactory.success(contractLogMapper.selectLogWithUserName(userName,fromTime,toTime));
+            List<ContractLog> contractLogs = contractLogMapper.selectLogWithUserName(userName,fromTime,toTime);
+            return ResponseFactory.success(contractLogs);
         }
     }
 

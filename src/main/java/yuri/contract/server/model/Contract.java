@@ -33,20 +33,24 @@ public class Contract {
     /**
      * 开始时间
      */
+    @ApiModelProperty("开始时间")
     private Date begin;
 
     /**
      * 结束时间
      */
+    @ApiModelProperty("结束时间")
     private Date end;
 
     /**
      * 合同内容
      */
+    @ApiModelProperty("合同内容")
     private String content;
 
     /**
      * 起草人
      */
+    @ApiModelProperty("起草人")
     private String userName;
 }

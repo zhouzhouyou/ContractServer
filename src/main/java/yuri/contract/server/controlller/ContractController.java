@@ -1,6 +1,8 @@
 package yuri.contract.server.controlller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -351,58 +353,72 @@ public class ContractController extends BaseController {
 
 
     @Data
+    @ApiModel("合同编号")
     private static class ContractNum {
         /**
          * 合同编号
          */
+        @ApiModelProperty("合同编号")
         private int contractNum;
     }
 
     @Data
+    @ApiModel("模糊查询关键字")
     private static class FuzzyContent {
         /**
          * 模糊查询关键字
          */
+        @ApiModelProperty("模糊查询关键字")
         private String content;
     }
 
     @Data
+    @ApiModel("分配任务所需信息")
     private static class Assign {
         /**
          * 分配任务列表
          */
+        @ApiModelProperty("分配任务列表")
         private List<List<String>> assignLists;
         /**
          * 合同编号
          */
+        @ApiModelProperty("合同编号")
         private int contractNum;
     }
 
     @Data
+    @ApiModel("合同条件查询列表")
     private static class Filter {
         /**
          * 有无任务判断列表
          */
+        @ApiModelProperty("状态列表")
         private boolean[] statuses;
         /**
          * 客户编号
          */
+        @ApiModelProperty("客户编号")
         private Integer customerNum;
     }
 
     @Data
+    @ApiModel("进行合同操作所需信息")
     private static class ProcessJob{
         /**
          * 合同号
          */
+        @ApiModelProperty("合同编号")
         private Integer contractNum;
         /**
          * 操作内容
          */
+        @ApiModelProperty("操作内容")
         private String content;
         /**
          * 操作结果
          */
+        @ApiModelProperty("操作结果")
         private Integer state;
     }
 }

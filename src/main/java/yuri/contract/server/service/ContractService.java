@@ -44,7 +44,7 @@ public class ContractService extends BaseService {
         int count = contractMapper.insert(contract, operator);
         if (count == 0)
             return ResponseFactory.badRequest("fail to add");
-        writeLog(operator, "add contract: " + contract.getName());
+        writeLog(operator, "起草了合同: " + contract.getName());
         int contractNum = contract.getNum();
         processMapper.insert(contractNum, OperationType.ASSIGN.getValue(), OperationState.UNFINISHED.getValue(), operator, contract.getContent());
         processMapper.insert(contractNum, OperationType.FINALIZE.getValue(), OperationState.UNFINISHED.getValue(), operator, contract.getContent());
@@ -100,7 +100,7 @@ public class ContractService extends BaseService {
         int count = attachmentMapper.insert(attachment.getContractNum(), attachment.getFileName(), attachment.getPath(), attachment.getType());
         if (count == 0)
             return ResponseFactory.badRequest("fail to add contract attachment");
-        writeLog(operator, "add contract attachment for " + attachment.getContractNum());
+        writeLog(operator, "添加附件 " + attachment.getContractNum());
         return ResponseFactory.success("add contract attachment for " + attachment.getContractNum());
     }
 
@@ -137,7 +137,7 @@ public class ContractService extends BaseService {
 //                    OperationState.FINISHED.getValue(), countersignUser, "");
             processMapper.updateState(OperationState.FINISHED.getValue(), contractNum,
                     OperationType.ASSIGN.getValue(), operator);
-            writeLog(operator, "assigned " + countersignUser + " to countersign" + contractNum + " contract");
+            writeLog(operator, "分配了 " + countersignUser + " 来会签 " + contractNum + " 合同");
         });
         reviews.forEach(reviewUser -> {
             processMapper.insert(contractNum, OperationType.REVIEW.getValue(),
@@ -146,7 +146,7 @@ public class ContractService extends BaseService {
 //                    OperationState.FINISHED.getValue(), reviewUser, "");
             processMapper.updateState(OperationState.FINISHED.getValue(), contractNum,
                     OperationType.ASSIGN.getValue(), operator);
-            writeLog(operator, "assigned " + reviewUser + " to review" + contractNum + " contract");
+            writeLog(operator, "分配了 " + reviewUser + " 来审核 " + contractNum + " 合同");
         });
         signs.forEach(signUser -> {
             processMapper.insert(contractNum, OperationType.SIGN.getValue(),
@@ -155,20 +155,31 @@ public class ContractService extends BaseService {
 //                    OperationState.FINISHED.getValue(), signUser, "");
             processMapper.updateState(OperationState.FINISHED.getValue(), contractNum,
                     OperationType.ASSIGN.getValue(), operator);
-            writeLog(operator, "assigned " + signUser + " to sign" + contractNum + " contract");
+            writeLog(operator, "分配了 " + signUser + " 来签订 " + contractNum + " 合同");
         });
         stateMapper.insert(contractNum, Status.ASSIGN.getValue());
+        writeLog(operator,"完成了分配工作");
         return ResponseFactory.success("assign job done.");
 
     }
 
     public ResponseEntity<List<Contract>> fuzzySelectAllUnAssignedContracts(String content) {
-        List<Integer> contractNums = processMapper.fuzzySelectNumOfUnAssigned(content);
-        List<Contract> contracts = new ArrayList<>();
-        if (contractNums == null || contractNums.size() == 0)
-            return ResponseFactory.success(contracts);
-        contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) >= 2);
-        contractNums.forEach(contractNum -> contracts.add(contractMapper.select(contractNum)));
+        List<Contract> contracts = contractMapper.fuzzyQuery(content);
+        List<Integer> contractNums = processMapper.selectNumOfUnAssigned();
+        var iterator = contracts.iterator();
+        Contract contract = null;
+        while (iterator.hasNext()) {
+            contract = iterator.next();
+            boolean flag = false;
+            for (var contractNum : contractNums) {
+                if (contract.getNum() == contractNum) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag)
+                iterator.remove();
+        }
         return ResponseFactory.success(contracts);
     }
 
@@ -200,37 +211,42 @@ public class ContractService extends BaseService {
     }
 
     public ResponseEntity<List<Contract>> fuzzySelectAllNeededContracts(String operator, String content, int type) {
-        List<Integer> unfinishedContractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type, OperationState.UNFINISHED.getValue());
+        List<Integer> contractNums = processMapper.selectUnfinishedContractNum(operator, type, OperationState.UNFINISHED.getValue());
         //List<Integer> finishedContractNums = processMapper.fuzzySelectNumOfNeededProcess(operator, content, type, OperationState.FINISHED.getValue());
-        List<Contract> processContracts = new ArrayList<>();
-        List<Contract> fuzzyContracts = contractMapper.fuzzyQuery(content);
-        if (unfinishedContractNums == null || unfinishedContractNums.size() == 0)
-            return ResponseFactory.success(processContracts);
+
+        List<Contract> contracts = contractMapper.fuzzyQuery(content);
         switch (type) {
             case 0:
-                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
+                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 2);
                 break;
             case 1:
-                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
+                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 3);
                 break;
             case 2:
-                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
+                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 4);
                 break;
             case 3:
-                unfinishedContractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
+                contractNums.removeIf(contractNum -> stateMapper.getContractStatus(contractNum) != 5);
                 break;
             default:
                 break;
         }
-        unfinishedContractNums.forEach(contractNum -> processContracts.add(contractMapper.select(contractNum)));
+        var iterator = contracts.iterator();
+        Contract contract = null;
+        while (iterator.hasNext()) {
+            contract = iterator.next();
+            boolean flag = false;
+            for (var contractNum : contractNums) {
+                if (contract.getNum() == contractNum) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag)
+                iterator.remove();
+        }
+        return ResponseFactory.success(contracts);
 
-        Set<Contract> originContracts = new HashSet<>(processContracts);
-        Set<Contract> fuzzyContractSet = new HashSet<>(fuzzyContracts);
-        fuzzyContractSet.removeAll(originContracts);
-        originContracts.addAll(fuzzyContracts);
-
-        List<Contract> finalContracts = new ArrayList<>(originContracts);
-        return ResponseFactory.success(finalContracts);
     }
 
     public ResponseEntity<String> doProcessJob(String operator, int contractNum, String content, int type, int state) {
@@ -243,16 +259,16 @@ public class ContractService extends BaseService {
             return ResponseFactory.badRequest("fail");
         switch (type) {
             case 0:
-                writeLog(operator, "countersigned contract: " + contractNum);
+                writeLog(operator, "会签了合同: " + contractNum);
                 break;
             case 1:
-                writeLog(operator, "finalized contract: " + contractNum);
+                writeLog(operator, "定稿了合同: " + contractNum);
                 break;
             case 2:
-                writeLog(operator, "reviewed contract: " + contractNum);
+                writeLog(operator, "审核了合同: " + contractNum);
                 break;
             case 3:
-                writeLog(operator, "signed contract: " + contractNum);
+                writeLog(operator, "签订了合同: " + contractNum);
                 break;
             default:
                 break;
@@ -264,20 +280,20 @@ public class ContractService extends BaseService {
             switch (type) {
                 case 0:
                     stateMapper.insert(contractNum, Status.COUNTER_SIGN_FINISHED.getValue());
-                    writeLog(operator, "countersign contract: " + contractNum + " finish.");
+                    writeLog(operator, "会签合同: " + contractNum + " 完成.");
                     break;
                 case 1:
                     stateMapper.insert(contractNum, Status.FINALIZE_FINISHED.getValue());
                     contractMapper.updateContent(contractNum, content);
-                    writeLog(operator, "finalize contract: " + contractNum + " finish.");
+                    writeLog(operator, "定稿合同: " + contractNum + " 完成.");
                     break;
                 case 2:
                     stateMapper.insert(contractNum, Status.REVIEW_FINISHED.getValue());
-                    writeLog(operator, "review contract: " + contractNum + " finish.");
+                    writeLog(operator, "审核合同: " + contractNum + " 完成.");
                     break;
                 case 3:
                     stateMapper.insert(contractNum, Status.SIGN_FINISHED.getValue());
-                    writeLog(operator, "sign contract: " + contractNum + " finish.");
+                    writeLog(operator, "签订合同: " + contractNum + " 完成.");
                     break;
                 default:
                     break;
@@ -318,7 +334,7 @@ public class ContractService extends BaseService {
         int count = contractMapper.delete(contractNum);
         if (count == 0)
             return ResponseFactory.badRequest("fail to delete contract.");
-        writeLog(operator, "delete contract: " + contractNum);
+        writeLog(operator, "删除合同: " + contractNum);
         return ResponseFactory.success("delete contract: " + contractNum);
     }
 
