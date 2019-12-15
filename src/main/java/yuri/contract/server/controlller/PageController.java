@@ -30,6 +30,11 @@ public class PageController {
         return "welcome";
     }
 
+    @GetMapping("welcome.html")
+    public String welcome2(HttpServletRequest request) {
+        return "welcome";
+    }
+
     @GetMapping("signUp")
     public String signUp(HttpServletRequest request) {
         return "signUp";
@@ -125,4 +130,10 @@ public class PageController {
     public String customer2(HttpServletRequest request) {
         return "customer";
     }
+
+    @GetMapping("resetPassword")
+    public String resetPassword(HttpServletRequest request){return "resetPassword";}
+
+    @GetMapping("resetPassword.html")
+    public String resetPassword2(HttpServletRequest request){return "resetPassword";}
 }

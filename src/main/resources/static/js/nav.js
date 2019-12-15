@@ -37,7 +37,7 @@ document.getElementById("header").innerHTML = `<link href="css/bootstrap.min.css
                 <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">个人信息</a>
                 <div aria-labelledby="navbarDropdown" class="dropdown-menu">
                     <a class="dropdown-item" href="welcome.html">欢迎页面</a>
-                    <a class="dropdown-item" href="#">重置密码</a>
+                    <a class="dropdown-item" href="resetPassword.html">重置密码</a>
                     <a class="dropdown-item" href="login.html">登录页面</a>
                     <a class="dropdown-item" href="signUp.html">注册页面</a>
                 </div>

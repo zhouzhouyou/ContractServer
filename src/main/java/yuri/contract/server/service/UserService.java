@@ -85,4 +85,9 @@ public class UserService extends BaseService {
         result.add(new ArrayList<>(signUsers));
         return ResponseFactory.success(result);
     }
+
+    public ResponseEntity<String> resetPassword(String operator, String password) {
+        userMapper.updatePassword(operator, password);
+        return ResponseFactory.success("success");
+    }
 }

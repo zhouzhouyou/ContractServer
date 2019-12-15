@@ -141,10 +141,26 @@ public class UserController extends BaseController {
         return userService.selectAll();
     }
 
+    @ApiOperation("重置密码")
+    @CrossOrigin
+    @PostMapping(value = "/user/resetPassword")
+    @ResponseBody
+    public ResponseEntity<String> resetPassword(@RequestBody Password password, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+        String operator = getOperator();
+        return userService.resetPassword(operator, password.password);
+    }
+
     @Data
     @ApiModel(description = "用户名")
     private static class Name {
         private String name;
     }
 
+    @Data
+    @ApiModel("密码")
+    private static class Password {
+        private String password;
+    }
 }
