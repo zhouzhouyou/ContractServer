@@ -28,7 +28,7 @@ $(function () {
             type: "POST",
             url: "api/user/resetPassword",
             data: JSON.stringify({
-                "password": `${passwordInput.val()}`
+                "password": getMd5(passwordInput.val())
             }),
             headers: {'Content-Type': 'application/json;charset=utf8','token': getToken()},
 

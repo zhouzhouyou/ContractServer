@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import yuri.contract.server.model.Act;
 import yuri.contract.server.service.ActService;
 import yuri.contract.server.util.annotation.NeedToken;
 import yuri.contract.server.util.response.ResponseFactory;
@@ -39,6 +40,18 @@ public class ActController extends BaseController {
         return actService.update(updateAct.username, updateAct.roles, getOperator());
     }
 
+    @ApiOperation("查找用户角色")
+    @CrossOrigin
+    @PostMapping(value = "/act/selectAct")
+    @ResponseBody
+    @NeedToken(function = NeedToken.GRANT)
+    public ResponseEntity<List<Act>> selectAct(@RequestBody SelectAct selectAct, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return ResponseFactory.badRequest(null);
+        }
+        return actService.findRoleByName(selectAct.username, getOperator());
+    }
+
 
 
     @Data
@@ -46,4 +59,10 @@ public class ActController extends BaseController {
         private String username;
         private List<Integer> roles;
     }
+
+    @Data
+    private static class SelectAct {
+        private String username;
+    }
+
 }

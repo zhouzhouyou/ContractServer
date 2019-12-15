@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import yuri.contract.server.mapper.ActMapper;
 import yuri.contract.server.mapper.ContractLogMapper;
+import yuri.contract.server.model.Act;
 import yuri.contract.server.util.response.ResponseFactory;
 
 import java.util.List;
@@ -21,6 +22,12 @@ public class ActService extends BaseService {
         this.actMapper = actMapper;
     }
 
+    public ResponseEntity<List<Act>> findRoleByName(String username, String operator) {
+        List<Act> roleName = actMapper.selectByUser(username);
+        writeLog(operator, "查找" + username + "的角色");
+        return ResponseFactory.success(roleName);
+    }
+
     public ResponseEntity<String> update(String username, List<Integer> roles, String operator) {
         try {
             actMapper.deleteByUsername(username);
@@ -31,6 +38,5 @@ public class ActService extends BaseService {
         catch (Exception e) {
             return ResponseFactory.badRequest(e.toString());
         }
-
     }
 }

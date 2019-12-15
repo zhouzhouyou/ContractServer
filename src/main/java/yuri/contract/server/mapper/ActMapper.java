@@ -15,6 +15,9 @@ public interface ActMapper {
     @Select("select * from act")
     List<Act> selectAll();
 
+    @Select("select * from act where username = #{userName}")
+    List<Act> selectByUser(String userName);
+
     @Insert("insert into act values(#{userName},#{roleId},#{description})")
     int insert(String userName, Integer roleId, String description);
 
@@ -32,4 +35,9 @@ public interface ActMapper {
 
     @Select("select userName from act where roleId = #{roleId}")
     List<String> selectByRole(Integer roleId);
+
+    @Select("select name from role where id = (select roleId from act where username =#{userName})")
+    List<String> findRoleByName(String userName);
+
+
 }
