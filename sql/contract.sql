@@ -17,22 +17,22 @@ DROP TABLE IF EXISTS customer;
 CREATE TABLE user
 (
     name     varchar(40) primary key,
-    password varchar(20) not null
+    password varchar(32) not null
 );
 INSERT INTO user
-VALUES ('system', '123');
+VALUES ('system', 'd9b1d7db4cd6e70935368a1efb10e377');
 INSERT INTO user
-VALUES ('test', 'test');
+VALUES ('test', 'fb469d7ef430b0baf0cab6c436e70375');
 INSERT INTO user
-VALUES ('zzy', 'zzy');
+VALUES ('zzy', '8e442b3237a64bd547969841070f1dae');
 INSERT INTO user
-VALUES ('ckf', 'ckf');
+VALUES ('ckf', '2dafcb660601ca7c952b3deabfdbfebc');
 INSERT INTO user
-VALUES ('czl', 'czl');
+VALUES ('czl', '15a8e1a055462ba53215199b46fb1744');
 INSERT INTO user
-VALUES ('ly', 'ly');
+VALUES ('ly', 'f36b6dc26f995a779bf67fa50da16483');
 INSERT INTO user
-VALUES ('jxl', 'jxl');
+VALUES ('jxl', '44555339337c78f326c352122da87195');
 
 CREATE TABLE role
 (

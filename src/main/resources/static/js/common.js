@@ -46,3 +46,7 @@ function sendRequest(method, uri, data, successFunc, failFunc) {
         }
     });
 }
+
+function getMd5(src) {
+    return $.md5($.md5(src));
+}

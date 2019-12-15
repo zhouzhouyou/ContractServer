@@ -28,8 +28,8 @@ $(function () {
             type: "POST",
             url: "api/signIn",
             data: JSON.stringify({
-                "name": `${nameInput.val()}`,
-                "password": `${passwordInput.val()}`
+                "name": nameInput.val(),
+                "password": getMd5(passwordInput.val())
             }),
             headers: {'Content-Type': 'application/json;charset=utf8'},
 
