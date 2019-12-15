@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <title>Title</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/my-form.css" rel="stylesheet">
+    <link href="css/gijgo.min.css" rel="stylesheet">
+
+    <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+
+    <script src="js/common.js" type="text/javascript"></script>
+    <script src="js/gijgo.min.js" type="text/javascript"></script>
+    <script src="js/messages.zh-cn.min.js" type="text/javascript"></script>
+</head>
+<body style="text-align: center">
+<div id="header"></div>
+<div class="text-center">
+    <form>
+        <div class="form-group row">
+            <label class="col-form-label col-sm-1" style="display: inline">选择用户</label>
+            <div class="dropdown col-sm-2">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="userSelector" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    选择
+                </button>
+                <div class="dropdown-menu" id="users" aria-labelledby="dropdownMenuButton">
+                </div>
+            </div>
+
+            <div class="col-sm-1">
+                <button class="btn btn-primary form-control" onclick="sendQuery();" type="button">查询角色</button>
+            </div>
+
+            <div class="col-sm-1">
+                <button class="btn btn-primary form-control" onclick="updateAct();" type="button">更新角色</button>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="updateActModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">更新角色</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="col-sm-1">
+                                <label for="manager">管理员</label>
+                                <input checked id="manager" type="checkbox"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <label for="operator">操作员</label>
+                                <input checked id="operator" type="checkbox"/>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">返回</button>
+                            <button type="button" class="btn btn-primary" onclick="save();">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div class="text-center" style="margin-top: 50px;">
+    <table class="table table-hover" id="act_table" style=" margin-top: 20px; alignment: center">
+        <thead>
+        <tr>
+            <th scope="col">用户名</th>
+            <th scope="col">角色名</th>
+            <th scope="col">角色描述</th>
+        </tr>
+        </thead>
+        <tbody id="actTableBody">
+        </tbody>
+    </table>
+</div>
+
+</body>
+
+<script src="js/nav.js" type="text/javascript"></script>
+
+<script>
+    let manager;
+    let operator;
+    let actTableBody;
+    let userSelector;
+    $(function () {
+        actTableBody = $("#actTableBody");
+        userSelector = $("#userSelector");
+        loadUsers();
+    });
+
+    function sendQuery() {
+        let userSelectText = userSelector.text();
+        if (userSelectText === "选择")
+            userSelectText = "";
+        $.ajax({
+            type: "POST",
+            url: "api/act/selectAct",
+            data: JSON.stringify({
+                "userName": userSelectText,
+            }),
+
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+
+            statusCode: {
+                200: (resultList) => loadActTable(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+    function loadUsers() {
+        $.ajax({
+            type: "GET",
+            url: "api/user/selectAll",
+
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+
+            statusCode: {
+                200: (resultList) => addUser(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
+
+    }
+
+    function addUser(resultList) {
+        let def = $(`<a class="dropdown-item">选择</a>`);
+        def.click(() => userSelector.text("选择"));
+        users.append(def);
+        resultList.forEach(function (element) {
+            let a = $(`<a class="dropdown-item">${element}</a>`);
+            a.click(() => userSelector.text(element));
+            users.append(a);
+        });
+    }
+
+    function loadActTable(resultList) {
+        refreshTable(actTableBody, resultList, null, null);
+    }
+
+    function updateAct() {
+        $('#updateActModal').modal('show');
+    }
+
+    function isChecked(cb) {
+        return cb.is(' :checked');
+    }
+
+    function checkedStatuses() {
+        return [isChecked(manager), isChecked(operator)];
+    }
+
+    function save() {
+        let userSelectText = userSelector.text();
+        manager = $("#manager");
+        operator = $("#operator");
+        let role = []
+        if (manager.is(":checked")) {
+            role.push(1)
+        }
+        if (operator.is(":checked")) {
+            role.push(2)
+        }
+        $.ajax({
+            type: "POST",
+            url: "/api/act/update",
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "username": userSelectText,
+                "roles": role
+            }),
+            statusCode: {
+                200: () => {
+                    signModal.modal('hide');
+                    alert('更新成功');}
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
+</script>
+
+</html>
