@@ -27,8 +27,8 @@ document.getElementById("header").innerHTML = `<link href="css/bootstrap.min.css
             <li class="nav-item dropdown" id="functionManagementNav">
                 <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">权限管理</a>
                 <div aria-labelledby="navbarDropdown" class="dropdown-menu">
-                    <a class="dropdown-item" href="#">用户管理</a>
-                    <a class="dropdown-item" href="#">角色管理</a>
+                    <a class="dropdown-item" href="act.html">用户管理</a>
+                    <a class="dropdown-item" href="behavior.html">角色管理</a>
                 </div>
             </li>
             <li class="nav-item" id="customerNav"><a class="nav-link" href="customer.html">客户管理</a></li>
