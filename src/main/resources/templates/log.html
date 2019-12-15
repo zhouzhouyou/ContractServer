@@ -39,13 +39,15 @@
                type="text">
 		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button"
                 onclick="sendFuzzyQuery()">查询</button>
+        <button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button"
+                onclick="toExcel()">导出为Excel</button>
 	</span>
     <form>
         <div class="form-group row">
             <label class="col-form-label col-sm-1" style="display: inline">选择用户</label>
             <div class="dropdown col-sm-2">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="userSelector" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" >
+                        aria-haspopup="true" aria-expanded="false">
                     选择用户
                 </button>
                 <div class="dropdown-menu" id="users" aria-labelledby="dropdownMenuButton">
@@ -95,6 +97,7 @@
     let beginTime;
     let endTime;
     let users;
+    let logTable;
     let userSelector;
     let today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     let operatorSelected = false;
@@ -108,7 +111,7 @@
         users = $("#users");
         userSelector = $("#userSelector");
         beginTime = $("#beginTime");
-
+        logTable = $("#log_table");
         beginTime.datepicker({
             uiLibrary: 'bootstrap4',
             locale: 'zh-cn',
@@ -209,7 +212,7 @@
 
     function isLater(a, b) {
         if (a.getFullYear() !== b.getFullYear()) return a.getFullYear() > b.getFullYear();
-        if (a.getMonth() !==  b.getMonth()) return a.getMonth() > b.getMonth();
+        if (a.getMonth() !== b.getMonth()) return a.getMonth() > b.getMonth();
         return a.getDate() > b.getDate();
     }
 
@@ -219,14 +222,14 @@
         let beginDate = beginValue.length === 0 ? null : new Date(beginValue);
         let endDate = endValue.length === 0 ? null : new Date(endValue);
 
-        let isBeginValid = function() {
+        let isBeginValid = function () {
             if (beginDate === null) return true;
             if (isLater(beginDate, today)) return false;
             if (endDate === null) return true;
             return !isLater(beginDate, endDate);
         };
 
-        let isEndValid = function() {
+        let isEndValid = function () {
             if (endDate === null) return true;
             if (isLater(endDate, today)) return false;
             if (beginDate === null) return true;
@@ -236,5 +239,26 @@
         setValid(beginTime, isBeginValid());
         setValid(endTime, isEndValid());
     }
+
+    function toExcel() {
+
+        let $trs = logTable.find("tr");
+        let str = "";
+        for (let i = 0; i < $trs.length; i++) {
+            let $tds = $trs.eq(i).find("td,th");
+            for (let j = 0; j < $tds.length; j++) {
+                str += $tds.eq(j).text() + ",";
+            }
+            str += "\n";
+        }
+
+        let aaaa = "data:text/csv;charset=utf-8,\ufeff" + str;
+        let link = document.createElement("a");
+        link.setAttribute("href", aaaa);
+        let fileName = new Date().toDateString();
+        link.setAttribute("download", fileName + ".csv");
+        link.click();
+    }
+
 </script>
 </html>
