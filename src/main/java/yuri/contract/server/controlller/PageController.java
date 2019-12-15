@@ -30,6 +30,11 @@ public class PageController {
         return "welcome";
     }
 
+    @GetMapping("welcome.html")
+    public String welcome2(HttpServletRequest request) {
+        return "welcome";
+    }
+
     @GetMapping("signUp")
     public String signUp(HttpServletRequest request) {
         return "signUp";
@@ -111,20 +116,48 @@ public class PageController {
     }
 
     @GetMapping("log")
-    public String log(HttpServletRequest request){return "log";}
+    public String log(HttpServletRequest request) {
+        return "log";
+    }
 
     @GetMapping("log.html")
-    public String log2(HttpServletRequest request){return "log";}
+    public String log2(HttpServletRequest request) {
+        return "log";
+    }
 
     @GetMapping("act")
-    public String act(HttpServletRequest request){return "act";}
+    public String act(HttpServletRequest request) {
+        return "act";
+    }
 
     @GetMapping("act.html")
-    public String act2(HttpServletRequest request){return "act";}
+    public String act2(HttpServletRequest request) {
+        return "act";
+    }
 
     @GetMapping("behavior")
-    public String behavior(HttpServletRequest request){return "behavior";}
+    public String behavior(HttpServletRequest request) {
+        return "behavior";
+    }
 
     @GetMapping("behavior.html")
-    public String behavior2(HttpServletRequest request){return "behavior";}
+    public String behavior2(HttpServletRequest request) {
+        return "behavior";
+    }
+
+    @GetMapping("customer")
+    public String customer(HttpServletRequest request) {
+        return "customer";
+    }
+
+    @GetMapping("customer.html")
+    public String customer2(HttpServletRequest request) {
+        return "customer";
+    }
+
+    @GetMapping("resetPassword")
+    public String resetPassword(HttpServletRequest request){return "resetPassword";}
+
+    @GetMapping("resetPassword.html")
+    public String resetPassword2(HttpServletRequest request){return "resetPassword";}
 }
