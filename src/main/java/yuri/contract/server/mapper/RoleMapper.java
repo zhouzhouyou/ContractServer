@@ -15,6 +15,9 @@ public interface RoleMapper {
     @Select("select * from role")
     List<Role> selectAll();
 
+    @Select("select name from role")
+    List<String> selectAllName();
+
     @Select("select count(*) from role where id = #{id}")
     int exists(String id);
 

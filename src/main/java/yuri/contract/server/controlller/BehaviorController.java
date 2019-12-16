@@ -39,6 +39,15 @@ public class BehaviorController extends BaseController {
         return behaviorService.update(updateBehavior.roleId, updateBehavior.nums, getOperator());
     }
 
+    @ApiOperation("查询全部角色权限")
+    @CrossOrigin
+    @PostMapping(value = "/behavior/selectAll")
+    @ResponseBody
+    @NeedToken(function = NeedToken.GRANT)
+    public ResponseEntity<List<String>> selectAll() {
+        return behaviorService.selectAll();
+    }
+
 
 
     @Data

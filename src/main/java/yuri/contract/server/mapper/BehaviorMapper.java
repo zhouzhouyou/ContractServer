@@ -18,8 +18,8 @@ public interface BehaviorMapper {
     @Select("select num from behavior where roleId =#{roleId}")
     List<String> selectByRole(Integer roleId);
 
-    @Select("select * from behavior")
-    List<Behavior> selectAll();
+    @Select("select name from function")
+    List<String> selectAll();
 
     @Insert("insert into behavior values(#{roleId}, #{num})")
     int insert(Integer roleId, String num);

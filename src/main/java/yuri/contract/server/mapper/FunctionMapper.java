@@ -12,8 +12,8 @@ public interface FunctionMapper {
     @Select("select * from `function` where num=#{num}")
     Function select(String num);
 
-    @Select("select * from `function`")
-    List<Function> selectAll();
+    @Select("select name from `function`")
+    List<String> selectAllName();
 
     @Insert("insert into `function` values(#{num},#{name},#{description})")
     int insert(String num, String name, String description);

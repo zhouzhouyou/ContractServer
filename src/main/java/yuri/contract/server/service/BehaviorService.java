@@ -36,4 +36,9 @@ public class BehaviorService extends BaseService {
             return ResponseFactory.badRequest(e.toString());
         }
     }
+
+    public ResponseEntity<List<String>> selectAll() {
+        return ResponseFactory.success(behaviorMapper.selectAll());
+
+    }
 }

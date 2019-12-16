@@ -1,6 +1,7 @@
 package yuri.contract.server.controlller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,22 +46,57 @@ public class ActController extends BaseController {
     @PostMapping(value = "/act/selectAct")
     @ResponseBody
     @NeedToken(function = NeedToken.GRANT)
-    public ResponseEntity<List<Act>> selectAct(@RequestBody SelectAct selectAct, BindingResult bindingResult) {
+    public ResponseEntity<List<Act>> sendQuery(@RequestBody SelectAct selectAct, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return ResponseFactory.badRequest(null);
         }
         return actService.findRoleByName(selectAct.username, getOperator());
     }
 
+    @ApiOperation("模糊查找用户角色")
+    @CrossOrigin
+    @PostMapping(value = "/act/fuzzyQuery")
+    @ResponseBody
+    @NeedToken(function = NeedToken.GRANT)
+    public ResponseEntity<List<Act>> sendFuzzyQuery(@RequestBody Query query, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return ResponseFactory.badRequest(null);
+        }
+        return actService.fuzzyQuery(query.query);
+    }
+
+    @ApiOperation("查找指定用户角色")
+    @CrossOrigin
+    @PostMapping(value = "/act/filterSelect")
+    @ResponseBody
+    @NeedToken(function = NeedToken.GRANT)
+    public ResponseEntity<List<Act>> sendfilterSelect(@RequestBody SelectAct selectAct, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return ResponseFactory.badRequest(null);
+        }
+        return actService.filterSelectAct(selectAct.username);
+    }
+
 
 
     @Data
+    @ApiModel
     private static class UpdateAct {
         private String username;
-        private List<Integer> roles;
+        private List<String> roles;
     }
 
     @Data
+    @ApiModel(description = "模糊查询请求")
+    private static class Query {
+        /**
+         * 关键字
+         */
+        private String query;
+    }
+
+    @Data
+    @ApiModel
     private static class SelectAct {
         private String username;
     }

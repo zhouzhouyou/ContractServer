@@ -7,6 +7,20 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/my-form.css" rel="stylesheet">
     <link href="css/gijgo.min.css" rel="stylesheet">
+    <style type="text/css">
+        .clearfix:before, .clearfix:after {
+            content: "";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            zoom: 1;
+        }
+    </style>
 
     <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
     <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
@@ -19,25 +33,34 @@
 <body style="text-align: center">
 <div id="header"></div>
 <div class="text-center">
+    <span class="clearfix" style="margin: 20px;">
+		<input autofocus class="form-control" id="content" placeholder="查询权限"
+               required style="float: left; width: 20%; margin-left: 20px; display: inline;"
+               type="text">
+		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button"
+                onclick="sendFuzzyQuery()">模糊查询</button>
+	</span>
     <form>
         <div class="form-group row">
             <label class="col-form-label col-sm-1" style="display: inline">选择角色</label>
             <div class="dropdown col-sm-2">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="actSelector" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                    选择
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="userSelector" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">选择
                 </button>
-                <div class="dropdown-menu" id="acts" aria-labelledby="dropdownMenuButton">
+                <div class="dropdown-menu" id="users" aria-labelledby="dropdownMenuButton">
                 </div>
             </div>
 
+            <div class="col-sm-1">
+                <button class="btn btn-primary form-control" onclick="sendFilterQuery();" type="button">查询权限</button>
+            </div>
 
             <div class="col-sm-1">
-                <button class="btn btn-primary form-control" onclick="updateBehavior();" type="button">更新权限</button>
+                <button class="btn btn-primary form-control" onclick="updateAct();" type="button">更新权限</button>
             </div>
 
             <!-- Modal -->
-            <div class="modal fade" id="updateBehaviorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade" id="updateActModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -46,95 +69,8 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
-                            <div class="col-sm-1">
-                                <label for="fun0">起草合同</label>
-                                <input checked id="fun0" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun1">定稿合同</label>
-                                <input checked id="fun1" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun2">查询合同</label>
-                                <input checked id="fun2" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun3">删除合同</label>
-                                <input checked id="fun3" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun4">会签合同</label>
-                                <input checked id="fun4" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun5">审批合同</label>
-                                <input checked id="fun5" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun6">签订合同</label>
-                                <input checked id="fun6" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun7">分配</label>
-                                <input checked id="fun7" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun10">流程查询</label>
-                                <input checked id="fun10" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun11">新增用户</label>
-                                <input checked id="fun11" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun12">编辑用户</label>
-                                <input checked id="fun12" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun13">查询用户</label>
-                                <input checked id="fun13" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun14">删除用户</label>
-                                <input checked id="fun14" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun15">新增角色</label>
-                                <input checked id="fun15" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun16">编辑角色</label>
-                                <input checked id="fun16" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun17">查询角色</label>
-                                <input checked id="fun17" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun18">删除角色</label>
-                                <input checked id="fun18" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun22">配置权限</label>
-                                <input checked id="fun22" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun23">新增客户</label>
-                                <input checked id="fun23" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun24">编辑客户</label>
-                                <input checked id="fun24" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun25">查询客户</label>
-                                <input checked id="fun25" type="checkbox"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <label for="fun26">删除客户</label>
-                                <input checked id="fun26" type="checkbox"/>
-                            </div>
+                        <div class="modal-body" id="mb">
+
 
                         </div>
                         <div class="modal-footer">
@@ -149,169 +85,182 @@
     </form>
 </div>
 
+<div class="text-center" style="margin-top: 50px;">
+    <table class="table table-hover" id="act_table" style=" margin-top: 20px; alignment: center">
+        <thead>
+        <tr>
+            <th scope="col">角色名</th>
+            <th scope="col">权限名</th>
+            <th scope="col">权限描述</th>
+        </tr>
+        </thead>
+        <tbody id="actTableBody">
+        </tbody>
+    </table>
+</div>
 
 </body>
 
 <script src="js/nav.js" type="text/javascript"></script>
 
 <script>
-    let f0;
-    let f1;
-    let f2;
-    let f3;
-    let f4;
-    let f5;
-    let f6;
-    let f7;
-    let f10;
-    let f11;
-    let f12;
-    let f13;
-    let f14;
-    let f15;
-    let f16;
-    let f17;
-    let f18;
-    let f22;
-    let f23;
-    let f24;
-    let f25;
-    let f26;
-
-    let actSelector;
+    let manager;
+    let content;
+    let operator;
+    let actTableBody;
+    let userSelector;
+    let act_list = [];
+    let operatorSelected = false;
+    let users;
     $(function () {
-        actSelector = $("#actSelector");
+        actTableBody = $("#actTableBody");
+        userSelector = $("#userSelector");
+        content = $("#content");
+        users = $("#users")
         loadAct();
+        sendFuzzyQuery();
     });
 
+    function sendFilterQuery() {
+        $.ajax({
+            type: "POST",
+            url: "api/act/filterSelect",
+            data: JSON.stringify({
+                "username": operatorSelected ? userSelector.text() : '',
+            }),
+
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+
+            statusCode: {
+                200: (resultList) => loadActTable(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
 
     function loadAct() {
-        act_list = ["管理员", "操作员"];
-        addAct(act_list);
+
+        $.ajax({
+            type: "POST",
+            url: "/api/role/selectAll",
+
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "role": "all"
+            }),
+
+            statusCode: {
+                200: (resultList) => addAct(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
+
     }
 
     function addAct(resultList) {
         let def = $(`<a class="dropdown-item">选择</a>`);
-        def.click(() => actSelector.text("选择"));
+        def.click(() => userSelector.text("选择"));
         users.append(def);
         resultList.forEach(function (element) {
             let a = $(`<a class="dropdown-item">${element}</a>`);
-            a.click(() => actSelector.text(element));
+            a.click(() => userSelector.text(element));
+            operatorSelected = true;
             users.append(a);
         });
     }
 
+    function sendFuzzyQuery() {
+        $.ajax({
+            type: "POST",
+            url: "api/act/fuzzyQuery",
+            data: JSON.stringify({
+                "query": content.val()
+            }),
 
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
 
-    function updateBehavior() {
-        $('#updateBehaviorModal').modal('show');
+            statusCode: {
+                200: (resultList) => loadActTable(resultList)
+            },
+
+            error: () => alert("未连接到网络，或者无权限")
+        })
     }
 
 
 
 
-    function save() {
-        let actSelectText = actSelector.text();
-        let act;
-        if (actSelectText == "管理员") act = 1;
-        else if (actSelectText == "操作员") act = 2;
-        f0 = $("#fun0");
-        f1 = $("#fun1");
-        f2 = $("#fun2");
-        f3 = $("#fun3");
-        f4 = $("#fun4");
-        f5 = $("#fun5");
-        f6 = $("#fun6");
-        f7 = $("#fun7");
-        f10 = $("#fun10");
-        f11 = $("#fun11");
-        f12 = $("#fun12");
-        f13 = $("#fun13");
-        f14 = $("#fun14");
-        f15 = $("#fun15");
-        f16 = $("#fun16");
-        f17 = $("#fun17");
-        f18 = $("#fun18");
-        f22 = $("#fun22");
-        f23 = $("#fun23");
-        f24 = $("#fun24");
-        f25 = $("#fun25");
-        f26 = $("#fun26");
-        let behavior = []
-        if (f0.is(":checked")) {
-            behavior.push("0")
+
+    function loadActTable(resultList) {
+        refreshTable(actTableBody, resultList, null, null);
+    }
+
+    function changeColor(t) {
+
+        if(t.hasClass('btn btn-primary')) {
+            t.attr('class', 'btn btn-secondary');
+            act_list.splice(act_list.indexOf(t.text()), 1);
+        }else {
+            t.attr('class', "btn btn-primary");
+            act_list.push(t.text());
         }
-        if (f1.is(":checked")) {
-            behavior.push("1")
+    }
+
+    function readAct(actList) {
+        $("#mb").empty();
+        for (var i = 0; i < actList.length; i++) {
+            str = "<button type=\"button\" class=\"btn btn-secondary\"  onclick=\"changeColor($(this));\" >" + actList[i] + "</button>";
+            $("#mb").append(str);
         }
-        if (f2.is(":checked")) {
-            behavior.push("2")
-        }
-        if (f3.is(":checked")) {
-            behavior.push("3")
-        }
-        if (f4.is(":checked")) {
-            behavior.push("4")
-        }
-        if (f5.is(":checked")) {
-            behavior.push("5")
-        }
-        if (f6.is(":checked")) {
-            behavior.push("6")
-        }
-        if (f7.is(":checked")) {
-            behavior.push("7")
-        }
-        if (f10.is(":checked")) {
-            behavior.push("10")
-        }
-        if (f11.is(":checked")) {
-            behavior.push("11")
-        }
-        if (f12.is(":checked")) {
-            behavior.push("12")
-        }
-        if (f13.is(":checked")) {
-            behavior.push("13")
-        }
-        if (f14.is(":checked")) {
-            behavior.push("14")
-        }
-        if (f15.is(":checked")) {
-            behavior.push("15")
-        }
-        if (f16.is(":checked")) {
-            behavior.push("16")
-        }
-        if (f17.is(":checked")) {
-            behavior.push("17")
-        }
-        if (f18.is(":checked")) {
-            behavior.push("18")
-        }
-        if (f22.is(":checked")) {
-            behavior.push("22")
-        }
-        if (f23.is(":checked")) {
-            behavior.push("23")
-        }
-        if (f24.is(":checked")) {
-            behavior.push("24")
-        }
-        if (f25.is(":checked")) {
-            behavior.push("25")
-        }
-        if (f26.is(":checked")) {
-            behavior.push("26")
-        }
+
+    }
+
+    function updateAct() {
+
+        $("#mb").empty();
+        act_list = []
+
+        $('#updateActModal').modal('show');
 
         $.ajax({
             type: "POST",
-            url: "/api/behavior/update",
+            url: "/api/function/selectAll",
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
             data: JSON.stringify({
-                "roleId": act,
-                "nums": behavior
+                "role": "all"
+            }),
+            statusCode: {
+                200: function(data){
+                    readAct(data)
+                },
+                error: () => alert("未连接到网络，或者无权限")}
+        })
+
+    }
+
+    function isChecked(cb) {
+        return cb.is(' :checked');
+    }
+
+    function checkedStatuses() {
+        return [isChecked(manager), isChecked(operator)];
+    }
+
+    function save() {
+        let userSelectText = userSelector.text();
+        let role = [];
+        for(var i = 0; i < act_list.length; i++) {
+            role.push(act_list[i]);
+        }
+        $.ajax({
+            type: "POST",
+            url: "/api/act/update",
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "username": userSelectText,
+                "roles": role
             }),
             statusCode: {
                 200: () => {
