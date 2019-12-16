@@ -1,6 +1,5 @@
 package yuri.contract.server.service;
 
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -45,22 +44,47 @@ public class UserService extends BaseService {
         return userMapper.count(name) > 0;
     }
 
+    /**
+     * 通过用户名来查找用户
+     *
+     * @param name 用户名
+     * @return 用户
+     */
     public User findUserByName(String name) {
         return userMapper.findUserByName(name);
     }
 
+    /**
+     * 通过用户名来删除某个用户
+     *
+     * @param operator 操作者
+     * @param name     用户名
+     * @return 删除是否成功
+     */
     public ResponseEntity<String> deleteUserByName(String operator, String name) {
-        writeLog(operator, "delete user: " + name);
+        writeLog(operator, "删除了用户: " + name);
         return ResponseFactory.success(name);
     }
 
+    /**
+     * 创建一个新用户
+     *
+     * @param operator 创建人
+     * @param user     创建的新账户
+     * @return 创建是否成功
+     */
     public ResponseEntity<String> insertUser(String operator, User user) {
         int count = userMapper.insert(user.getName(), user.getPassword());
         if (count == 0) return ResponseFactory.badRequest(user.getName());
-        writeLog(operator, "insert user: " + user.getName());
+        writeLog(operator, "创建了账户: " + user.getName());
         return ResponseFactory.success(user.getName());
     }
 
+    /**
+     * 获取所有用户的用户名
+     *
+     * @return 所有的用户名
+     */
     public ResponseEntity<List<String>> selectAll() {
         List<User> users = userMapper.selectAll();
         List<String> names = new ArrayList<>();
@@ -68,6 +92,11 @@ public class UserService extends BaseService {
         return ResponseFactory.success(names);
     }
 
+    /**
+     * 获取可以会签、审核、签订的用户名
+     *
+     * @return 可以会签、审核、签订的用户名
+     */
     public ResponseEntity<List<List<String>>> queryAvailableUsers() {
         List<List<String>> result = new ArrayList<>();
 
@@ -86,8 +115,16 @@ public class UserService extends BaseService {
         return ResponseFactory.success(result);
     }
 
+    /**
+     * 重置密码
+     *
+     * @param operator 谁在重置密码
+     * @param password 密码
+     * @return 重置密码的结果
+     */
     public ResponseEntity<String> resetPassword(String operator, String password) {
         userMapper.updatePassword(operator, password);
+        writeLog(operator, "重置了密码");
         return ResponseFactory.success("success");
     }
 }

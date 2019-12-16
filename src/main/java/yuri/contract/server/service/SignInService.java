@@ -20,6 +20,13 @@ public class SignInService extends BaseService {
         this.userMapper = userMapper;
     }
 
+    /**
+     * 登录
+     *
+     * @param name     用户名
+     * @param password 密码
+     * @return 登录是否成功 ? token ： 失败的结果
+     */
     public ResponseEntity<String> signIn(String name, String password) {
         if (userMapper.select(name, password) != null) {
             return ResponseFactory.success(SecurityUtils.getToken(name));
@@ -27,10 +34,17 @@ public class SignInService extends BaseService {
         return ResponseFactory.unauthorized(name);
     }
 
+    /**
+     * 注册
+     *
+     * @param name     用户名
+     * @param password 密码
+     * @return 注册是否成功 ? token : 失败的结果
+     */
     public ResponseEntity<String> signUp(String name, String password) {
         if (userMapper.count(name) > 0) return ResponseFactory.badRequest(name + " exists");
         userMapper.insert(name, password);
-        writeLog(name, "user created");
+        writeLog(name, "用户创建了");
         return ResponseFactory.success(SecurityUtils.getToken(name));
     }
 

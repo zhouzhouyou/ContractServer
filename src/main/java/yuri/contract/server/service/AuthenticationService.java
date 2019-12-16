@@ -49,6 +49,7 @@ public class AuthenticationService {
 
     /**
      * 通过用户名来判断有哪些权限
+     *
      * @param username 用户名
      * @return 权限名列表
      */
@@ -60,7 +61,7 @@ public class AuthenticationService {
         }
         List<String> functionNames = new ArrayList<>();
         for (var function : functions) {
-            Function f  = functionMapper.select(function);
+            Function f = functionMapper.select(function);
             functionNames.add(f.getName());
         }
 
