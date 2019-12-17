@@ -61,6 +61,7 @@ public class UserService extends BaseService {
      * @return 删除是否成功
      */
     public ResponseEntity<String> deleteUserByName(String operator, String name) {
+        if (operator.equals(name)) return ResponseFactory.badRequest("你居然想删除自己？");
         if (processMapper.hasAnyJob(name) != 0) return ResponseFactory.badRequest("还有任务呢");
         int count = userMapper.delete(name);
         if (count == 0) return ResponseFactory.badRequest("删除失败");

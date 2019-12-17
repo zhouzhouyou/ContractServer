@@ -35,7 +35,14 @@ public class RoleService extends BaseService  {
     public ResponseEntity<Integer> insert(String operator,  Role role) {
         int count = roleMapper.insert(role.getName(), role.getDescription());
         if (count == 0) return ResponseFactory.badRequest(null);
-        writeLog(operator, "创建了");
+        writeLog(operator, "创建了" + role.getName());
         return ResponseFactory.success(count);
+    }
+
+    public ResponseEntity<Integer> delete(String operator, Integer id) {
+        int count = roleMapper.delete(id);
+        if (count == 0) return ResponseFactory.badRequest(null);
+        writeLog(operator, "删除了角色，角色id：" + id);
+        return ResponseFactory.success(id);
     }
 }

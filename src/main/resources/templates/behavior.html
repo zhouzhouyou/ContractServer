@@ -250,7 +250,23 @@
             tr.append(changeBehaviorTD);
             let deleteTD = $(`<td><button class="btn btn-danger">删除</button></td>`);
             deleteTD.click(function () {
-
+                if (confirm(`你确定要删除${roleName}?`)) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: 'api/role/delete',
+                        headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                        data: JSON.stringify({
+                            "id": currentRole
+                        }),
+                        statusCode: {
+                            200: () => {
+                                alert(`成功删除了`);
+                                refreshTable();
+                            }
+                        },
+                        error: () => alert("网络问题或者无权限")
+                    })
+                }
             });
             tr.append(deleteTD);
         })

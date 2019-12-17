@@ -144,8 +144,22 @@
     let insertModalBtn;
     let updateModalBtn;
 
+    function sendFuzzyQuery() {
+        $.ajax({
+            type: 'POST',
+            url: 'api/customer/fuzzyQuery',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "content": fuzzyQuery.val()
+            }),
+            statusCode: {
+                200: (resultList) => loadTable(resultList)
+            },
+            error: () => alert("未连接到网络，或者无权限")
+        })
+    }
+
     function selectAll() {
-        customerTableBody.empty();
         $.ajax({
             type: 'POST',
             url: 'api/customer/selectAll',
@@ -196,6 +210,7 @@
     }
 
     function loadTable(resultList) {
+        customerTableBody.empty();
         resultList.forEach((customer) => {
             let tr = $(`<tr></tr>`);
             Object.keys(customer).forEach(value => tr.append($(`<td>${customer[value]}</td>`)));

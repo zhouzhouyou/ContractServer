@@ -2,6 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
     <title>用户管理</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -335,7 +336,7 @@
                                 alert(`您已经成功地送${currentUser}去见上帝了`);
                                 refreshTable();
                             },
-                            400: () => alert(`他还有没做完的事情`)
+                            400: (result) => alert(result)
                         },
                         error: () => alert(`一次失败的尝试~`)
                     })

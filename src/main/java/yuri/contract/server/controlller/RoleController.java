@@ -58,6 +58,22 @@ public class RoleController extends BaseController {
         return roleService.insert(getOperator(), role);
     }
 
+    @ApiOperation("删除角色")
+    @CrossOrigin
+    @DeleteMapping("/delete")
+    @ResponseBody
+    @NeedToken(function = NeedToken.DELETE_ROLE)
+    public ResponseEntity<Integer> delete(@RequestBody RoleId roleId, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(null);
+        return roleService.delete(getOperator(), roleId.id);
+    }
+
+    @Data
+    @ApiModel
+    private static class RoleId {
+        private Integer id;
+    }
+
     @Data
     @ApiModel(description = "模糊查询请求")
     private static class Query {
