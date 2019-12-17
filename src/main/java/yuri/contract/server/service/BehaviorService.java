@@ -1,11 +1,9 @@
 package yuri.contract.server.service;
 
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import yuri.contract.server.mapper.ActMapper;
 import yuri.contract.server.mapper.BehaviorMapper;
 import yuri.contract.server.mapper.ContractLogMapper;
 import yuri.contract.server.util.response.ResponseFactory;
@@ -19,7 +17,6 @@ public class BehaviorService extends BaseService {
     private final BehaviorMapper behaviorMapper;
 
     @Autowired
-
     public BehaviorService(ContractLogMapper logMapper, BehaviorMapper behaviorMapper) {
         super(logMapper);
         this.behaviorMapper = behaviorMapper;

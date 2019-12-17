@@ -21,6 +21,9 @@ public interface UserMapper {
     @Select("select * from user")
     List<User> selectAll();
 
+    @Select("select name from user where name like concat('%', #{query}, '%')")
+    List<String> fuzzyQuery(String query);
+
     @Insert("insert into user values (#{name}, #{password})")
     int insert(String name, String password);
 

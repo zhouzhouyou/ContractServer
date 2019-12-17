@@ -4,10 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import yuri.contract.server.service.AuthenticationService;
-import yuri.contract.server.util.annotation.NeedToken;
 import yuri.contract.server.util.response.ResponseFactory;
 
 import javax.servlet.http.HttpServletRequest;

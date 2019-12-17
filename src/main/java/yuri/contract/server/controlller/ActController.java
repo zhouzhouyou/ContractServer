@@ -5,11 +5,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import yuri.contract.server.model.Act;
+import yuri.contract.server.model.Role;
+import yuri.contract.server.model.User;
 import yuri.contract.server.service.ActService;
 import yuri.contract.server.util.annotation.NeedToken;
 import yuri.contract.server.util.response.ResponseFactory;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Api(tags = "用户角色控制")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/act")
 public class ActController extends BaseController {
     private final ActService actService;
 
@@ -31,59 +32,42 @@ public class ActController extends BaseController {
 
     @ApiOperation("更新用户角色")
     @CrossOrigin
-    @PostMapping(value = "/act/update")
+    @PostMapping("/update")
     @ResponseBody
     @NeedToken(function = NeedToken.UPDATE_USER)
     public ResponseEntity<String> updateAct(@RequestBody UpdateAct updateAct, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
-            return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
-        }
-        return actService.update(updateAct.username, updateAct.roles, getOperator());
+        if(bindingResult.hasErrors()) return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+        return actService.update(updateAct.username, updateAct.ids, getOperator());
     }
 
     @ApiOperation("查找用户角色")
     @CrossOrigin
-    @PostMapping(value = "/act/selectAct")
+    @PostMapping("/select")
     @ResponseBody
     @NeedToken(function = NeedToken.GRANT)
-    public ResponseEntity<List<Act>> sendQuery(@RequestBody SelectAct selectAct, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
-            return ResponseFactory.badRequest(null);
-        }
-        return actService.findRoleByName(selectAct.username, getOperator());
+    public ResponseEntity<List<Role>> selectUserRoles(@RequestBody UserName userName, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) return ResponseFactory.badRequest(null);
+        return actService.findRoleByName(userName.username);
     }
 
     @ApiOperation("模糊查找用户角色")
     @CrossOrigin
-    @PostMapping(value = "/act/fuzzyQuery")
+    @PostMapping("/fuzzyQuery")
     @ResponseBody
     @NeedToken(function = NeedToken.GRANT)
     public ResponseEntity<List<Act>> sendFuzzyQuery(@RequestBody Query query, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return ResponseFactory.badRequest(null);
         }
-        return actService.fuzzyQuery(query.query);
+        return actService.fuzzyQuery(query.content);
     }
-
-    @ApiOperation("查找指定用户角色")
-    @CrossOrigin
-    @PostMapping(value = "/act/filterSelect")
-    @ResponseBody
-    @NeedToken(function = NeedToken.GRANT)
-    public ResponseEntity<List<Act>> sendfilterSelect(@RequestBody SelectAct selectAct, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
-            return ResponseFactory.badRequest(null);
-        }
-        return actService.filterSelectAct(selectAct.username);
-    }
-
 
 
     @Data
     @ApiModel
     private static class UpdateAct {
         private String username;
-        private List<String> roles;
+        private List<Integer> ids;
     }
 
     @Data
@@ -92,13 +76,12 @@ public class ActController extends BaseController {
         /**
          * 关键字
          */
-        private String query;
+        private String content;
     }
 
     @Data
     @ApiModel
-    private static class SelectAct {
+    private static class UserName {
         private String username;
     }
-
 }

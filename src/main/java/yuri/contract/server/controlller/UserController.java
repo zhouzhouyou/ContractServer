@@ -152,6 +152,26 @@ public class UserController extends BaseController {
         return userService.resetPassword(operator, password.password);
     }
 
+    @ApiOperation("重置密码")
+    @CrossOrigin
+    @PostMapping(value = "/user/resetOthersPassword")
+    @ResponseBody
+    public ResponseEntity<String> resetOthersPassword(@RequestBody User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ResponseFactory.badRequest(bindingResult.getFieldError().getDefaultMessage());
+        String operator = getOperator();
+        return userService.resetOthersPassword(operator, user.getName(), user.getPassword());
+    }
+
+    @ApiOperation("模糊查询")
+    @CrossOrigin
+    @PostMapping("/user/fuzzyQuery")
+    @ResponseBody
+    public ResponseEntity<List<String>> fuzzyQuery(@RequestBody Name name, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return ResponseFactory.badRequest(null);
+        return userService.fuzzyQuery(name.name);
+    }
+
     @Data
     @ApiModel(description = "用户名")
     private static class Name {

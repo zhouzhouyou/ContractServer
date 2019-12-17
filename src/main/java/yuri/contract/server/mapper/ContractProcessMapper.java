@@ -1,11 +1,9 @@
 package yuri.contract.server.mapper;
 
-import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 import yuri.contract.server.model.ContractProcess;
 
-import java.sql.Date;
 import java.util.List;
 
 @Mapper
@@ -58,4 +56,7 @@ public interface ContractProcessMapper {
 
     @Delete("delete from contract_process")
     int deleteAll();
+
+    @Select("select count(*) from contract_process where type != -1 and state = 0 and userName =#{username}")
+    int hasAnyJob(String username);
 }

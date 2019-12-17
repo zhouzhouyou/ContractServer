@@ -32,4 +32,7 @@ public interface RoleMapper {
 
     @Delete("delete from role")
     int deleteAll();
+
+    @Select("select * from role where concat_ws(name, description) like concat('%', #{content}, '%')")
+    List<Role> fuzzyQuery(String content);
 }

@@ -215,8 +215,7 @@ CREATE TABLE contract
     end         date        not null,
     content     text        not null,
     userName    varchar(40),
-    foreign key (customerNum) REFERENCES customer (num) ON DELETE CASCADE,
-    foreign key (userName) REFERENCES user (name) ON DELETE NO ACTION
+    foreign key (customerNum) REFERENCES customer (num) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 CREATE TABLE contract_process
@@ -229,8 +228,7 @@ CREATE TABLE contract_process
     content     text,
     time        date,
     primary key (processNum),
-    foreign key (contractNum) REFERENCES contract (num) ON DELETE CASCADE,
-    foreign key (userName) REFERENCES user (name) ON DELETE CASCADE
+    foreign key (contractNum) REFERENCES contract (num) ON DELETE CASCADE
 );
 
 CREATE TABLE contract_state
@@ -247,8 +245,7 @@ CREATE TABLE contract_log
     id       integer primary key auto_increment,
     userName varchar(40),
     content  text,
-    time     datetime,
-    foreign key (userName) REFERENCES user (name) ON DELETE NO ACTION
+    time     datetime
 );
 
 CREATE TABLE contract_attachment

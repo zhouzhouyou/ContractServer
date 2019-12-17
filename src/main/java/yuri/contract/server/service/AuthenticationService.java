@@ -67,4 +67,14 @@ public class AuthenticationService {
 
         return ResponseFactory.success(functionNames);
     }
+
+    /**
+     * 获取角色的功能
+     *
+     * @param roleId 角色id
+     * @return 角色的功能
+     */
+    public ResponseEntity<List<String>> queryFunctionsByRoleId(Integer roleId) {
+        return ResponseFactory.success(behaviorMapper.selectByRole(roleId));
+    }
 }

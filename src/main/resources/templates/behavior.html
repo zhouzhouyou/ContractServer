@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Title</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>角色管理</title>
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/my-form.css" rel="stylesheet">
-    <link href="css/gijgo.min.css" rel="stylesheet">
     <style type="text/css">
         .clearfix:before, .clearfix:after {
             content: "";
@@ -25,252 +24,283 @@
     <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
     <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
     <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
-
     <script src="js/common.js" type="text/javascript"></script>
-    <script src="js/gijgo.min.js" type="text/javascript"></script>
-    <script src="js/messages.zh-cn.min.js" type="text/javascript"></script>
 </head>
-<body style="text-align: center">
+<body>
 <div id="header"></div>
-<div class="text-center">
+<div style="display: inline">
     <span class="clearfix" style="margin: 20px;">
-		<input autofocus class="form-control" id="content" placeholder="查询权限"
-               required style="float: left; width: 20%; margin-left: 20px; display: inline;"
-               type="text">
-		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button"
-                onclick="sendFuzzyQuery()">模糊查询</button>
-	</span>
-    <form>
-        <div class="form-group row">
-            <label class="col-form-label col-sm-1" style="display: inline">选择角色</label>
-            <div class="dropdown col-sm-2">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="userSelector" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">选择
-                </button>
-                <div class="dropdown-menu" id="users" aria-labelledby="dropdownMenuButton">
-                </div>
-            </div>
-
-            <div class="col-sm-1">
-                <button class="btn btn-primary form-control" onclick="sendFilterQuery();" type="button">查询权限</button>
-            </div>
-
-            <div class="col-sm-1">
-                <button class="btn btn-primary form-control" onclick="updateAct();" type="button">更新权限</button>
-            </div>
-
-            <!-- Modal -->
-            <div class="modal fade" id="updateActModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenterTitle">更新权限</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" id="mb">
-
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">返回</button>
-                            <button type="button" class="btn btn-primary" onclick="save();">保存</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </form>
+        <input autofocus class="form-control" id="fuzzyQuery" placeholder="查询角色"
+               required style="float: left; width: 20%; margin-left: 20px; display: inline;" type="text">
+        <button class="btn btn-primary" onclick="sendFuzzyQuery()"
+                style="float: left; margin-left: 20px;" type="button">模糊查询</button>
+        <button class="btn btn-primary" onclick="addRoleModal()"
+                style="float: left; margin-left: 20px;" type="button">新增角色</button>
+    </span>
 </div>
-
-<div class="text-center" style="margin-top: 50px;">
-    <table class="table table-hover" id="act_table" style=" margin-top: 20px; alignment: center">
+<div style="padding: 20px">
+    <table class="table">
         <thead>
         <tr>
+            <th scope="col">序号</th>
             <th scope="col">角色名</th>
-            <th scope="col">权限名</th>
-            <th scope="col">权限描述</th>
+            <th scope="col">角色描述</th>
+            <th scope="col">更改权限</th>
+            <th scope="col">删除角色</th>
         </tr>
         </thead>
-        <tbody id="actTableBody">
-        </tbody>
+        <tbody id="roleTableBody"></tbody>
     </table>
 </div>
-
+<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade modifyModal" data-backdrop="static"
+     id="roleModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">修改角色</div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label for="newRoleName" class="col-form-label col-sm-2">角色名</label>
+                        <input id="newRoleName" class="form-control col-sm-8"/>
+                    </div>
+                    <div class="form-group row">
+                        <label for="newRoleDesc" class="col-form-label col-sm-2">描述</label>
+                        <input id="newRoleDesc" class="form-control col-sm-8"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="addRole()" type="button">确定</button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade functionModal" data-backdrop="static"
+     id="functionModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="height: 50px;">
+                <h4 class="modal-title" id="user_modal_title"></h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="group_1" class="col-form-label col-sm-2">合同管理</label>
+                        <div aria-label="合同管理" class="btn-group mr-2 col-sm-8" id="group_1" role="group">
+                            <button class="btn btn-secondary" id="id_0" type="button">起草合同</button>
+                            <button class="btn btn-secondary" id="id_1" type="button">定稿合同</button>
+                            <button class="btn btn-secondary" id="id_2" type="button">查询合同</button>
+                            <button class="btn btn-secondary" id="id_3" type="button">删除合同</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_2" class="col-form-label col-sm-2">流程管理</label>
+                        <div aria-label="流程管理" class="btn-group mr-2 col-sm-8" id="group_2" role="group">
+                            <button class="btn btn-secondary" id="id_4" type="button">会签合同</button>
+                            <button class="btn btn-secondary" id="id_5" type="button">审批合同</button>
+                            <button class="btn btn-secondary" id="id_6" type="button">签订合同</button>
+                            <button class="btn btn-secondary" id="id_7" type="button">分配合同</button>
+                            <button class="btn btn-secondary" id="id_10" type="button">流程查询</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_3" class="col-form-label col-sm-2">用户管理</label>
+                        <div aria-label="用户管理" class="btn-group mr-2 col-sm-8" id="group_3" role="group">
+                            <button class="btn btn-secondary" id="id_11" type="button">新增用户</button>
+                            <button class="btn btn-secondary" id="id_12" type="button">编辑用户</button>
+                            <button class="btn btn-secondary" id="id_13" type="button">查询用户</button>
+                            <button class="btn btn-secondary" id="id_14" type="button">删除用户</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_4" class="col-form-label col-sm-2">角色管理</label>
+                        <div aria-label="角色管理" class="btn-group mr-2 col-sm-8" id="group_4" role="group">
+                            <button class="btn btn-secondary" id="id_15" type="button">新增角色</button>
+                            <button class="btn btn-secondary" id="id_16" type="button">编辑角色</button>
+                            <button class="btn btn-secondary" id="id_17" type="button">查询角色</button>
+                            <button class="btn btn-secondary" id="id_18" type="button">删除角色</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_5" class="col-form-label col-sm-2">权限管理</label>
+                        <div aria-label="权限管理" class="btn-group col-sm-8" id="group_5" role="group">
+                            <button class="btn btn-secondary" id="id_22" type="button">配置权限</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_5" class="col-form-label col-sm-2">客户管理</label>
+                        <div aria-label="客户管理" class="btn-group mr-2 col-sm-8" id="group_6" role="group">
+                            <button class="btn btn-secondary" id="id_23" type="button">新增客户</button>
+                            <button class="btn btn-secondary" id="id_24" type="button">编辑客户</button>
+                            <button class="btn btn-secondary" id="id_25" type="button">查询客户</button>
+                            <button class="btn btn-secondary" id="id_26" type="button">删除客户</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="resetModalBtn" onclick="updateFunctions()" type="button">更改</button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
-
 <script src="js/nav.js" type="text/javascript"></script>
-
 <script>
-    let manager;
-    let content;
-    let operator;
-    let actTableBody;
-    let userSelector;
-    let act_list = [];
-    let operatorSelected = false;
-    let users;
-    $(function () {
-        actTableBody = $("#actTableBody");
-        userSelector = $("#userSelector");
-        content = $("#content");
-        users = $("#users")
-        loadAct();
-        sendFuzzyQuery();
-    });
+    let roleTableBody;
+    let functionModal;
+    let roleModal;
+    let functionBtns = [];
+    let currentRole;
 
-    function sendFilterQuery() {
+    function addRoleModal() {
+        roleModal.modal();
+    }
+
+    function addRole() {
+        let newName = $("#newRoleName").val();
+        if (newName.length === 0) {
+            alert("请输入角色名");
+            return;
+        }
+        let newDesc = $("#newRoleDesc").val();
         $.ajax({
-            type: "POST",
-            url: "api/act/filterSelect",
-            data: JSON.stringify({
-                "username": operatorSelected ? userSelector.text() : '',
-            }),
-
+            type: 'POST',
+            url: 'api/role/insert',
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-
+            data: JSON.stringify({
+                "id":'',
+                "name":newName,
+                "description":newDesc
+            }),
             statusCode: {
-                200: (resultList) => loadActTable(resultList)
+                200: ()=>{
+                    alert("增加成功");
+                    refreshTable();
+                    roleModal.modal('hide');
+                    $("#newRoleName").val('');
+                    $("#newRoleDesc").val('');
+                }
             },
-
-            error: () => alert("未连接到网络，或者无权限")
+            error: () => alert("网络问题或者无权限")
         })
     }
 
-    function loadAct() {
-
+    function updateFunctions() {
         $.ajax({
-            type: "POST",
-            url: "/api/role/selectAll",
-
+            type: 'POST',
+            url: 'api/behavior/update',
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
             data: JSON.stringify({
-                "role": "all"
+                "nums": getSelectedBtns(),
+                "roleId": currentRole
             }),
-
             statusCode: {
-                200: (resultList) => addAct(resultList)
+                200: () => {
+                    alert("修改成功");
+                    functionModal.modal('hide');
+                }
             },
-
-            error: () => alert("未连接到网络，或者无权限")
+            error: () => alert("网络问题或者无权限")
         })
-
     }
 
-    function addAct(resultList) {
-        let def = $(`<a class="dropdown-item">选择</a>`);
-        def.click(() => userSelector.text("选择"));
-        users.append(def);
-        resultList.forEach(function (element) {
-            let a = $(`<a class="dropdown-item">${element}</a>`);
-            a.click(() => userSelector.text(element));
-            operatorSelected = true;
-            users.append(a);
+    function resetAllBtns() {
+        functionBtns.forEach((btn) => btn.removeClass("btn-primary").addClass("btn-secondary"));
+    }
+
+    function getSelectedBtns() {
+        let output = [];
+        functionBtns.forEach((btn) => {
+            if (btn.hasClass("btn-primary")) output.push(btn.attr('id').substring(3));
         });
+        return output;
+    }
+
+    function loadRoleTable(resultList) {
+        roleTableBody.empty();
+        resultList.forEach((result) => {
+            currentRole = result['id'];
+            let roleName = result['name'];
+            let tr = $(`<tr></tr>`);
+            roleTableBody.append(tr);
+            tr.append($(`<td>${currentRole}</td>`));
+            tr.append($(`<td>${roleName}</td>`));
+            tr.append($(`<td>${result['description']}</td>`));
+            let changeBehaviorTD = $(`<td><button class="btn btn-primary">更改</button></td>`);
+            changeBehaviorTD.click(function () {
+                $("#user_modal_title").text(roleName);
+                resetAllBtns();
+                $.ajax({
+                    type: 'POST',
+                    url: 'api/behavior/selectFunctions',
+                    headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                    data: JSON.stringify({
+                        "id": currentRole
+                    }),
+                    statusCode: {
+                        200: (resultList) => resultList.forEach((result) => $(`#id_${result}`).removeClass("btn-secondary").addClass("btn-primary"))
+                    },
+                    error: () => alert("网络问题或者无权限")
+                });
+                functionModal.modal();
+            });
+            tr.append(changeBehaviorTD);
+            let deleteTD = $(`<td><button class="btn btn-danger">删除</button></td>`);
+            deleteTD.click(function () {
+
+            });
+            tr.append(deleteTD);
+        })
+    }
+
+    function refreshTable() {
+        $.ajax({
+            type: 'POST',
+            url: 'api/role/selectAll',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (resultList) => loadRoleTable(resultList)
+            },
+            error: () => alert("网络问题或者无权限")
+        })
     }
 
     function sendFuzzyQuery() {
         $.ajax({
-            type: "POST",
-            url: "api/act/fuzzyQuery",
-            data: JSON.stringify({
-                "query": content.val()
-            }),
-
+            type: 'POST',
+            url: 'api/role/fuzzyQuery',
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-
+            data: JSON.stringify({
+                "content": $("#fuzzyQuery").val()
+            }),
             statusCode: {
-                200: (resultList) => loadActTable(resultList)
+                200: (resultList) => loadRoleTable(resultList)
             },
-
-            error: () => alert("未连接到网络，或者无权限")
+            error: () => alert("网络问题或者无权限")
         })
     }
 
+    $(function () {
+        changeActive(functionManagementNav);
 
+        roleTableBody = $("#roleTableBody");
+        functionModal = $("#functionModal");
+        roleModal = $("#roleModal");
+        for (let i = 0; i < 8; i++) functionBtns.push($(`#id_${i}`));
+        for (let i = 10; i < 19; i++) functionBtns.push($(`#id_${i}`));
+        for (let i = 22; i < 27; i++) functionBtns.push($(`#id_${i}`));
 
+        functionBtns.forEach((btn) => {
+            btn.click(function () {
+                if (btn.hasClass("btn-primary")) btn.removeClass("btn-primary").addClass("btn-secondary");
+                else btn.removeClass("btn-secondary").addClass("btn-primary");
+            })
+        });
 
-
-    function loadActTable(resultList) {
-        refreshTable(actTableBody, resultList, null, null);
-    }
-
-    function changeColor(t) {
-
-        if(t.hasClass('btn btn-primary')) {
-            t.attr('class', 'btn btn-secondary');
-            act_list.splice(act_list.indexOf(t.text()), 1);
-        }else {
-            t.attr('class', "btn btn-primary");
-            act_list.push(t.text());
-        }
-    }
-
-    function readAct(actList) {
-        $("#mb").empty();
-        for (var i = 0; i < actList.length; i++) {
-            str = "<button type=\"button\" class=\"btn btn-secondary\"  onclick=\"changeColor($(this));\" >" + actList[i] + "</button>";
-            $("#mb").append(str);
-        }
-
-    }
-
-    function updateAct() {
-
-        $("#mb").empty();
-        act_list = []
-
-        $('#updateActModal').modal('show');
-
-        $.ajax({
-            type: "POST",
-            url: "/api/function/selectAll",
-            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-            data: JSON.stringify({
-                "role": "all"
-            }),
-            statusCode: {
-                200: function(data){
-                    readAct(data)
-                },
-                error: () => alert("未连接到网络，或者无权限")}
-        })
-
-    }
-
-    function isChecked(cb) {
-        return cb.is(' :checked');
-    }
-
-    function checkedStatuses() {
-        return [isChecked(manager), isChecked(operator)];
-    }
-
-    function save() {
-        let userSelectText = userSelector.text();
-        let role = [];
-        for(var i = 0; i < act_list.length; i++) {
-            role.push(act_list[i]);
-        }
-        $.ajax({
-            type: "POST",
-            url: "/api/act/update",
-            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-            data: JSON.stringify({
-                "username": userSelectText,
-                "roles": role
-            }),
-            statusCode: {
-                200: () => {
-                    signModal.modal('hide');
-                    alert('更新成功');}
-            },
-            error: () => alert("未连接到网络，或者无权限")
-        })
-    }
-
+        refreshTable();
+    })
 </script>
-
 </html>

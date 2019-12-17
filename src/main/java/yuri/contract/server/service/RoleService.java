@@ -8,6 +8,7 @@ import yuri.contract.server.mapper.ActMapper;
 import yuri.contract.server.mapper.ContractLogMapper;
 import yuri.contract.server.mapper.RoleMapper;
 import yuri.contract.server.model.Act;
+import yuri.contract.server.model.Role;
 import yuri.contract.server.util.response.ResponseFactory;
 
 import java.util.List;
@@ -23,7 +24,18 @@ public class RoleService extends BaseService  {
         this.roleMapper = roleMapper;
     }
 
-    public ResponseEntity<List<String>> selectAll(String all) {
-        return ResponseFactory.success(roleMapper.selectAllName());
+    public ResponseEntity<List<Role>> selectAll() {
+        return ResponseFactory.success(roleMapper.selectAll());
+    }
+
+    public ResponseEntity<List<Role>> fuzzyQuery(String content) {
+        return ResponseFactory.success(roleMapper.fuzzyQuery(content));
+    }
+
+    public ResponseEntity<Integer> insert(String operator,  Role role) {
+        int count = roleMapper.insert(role.getName(), role.getDescription());
+        if (count == 0) return ResponseFactory.badRequest(null);
+        writeLog(operator, "创建了");
+        return ResponseFactory.success(count);
     }
 }

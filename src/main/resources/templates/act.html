@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Title</title>
+    <title>用户管理</title>
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/my-form.css" rel="stylesheet">
-    <link href="css/gijgo.min.css" rel="stylesheet">
     <style type="text/css">
         .clearfix:before, .clearfix:after {
             content: "";
@@ -25,247 +23,357 @@
     <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
     <script src="js/js.cookie-2.2.1.min.js" type="text/javascript"></script>
     <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
-
+    <script src="js/md5.js" type="text/javascript"></script>
     <script src="js/common.js" type="text/javascript"></script>
-    <script src="js/gijgo.min.js" type="text/javascript"></script>
-    <script src="js/messages.zh-cn.min.js" type="text/javascript"></script>
 </head>
-<body style="text-align: center">
+<body>
 <div id="header"></div>
-<div class="text-center">
+<div style="display: inline">
     <span class="clearfix" style="margin: 20px;">
-		<input autofocus class="form-control" id="content" placeholder="查询角色"
-               required style="float: left; width: 20%; margin-left: 20px; display: inline;"
-               type="text">
-		<button class="btn btn-primary" style="float: left; margin-left: 20px;" type="button"
-                onclick="sendFuzzyQuery()">模糊查询</button>
-	</span>
-    <form>
-        <div class="form-group row">
-            <label class="col-form-label col-sm-1" style="display: inline">选择用户</label>
-            <div class="dropdown col-sm-2">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="userSelector" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">选择
-                </button>
-                <div class="dropdown-menu" id="users" aria-labelledby="dropdownMenuButton">
-                </div>
-            </div>
-
-            <div class="col-sm-1">
-                <button class="btn btn-primary form-control" onclick="sendFilterQuery();" type="button">查询角色</button>
-            </div>
-
-            <div class="col-sm-1">
-                <button class="btn btn-primary form-control" onclick="updateAct();" type="button">更新角色</button>
-            </div>
-
-            <!-- Modal -->
-            <div class="modal fade" id="updateActModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenterTitle">更新角色</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" id="mb">
-
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">返回</button>
-                            <button type="button" class="btn btn-primary" onclick="save();">保存</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </form>
+        <input autofocus class="form-control" id="fuzzyQuery" placeholder="查询用户"
+               required style="float: left; width: 20%; margin-left: 20px; display: inline;" type="text">
+        <button class="btn btn-primary" onclick="sendFuzzyQuery()"
+                style="float: left; margin-left: 20px;" type="button">模糊查询</button>
+        <button class="btn btn-primary" onclick="addUser()"
+                style="float: left; margin-left: 20px;" type="button">新增用户</button>
+    </span>
 </div>
-
-<div class="text-center" style="margin-top: 50px;">
-    <table class="table table-hover" id="act_table" style=" margin-top: 20px; alignment: center">
+<div style="padding: 20px">
+    <table class="table">
         <thead>
         <tr>
             <th scope="col">用户名</th>
-            <th scope="col">角色名</th>
-            <th scope="col">角色描述</th>
+            <th scope="col">重置密码</th>
+            <th scope="col">修改角色</th>
+            <th scope="col">删除用户</th>
         </tr>
         </thead>
-        <tbody id="actTableBody">
-        </tbody>
+        <tbody id="userTableBody"></tbody>
     </table>
+</div>
+<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade userModal" data-backdrop="static"
+     id="userModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="height: 50px;">
+                <h4 class="modal-title" id="user_modal_title"></h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="username" style="display: inline">用户名</label>
+                        <div class="col-sm-8">
+                            <input class="form-control" id="username" maxlength="40"/>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="password" style="display: inline">密码</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" id="password" maxlength="32"/>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="password2" style="display: inline">确认密码</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" id="password2" maxlength="32"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="insertModalBtn" onclick="insertUser()" type="button">创建</button>
+                <button class="btn btn-danger" id="resetModalBtn" onclick="resetPassword()" type="button">更改</button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="failToSignUp">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button class="close" data-dismiss="modal" type="button">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-body">创建失败，也许存在同名账户</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade modifyModal" data-backdrop="static"
+     id="modifyModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">修改角色</div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="updateRoles()" type="button">更改</button>
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>
-
 <script src="js/nav.js" type="text/javascript"></script>
-
 <script>
-    let manager;
-    let content;
-    let operator;
-    let actTableBody;
-    let userSelector;
-    let act_list = [];
-    let operatorSelected = false;
-    let users;
-    $(function () {
-        actTableBody = $("#actTableBody");
-        userSelector = $("#userSelector");
-        content = $("#content");
-        users = $("#users")
-        loadUsers();
-        sendFuzzyQuery();
-    });
-
-    function sendFilterQuery() {
-        $.ajax({
-            type: "POST",
-            url: "api/act/filterSelect",
-            data: JSON.stringify({
-                "username": operatorSelected ? userSelector.text() : '',
-            }),
-
-            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-
-            statusCode: {
-                200: (resultList) => loadActTable(resultList)
-            },
-
-            error: () => alert("未连接到网络，或者无权限")
-        })
-    }
-
-    function loadUsers() {
-        $.ajax({
-            type: "GET",
-            url: "api/user/selectAll",
-
-            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-
-            statusCode: {
-                200: (resultList) => addUser(resultList)
-            },
-
-            error: () => alert("未连接到网络，或者无权限")
-        })
-
-    }
-
-    function addUser(resultList) {
-        let def = $(`<a class="dropdown-item">选择</a>`);
-        def.click(() => userSelector.text("选择"));
-        users.append(def);
-        resultList.forEach(function (element) {
-            let a = $(`<a class="dropdown-item">${element}</a>`);
-            a.click(() => userSelector.text(element));
-            operatorSelected = true;
-            users.append(a);
-        });
-    }
+    let userTableBody;
+    let userModal;
+    let user_modal_title;
+    let username;
+    let password;
+    let password2;
+    let currentUser;
+    let insertModalBtn;
+    let resetModalBtn;
+    let modalBody;
+    let modifyModal;
+    let fuzzyQuery;
 
     function sendFuzzyQuery() {
         $.ajax({
-            type: "POST",
-            url: "api/act/fuzzyQuery",
-            data: JSON.stringify({
-                "query": content.val()
-            }),
-
+            type: 'POST',
+            url: 'api/user/fuzzyQuery',
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-
+            data: JSON.stringify({
+                "name": fuzzyQuery.val()
+            }),
             statusCode: {
-                200: (resultList) => loadActTable(resultList)
+                200: (resultList) => loadTableData(resultList)
             },
-
-            error: () => alert("未连接到网络，或者无权限")
+            error: () => alert("权限不足")
         })
     }
 
-
-
-
-
-    function loadActTable(resultList) {
-        refreshTable(actTableBody, resultList, null, null);
-    }
-
-    function changeColor(t) {
-
-        if(t.hasClass('btn btn-primary')) {
-            t.attr('class', 'btn btn-secondary');
-            act_list.splice(act_list.indexOf(t.text()), 1);
-        }else {
-            t.attr('class', "btn btn-primary");
-            act_list.push(t.text());
-        }
-    }
-
-    function readAct(actList) {
-        $("#mb").empty();
-        for (var i = 0; i < actList.length; i++) {
-            str = "<button type=\"button\" class=\"btn btn-secondary\"  onclick=\"changeColor($(this));\" >" + actList[i] + "</button>";
-            $("#mb").append(str);
-        }
-
-    }
-
-    function updateAct() {
-
-        $("#mb").empty();
-        act_list = []
-
-        $('#updateActModal').modal('show');
-        $.ajax({
-            type: "POST",
-            url: "/api/role/selectAll",
-            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
-            data: JSON.stringify({
-                "role": "all"
-            }),
-            statusCode: {
-                200: function(data){
-                    readAct(data)
-                },
-            error: () => alert("未连接到网络，或者无权限")}
-        })
-
-    }
-
-    function isChecked(cb) {
-        return cb.is(' :checked');
-    }
-
-    function checkedStatuses() {
-        return [isChecked(manager), isChecked(operator)];
-    }
-
-    function save() {
-        let userSelectText = userSelector.text();
-        let role = [];
-        for(var i = 0; i < act_list.length; i++) {
-            role.push(act_list[i]);
+    function updateRoles() {
+        let roles = [];
+        let roleBtns = modalBody.children();
+        for (let i = 0; i < roleBtns.length; i++) {
+            if (roleBtns[i].className.indexOf("btn-primary") !== -1) roles.push(roleBtns[i].id.substring(3));
         }
         $.ajax({
-            type: "POST",
-            url: "/api/act/update",
+            type: 'POST',
+            url: '/api/act/update',
             headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
             data: JSON.stringify({
-                "username": userSelectText,
-                "roles": role
+                "ids": roles,
+                "username": currentUser
             }),
             statusCode: {
                 200: () => {
-                    signModal.modal('hide');
-                    alert('更新成功');}
-            },
-            error: () => alert("未连接到网络，或者无权限")
+                    alert('修改成功');
+                    modifyModal.modal('hide');
+                }
+            }
         })
     }
 
-</script>
+    function updateRolesModal() {
+        modalBody.empty();
+        $.ajax({
+            type: 'POST',
+            url: '/api/role/selectAll',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (resultList) => {
+                    resultList.forEach((result) => {
+                        let btn = $(`<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" id="id_${result['id']}">${result['name']}</button>`);
+                        btn.click(() => {
+                            if (btn.hasClass("btn-secondary")) btn.removeClass("btn-secondary").addClass("btn-primary");
+                            else btn.removeClass("btn-primary").addClass("btn-secondary");
+                        });
+                        modalBody.append(btn);
+                    })
+                }
+            },
+            error: () => alert('请检查权限或者token已经过期')
+        });
+        $.ajax({
+            type: 'POST',
+            url: '/api/act/select',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "username": currentUser
+            }),
+            statusCode: {
+                200: (resultList) => {
+                    resultList.forEach((role) => $(`#id_${role['id']}`).removeClass("btn-secondary").addClass("btn-primary"))
+                }
+            },
+            error: () => alert('请检查权限或者token已经过期')
+        });
+        modifyModal.modal();
+    }
 
+    function setNameInputDisable(value) {
+        username.attr("disabled", value);
+    }
+
+    function addUser() {
+        setNameInputDisable(false);
+        username.val('');
+        user_modal_title.val('');
+        insertModalBtn.show();
+        resetModalBtn.hide();
+        userModal.modal();
+    }
+
+    function insertUser() {
+        let usernameVal = username.val();
+        if (usernameVal.length === 0) {
+            alert("请输入用户名");
+            return;
+        }
+        let pVal = password.val();
+        if (pVal.length === 0) {
+            alert("请输入密码");
+            return;
+        }
+        let p2Val = password2.val();
+        if (p2Val.length === 0) {
+            alert("请输入确认密码");
+            return;
+        }
+        if (pVal !== p2Val) {
+            alert("两次密码不一致");
+            return;
+        }
+        $.ajax({
+            type: "PUT",
+            url: "api/user/insert",
+            data: JSON.stringify({
+                "name": usernameVal,
+                "password": getMd5(pVal)
+            }),
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: () => {
+                    alert("创建成功");
+                    userModal.modal('hide');
+                    refreshTable()
+                }
+            },
+            error: () => $("#failToSignUp").modal()
+        })
+    }
+
+    function resetPassword() {
+        let pVal = password.val();
+        if (pVal.length === 0) {
+            alert("请输入密码");
+            return;
+        }
+        let p2Val = password2.val();
+        if (p2Val.length === 0) {
+            alert("请输入确认密码");
+            return;
+        }
+        if (pVal !== p2Val) {
+            alert("两次密码不一致");
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/api/user/resetOthersPassword',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            data: JSON.stringify({
+                "name": currentUser,
+                "password": getMd5(pVal)
+            }),
+            statusCode: {
+                200: () => {
+                    alert("重置成功");
+                    userModal.modal('hide');
+                }
+            },
+            error: () => alert("这居然也能失败？")
+        });
+    }
+
+    function loadTableData(resultList) {
+        userTableBody.empty();
+        resultList.forEach((result) => {
+            let tr = $(`<tr></tr>`);
+            userTableBody.append(tr);
+            let nameTD = $(`<td>${result}</td>`);
+            tr.append(nameTD);
+            let resetPasswordTD = $(`<td><button class="btn btn-danger">重置密码</button></td>`);
+            resetPasswordTD.click(() => {
+                currentUser = result;
+                username.val(currentUser);
+                setNameInputDisable(true);
+                insertModalBtn.hide();
+                resetModalBtn.show();
+                userModal.modal();
+            });
+            tr.append(resetPasswordTD);
+            let updateRoleTD = $(`<td><button class="btn btn-primary">修改角色</button></td>`);
+            updateRoleTD.click(() => {
+                currentUser = result;
+                updateRolesModal();
+            });
+            tr.append(updateRoleTD);
+            let deleteTD = $(`<td><button class="btn btn-danger">删除用户</button></td>`);
+            deleteTD.click(() => {
+                currentUser = result;
+                if (confirm(`您确定要删除用户${currentUser}吗？`)) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/user/delete',
+                        headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+                        data: JSON.stringify({
+                            "name": currentUser
+                        }),
+                        statusCode: {
+                            200: () => {
+                                alert(`您已经成功地送${currentUser}去见上帝了`);
+                                refreshTable();
+                            },
+                            400: () => alert(`他还有没做完的事情`)
+                        },
+                        error: () => alert(`一次失败的尝试~`)
+                    })
+                }
+            });
+            tr.append(deleteTD);
+        })
+    }
+
+    function refreshTable() {
+        $.ajax({
+            type: 'GET',
+            url: '/api/user/selectAll',
+            headers: {'Content-Type': 'application/json;charset=utf8', 'token': getToken()},
+            statusCode: {
+                200: (resultList) => loadTableData(resultList)
+            },
+            error: () => alert("权限不足")
+        })
+    }
+
+
+    $(function () {
+        changeActive(functionManagementNav);
+
+        userTableBody = $("#userTableBody");
+        userModal = $("#userModal");
+        user_modal_title = $("#user_modal_title");
+        username = $("#username");
+        password = $("#password");
+        password2 = $("#password2");
+        insertModalBtn = $("#insertModalBtn");
+        resetModalBtn = $("#resetModalBtn");
+        modalBody = $("#modalBody");
+        modifyModal = $("#modifyModal");
+        fuzzyQuery = $("#fuzzyQuery");
+
+        refreshTable();
+    })
+</script>
 </html>
