@@ -60,7 +60,7 @@ public class ContractController extends BaseController {
     @CrossOrigin
     @PostMapping(value = "/select")
     @ResponseBody
-    @NeedToken(function = NeedToken.SELECT_CONTRACT)
+    @NeedToken(function = NeedToken.SELECT_PROCESS)
     public ResponseEntity<DetailContractMessage> selectContract(@RequestBody ContractNum contractNum, BindingResult bindingResult) {
         String operator = getOperator();
         if (bindingResult.hasErrors())

@@ -1,26 +1,27 @@
 package yuri.contract.server.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import yuri.contract.server.mapper.*;
 import yuri.contract.server.model.*;
+import yuri.contract.server.model.DetailContractMessage.Message;
+import yuri.contract.server.model.PreviousProcessMessage.PreviousMessage;
 import yuri.contract.server.model.util.OperationState;
 import yuri.contract.server.model.util.OperationType;
 import yuri.contract.server.model.util.Status;
 import yuri.contract.server.util.response.ResponseFactory;
-import yuri.contract.server.model.DetailContractMessage.Message;
-import yuri.contract.server.model.PreviousProcessMessage.PreviousMessage;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-
+@Slf4j
 @Service
 @Component
 public class ContractService extends BaseService {
@@ -142,6 +143,7 @@ public class ContractService extends BaseService {
 //    }
 
     public ResponseEntity<String> doAssignJob(String operator, List<List<String>> lists, int contractNum) {
+        log.info("开始分配");
         var countersigns = lists.get(0);
         var reviews = lists.get(1);
         var signs = lists.get(2);
@@ -155,6 +157,7 @@ public class ContractService extends BaseService {
                     OperationType.ASSIGN.getValue(), operator);
             writeLog(operator, "分配了 " + countersignUser + " 来会签 " + contractNum + " 合同");
         });
+        log.info("会签分配");
         reviews.forEach(reviewUser -> {
             processMapper.insert(contractNum, OperationType.REVIEW.getValue(),
                     OperationState.UNFINISHED.getValue(), reviewUser, "");
@@ -164,6 +167,7 @@ public class ContractService extends BaseService {
                     OperationType.ASSIGN.getValue(), operator);
             writeLog(operator, "分配了 " + reviewUser + " 来审核 " + contractNum + " 合同");
         });
+        log.info("审核分配");
         signs.forEach(signUser -> {
             processMapper.insert(contractNum, OperationType.SIGN.getValue(),
                     OperationState.UNFINISHED.getValue(), signUser, "");
@@ -173,6 +177,7 @@ public class ContractService extends BaseService {
                     OperationType.ASSIGN.getValue(), operator);
             writeLog(operator, "分配了 " + signUser + " 来签订 " + contractNum + " 合同");
         });
+        log.info("签订分配");
         stateMapper.insert(contractNum, Status.ASSIGN.getValue());
         writeLog(operator,"完成了分配工作");
         return ResponseFactory.success("assign job done.");
@@ -460,7 +465,7 @@ public class ContractService extends BaseService {
                 result = "已会签";
                 break;
             case 4:
-                if (processMapper.getUnfinishedOrDeniedProcess(2, contractNum) != 0)
+                if (processMapper.getDenyCount(contractNum) != 0)
                     result = "已否决";
                 else
                     result = "已定稿";
@@ -488,8 +493,8 @@ public class ContractService extends BaseService {
         List<Message> signers = new ArrayList<>();
         //lists.add(drafter);
         //lists.add(assigner);
-        lists.add(finalizer);
         lists.add(counterSigners);
+        lists.add(finalizer);
         lists.add(reviewers);
         lists.add(signers);
 
@@ -498,12 +503,15 @@ public class ContractService extends BaseService {
 //        if (stateMapper.getContractStatus(contractNum) == 1) {
 //            assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "未完成")));}
         if (stateMapper.getContractStatus(contractNum) == 2) {
-            List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
+            //List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
+            List<String> finishCountersign = processMapper.selectOperatorWithState(contractNum,0,1);
+            List<String> unfinishedCountersign = processMapper.selectOperatorWithState(contractNum,0,0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
             List<String> signOperator = processMapper.selectOperator(contractNum, 3);
             //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
-            countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "未完成")));
+            finishCountersign.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
+            unfinishedCountersign.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "未完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "未完成")));
             reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "未完成")));
             signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
@@ -519,15 +527,18 @@ public class ContractService extends BaseService {
             reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "未完成")));
             signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 4) {
-            if (processMapper.getUnfinishedOrDeniedProcess(2, contractNum) == 0) {
+            if (processMapper.getDenyCount(contractNum) == 0) {
                 List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
                 List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
-                List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
+                //List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
+                List<String> finishReview = processMapper.selectOperatorWithState(contractNum,2,1);
+                List<String> unfinishedReview = processMapper.selectOperatorWithState(contractNum,2,0);
                 List<String> signOperator = processMapper.selectOperator(contractNum, 3);
                 //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
                 countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
                 finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
-                reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "未完成")));
+                finishReview.forEach(review -> reviewers.add(new Message(review, "审核", "已完成")));
+                unfinishedReview.forEach(review -> reviewers.add(new Message(review, "审核", "未完成")));
                 signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
             } else {
                 List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
@@ -541,19 +552,22 @@ public class ContractService extends BaseService {
                         if (review.equals(reject))
                             reviewers.add(new Message(review, "审核", "已否决"));
                         else
-                            reviewers.add(new Message(review, "审核", "已完成"));
+                            reviewers.add(new Message(review, "审核", "未完成"));
                 }
             }
         } else if (stateMapper.getContractStatus(contractNum) == 5) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
             List<String> reviewOperator = processMapper.selectOperator(contractNum, 2);
-            List<String> signOperator = processMapper.selectOperator(contractNum, 3);
+            List<String> finishSign = processMapper.selectOperatorWithState(contractNum,3,1);
+            List<String> unfinishedSign = processMapper.selectOperatorWithState(contractNum,3,0);
+           //List<String> signOperator = processMapper.selectOperator(contractNum, 3);
             //assignOperator.forEach(assign -> assigner.add(new Message(assign, "分配", "已完成")));
             countersignOperator.forEach(countersign -> counterSigners.add(new Message(countersign, "会签", "已完成")));
             finalizeOperator.forEach(finalize -> finalizer.add(new Message(finalize, "定稿", "已完成")));
             reviewOperator.forEach(review -> reviewers.add(new Message(review, "审核", "已完成")));
-            signOperator.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
+            finishSign.forEach(sign -> signers.add(new Message(sign, "签订", "已完成")));
+            unfinishedSign.forEach(sign -> signers.add(new Message(sign, "签订", "未完成")));
         } else if (stateMapper.getContractStatus(contractNum) == 6) {
             List<String> countersignOperator = processMapper.selectOperator(contractNum, 0);
             List<String> finalizeOperator = processMapper.selectOperator(contractNum, 1);
