@@ -109,6 +109,17 @@ public class ContractController extends BaseController {
         return contractService.uploadFile(file);
     }
 
+    @ApiOperation("下载附件")
+    @CrossOrigin
+    @PostMapping(value = "/attachment/download")
+    @ResponseBody
+    public ResponseEntity<String> downloadFile(@RequestBody ContractNum contractNum ,BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseFactory.badRequest(null);
+        return contractService.downloadFile(contractNum.contractNum);
+
+    }
+
     /*@ApiOperation("添加附件")
     @CrossOrigin
     @PutMapping(value = "/attachment/add")

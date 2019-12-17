@@ -2,6 +2,7 @@ package yuri.contract.server.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import yuri.contract.server.model.DetailContractMessage.Message;
 import yuri.contract.server.model.PreviousProcessMessage.PreviousMessage;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -78,6 +80,20 @@ public class ContractService extends BaseService {
             return ResponseFactory.badRequest(e.toString());
         }
         return ResponseFactory.success(String.format("{\"finalName\":\"%s\"}", descFile.getName()));
+    }
+
+    public ResponseEntity<String> downloadFile(int contractNum){
+        String basePath = System.getProperty("user.dir") + "/attachment";
+        String attachmentName = attachmentMapper.getAttachmentName(contractNum);
+       // String type = attachmentMapper.getAttachmentType(contractNum);
+        if(attachmentName == null||attachmentName.length() == 0)
+            return ResponseFactory.success(null);
+        File originFile = new File(basePath + File.separator + attachmentName);
+        if(!originFile.exists())
+            return ResponseFactory.success(null);
+        //MultipartFile file = new MockMultipartFile(attachmentName,new FileInputStream(originFile));
+        return ResponseFactory.success(originFile.getName());
+
     }
 
 //    public ResponseEntity<String> deleteContractByNum(String operator, String contractNum) {
@@ -332,6 +348,11 @@ public class ContractService extends BaseService {
 
     public ResponseEntity<String> deleteContract(String operator, int contractNum) {
         int count = contractMapper.delete(contractNum);
+        String basePath = System.getProperty("user.dir") + "/attachment";
+        String attachmentName = attachmentMapper.getAttachmentName(contractNum);
+        File file = new File(basePath + File.separator + attachmentName);
+        file.delete();
+
         if (count == 0)
             return ResponseFactory.badRequest("fail to delete contract.");
         writeLog(operator, "删除合同: " + contractNum);
